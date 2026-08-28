@@ -1,3 +1,1434 @@
 ---
-title: Mathematical Statistics (KAM/NMAST)
+title: "Mathematical Statistics (KAM/NMAST)"
+description: "Complete course materials for advanced mathematical statistics and data analysis"
+template: doc
 ---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+# Mathematical Statistics (KAM/NMAST)
+
+Welcome to the comprehensive course documentation for Mathematical Statistics. This course builds upon fundamental probability theory and extends into practical statistical methods used in real-world data analysis, from descriptive statistics to advanced multivariate techniques.
+
+## 📑 Table of Contents
+
+### Course Overview
+- [Course Objectives](#course-objectives)
+- [Assessment & Credit Requirements](#assessment--credit-requirements)
+- [Examination Structure](#examination-structure)
+- [Schedule](#schedule)
+
+### Lecture Materials
+1. [Week 1: Probability Foundations](#week-1-probability-foundations)
+2. [Week 2: Random Variables and Distributions](#week-2-random-variables-and-distributions)
+3. [Week 3: Descriptive Statistics](#week-3-descriptive-statistics)
+4. [Week 4: Data Visualization and Transformation](#week-4-data-visualization-and-transformation)
+5. [Week 5: Bivariate Statistics and Correlation](#week-5-bivariate-statistics-and-correlation)
+6. [Week 6: Goodness-of-Fit and Normality Tests](#week-6-goodness-of-fit-and-normality-tests)
+7. [Week 7: Nonparametric Tests](#week-7-nonparametric-tests)
+8. [Week 8: Price Indices and Time Series](#week-8-price-indices-and-time-series)
+9. [Week 9: Time Series Analysis](#week-9-time-series-analysis)
+10. [Week 10: Linear Regression](#week-10-linear-regression)
+11. [Week 11: Nonlinear and Orthogonal Regression](#week-11-nonlinear-and-orthogonal-regression)
+12. [Week 12: ANOVA and Experimental Design](#week-12-anova-and-experimental-design)
+13. [Week 13: Multivariate Methods](#week-13-multivariate-methods)
+
+### Assignments & Exam
+- [Semester Project Requirements](#semester-project-requirements)
+- [Code Review Guide](#code-review-guide)
+- [Exam Preparation](#exam-preparation)
+
+---
+
+## Course Overview
+
+### Course Objectives
+
+By the end of this course, students will be able to:
+
+<span class="badge">Core</span> Understand and apply fundamental probability theory and mathematical statistics concepts
+
+<span class="badge info">Data</span> Perform descriptive and inferential statistical analyses on real-world datasets
+
+<span class="badge warn">Modeling</span> Build and interpret regression models, including linear, nonlinear, and orthogonal approaches
+
+<span class="badge">Testing</span> Apply parametric and nonparametric hypothesis tests appropriately
+
+<span class="badge danger">Advanced</span> Implement multivariate statistical techniques including PCA, factor analysis, and clustering
+
+### Assessment & Credit Requirements
+
+<div class="exercise-box">
+
+<strong>📋 To receive credit (zápočet), students must:</strong>
+
+- Submit **one semester project** demonstrating application of statistical methods to a real dataset
+- Write a **formal mathematical/statistical report** in proper academic format
+- Maintain **active participation** in practical sessions (cvičení)
+- Have **no more than three absences** during the semester
+
+**Project Deliverables:**
+- Data analysis report (10-15 pages)
+- Source code with reproducible analysis
+- Presentation of findings (5-10 minutes)
+
+</div>
+
+### Examination Structure
+
+The exam consists of two parts:
+
+| Component | Weight | Description |
+|-----------|--------|-------------|
+| **Written Exam** | 60% | Theoretical questions and practical problems covering all course topics |
+| **Oral Exam** | 40% | Defense of semester project and discussion of selected topics |
+
+**Passing Criteria:**
+- Minimum 50% in the written exam
+- Successful defense of the semester project
+- Combined score ≥ 60%
+
+### Schedule
+
+| Week | Lecture Topic | Exercise Focus |
+|------|---------------|----------------|
+| 1 | Probability Foundations | Probability space exercises |
+| 2 | Random Variables and Distributions | Distribution calculations |
+| 3 | Descriptive Statistics | Data summarization |
+| 4 | Data Visualization | Creating histograms, boxplots |
+| 5 | Bivariate Statistics | Correlation analysis |
+| 6 | Goodness-of-Fit Tests | Normality testing |
+| 7 | Nonparametric Tests | Wilcoxon, Kruskal-Wallis |
+| 8 | Price Indices | Index calculations |
+| 9 | Time Series Analysis | Moving averages, forecasting |
+| 10 | Linear Regression | OLS implementation |
+| 11 | Nonlinear Regression | Curve fitting |
+| 12 | ANOVA | Design of experiments |
+| 13 | Multivariate Methods | PCA and clustering |
+
+---
+
+## Week 1: Probability Foundations
+
+This week reviews and deepens understanding of probability theory, establishing the rigorous mathematical foundation for all subsequent statistical methods.
+
+### Kolmogorov Probability Space
+
+A probability space is a triple `(Ω, ℱ, P)` where:
+
+- **Ω** (sample space) - set of all possible outcomes
+- **ℱ** (event space) - σ-algebra of subsets of Ω
+- **P** (probability measure) - function `P: ℱ → [0,1]` satisfying:
+  1. `P(Ω) = 1`
+  2. For disjoint `A₁, A₂, ...`, `P(∪Aᵢ) = ΣP(Aᵢ)`
+
+```python
+# Example: Tossing two dice - building sample space
+import itertools
+
+# Sample space for two dice
+Ω = [(i, j) for i in range(1, 7) for j in range(1, 7)]
+
+# Event: sum equals 7
+event_A = [outcome for outcome in Ω if sum(outcome) == 7]
+
+# Probability
+P_A = len(event_A) / len(Ω)
+print(f"P(sum=7) = {P_A}")  # 6/36 = 1/6
+```
+
+### Conditional Probability and Independence
+
+For events A and B with P(B) > 0:
+
+```
+P(A|B) = P(A∩B) / P(B)
+```
+
+Events A and B are independent iff:
+```
+P(A∩B) = P(A) · P(B)
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: Three Events Problem</strong>
+
+Given three events A, B, C in a probability space. Prove or disprove: If A is independent of B and A is independent of C, then A is independent of B∩C.
+
+**Requirements:**
+1. Provide a formal proof or counterexample
+2. Implement a simulation in Python to test your conclusion
+3. Discuss the implications for real-world applications
+
+```python
+# Hint: Start by writing a function to check independence
+def are_independent(P_A, P_B, P_AB):
+    return P_AB == P_A * P_B
+```
+
+</div>
+
+---
+
+## Week 2: Random Variables and Distributions
+
+Random variables formalize the mapping from outcomes to numerical values. This week covers univariate and multivariate distributions.
+
+### Distribution Functions
+
+The **cumulative distribution function (CDF)** of random variable X:
+
+```
+F(x) = P(X ≤ x) = P({ω: X(ω) ≤ x})
+```
+
+For continuous variables, the **probability density function (PDF)**:
+```
+f(x) = F'(x)
+```
+
+### Important Distributions
+
+| Distribution | Parameters | Support | Applications |
+|--------------|------------|---------|--------------|
+| Normal | μ, σ² | ℝ | Natural phenomena, errors |
+| Binomial | n, p | {0,...,n} | Count of successes |
+| Poisson | λ | ℕ₀ | Rare events, counts |
+| Exponential | λ | ℝ⁺ | Waiting times |
+| Chi-squared | k | ℝ⁺ | Variance estimation |
+
+```python
+import numpy as np
+from scipy import stats
+
+# Generate normal distribution samples
+X = np.random.normal(loc=0, scale=1, size=1000)
+
+# Empirical vs theoretical CDF comparison
+x_vals = np.linspace(-3, 3, 100)
+emp_cdf = [np.mean(X <= x) for x in x_vals]
+theoretical_cdf = stats.norm.cdf(x_vals)
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: Distribution Identification</strong>
+
+You are given a sample of data (simulated below). Determine the most likely distribution family and estimate its parameters.
+
+```python
+# Given sample data
+data = [2.3, 2.8, 3.1, 2.5, 2.9, 3.2, 2.7, 2.4, 3.0, 2.6,
+        2.8, 3.3, 2.5, 2.9, 3.1, 2.4, 2.7, 3.0, 2.6, 2.8]
+```
+
+**Tasks:**
+1. Plot the histogram and Q-Q plot
+2. Fit normal, exponential, and chi-squared distributions
+3. Use goodness-of-fit tests to select the best model
+4. Provide a written justification for your choice
+
+</div>
+
+---
+
+## Week 3: Descriptive Statistics
+
+Descriptive statistics summarize and describe the main features of a dataset.
+
+### Statistical Ensemble
+
+A **statistical ensemble** (statistický soubor) is a collection of statistical units. We distinguish between:
+- **Population**: All units of interest
+- **Sample**: A subset of the population
+
+### Numerical Characteristics
+
+**Measures of Central Tendency:**
+- Mean: `μ = (1/n) Σ xᵢ`
+- Median: middle value when sorted
+- Mode: most frequent value
+
+**Measures of Dispersion:**
+- Variance: `σ² = (1/n) Σ (xᵢ - μ)²`
+- Standard deviation: `σ = √σ²`
+- Range: `max - min`
+- Interquartile range (IQR): `Q₃ - Q₁`
+
+**Measures of Shape:**
+- Skewness: asymmetry
+- Kurtosis: tail heaviness
+
+```python
+import numpy as np
+from scipy import stats
+
+# Sample data
+data = np.array([1.5, 2.1, 2.3, 2.5, 2.7, 2.8, 3.0, 3.5, 4.2, 5.1])
+
+# Basic statistics
+mean = np.mean(data)
+median = np.median(data)
+variance = np.var(data, ddof=1)  # sample variance
+std_dev = np.std(data, ddof=1)
+skewness = stats.skew(data)
+kurtosis = stats.kurtosis(data)
+
+print(f"Mean: {mean:.2f}, Median: {median:.2f}")
+print(f"Variance: {variance:.2f}, Std Dev: {std_dev:.2f}")
+print(f"Skewness: {skewness:.2f}, Kurtosis: {kurtosis:.2f}")
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: Complete Data Analysis</strong>
+
+You have collected salary data (in thousands CZK) from 50 employees:
+
+```python
+salaries = np.random.normal(45, 12, 50)  # Simulated data
+```
+
+**Tasks:**
+1. Calculate all measures of central tendency and dispersion
+2. Identify outliers using the IQR method
+3. Determine whether the data is normally distributed
+4. Create a professional summary table of descriptive statistics
+5. Interpret your findings in a business context
+
+</div>
+
+---
+
+## Week 4: Data Visualization and Transformation
+
+Effective visualization is crucial for understanding and communicating statistical findings.
+
+### Histogram Construction
+
+**Steps for constructing a histogram:**
+1. Determine the number of bins (Sturges' rule: `k = 1 + 3.322 log₁₀(n)`)
+2. Calculate bin width: `h = (max - min) / k`
+3. Count frequencies in each bin
+4. Plot frequencies (or relative frequencies)
+
+### Boxplot (Box-and-Whisker Plot)
+
+A boxplot displays the five-number summary:
+- Minimum (or lower whisker)
+- First quartile (Q₁)
+- Median (Q₂)
+- Third quartile (Q₃)
+- Maximum (or upper whisker)
+
+**Outliers** are points beyond:
+- Lower bound: `Q₁ - 1.5 × IQR`
+- Upper bound: `Q₃ + 1.5 × IQR`
+
+```python
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Create histogram and boxplot side by side
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4))
+
+# Histogram
+ax1.hist(data, bins='auto', edgecolor='black')
+ax1.set_title('Histogram')
+ax1.set_xlabel('Value')
+ax1.set_ylabel('Frequency')
+
+# Boxplot
+ax2.boxplot(data)
+ax2.set_title('Boxplot')
+ax2.set_ylabel('Value')
+
+plt.show()
+```
+
+### Galton's Ogive
+
+The **ogive** (Galtonova ogiva) is a cumulative frequency curve that helps visualize the distribution's cumulative nature.
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: Data Visualization Portfolio</strong>
+
+Using the salary data from Week 3:
+
+1. Create a professional histogram with appropriate bin selection
+2. Construct a boxplot and identify outliers
+3. Draw a cumulative distribution curve (ogive)
+4. Create a Q-Q plot to assess normality
+5. Write a brief commentary explaining what each visualization reveals
+
+</div>
+
+---
+
+## Week 5: Bivariate Statistics and Correlation
+
+When analyzing relationships between two variables, we need specialized tools.
+
+### Contingency Tables
+
+A **contingency table** (četnostní tabulka) displays the frequency distribution of two categorical variables.
+
+| | Category B₁ | Category B₂ | Total |
+|---|---|---|---|
+| Category A₁ | n₁₁ | n₁₂ | n₁• |
+| Category A₂ | n₂₁ | n₂₂ | n₂• |
+| Total | n•₁ | n•₂ | n•• |
+
+### Correlation Measures
+
+**Pearson Correlation Coefficient:**
+```
+r = Σ(xᵢ - x̄)(yᵢ - ȳ) / √[Σ(xᵢ - x̄)² · Σ(yᵢ - ȳ)²]
+```
+
+**Spearman Rank Correlation** - nonparametric alternative based on ranks.
+
+**Kendall's Tau** - another nonparametric measure of association.
+
+### Variance-Covariance Matrix
+
+For a vector X = (X₁, X₂, ..., Xₚ):
+
+```
+Σ = [Cov(Xᵢ, Xⱼ)]
+```
+
+Where `Cov(Xᵢ, Xⱼ) = E[(Xᵢ - μᵢ)(Xⱼ - μⱼ)]`
+
+```python
+import numpy as np
+import pandas as pd
+
+# Create correlated data
+np.random.seed(42)
+X = np.random.normal(0, 1, 100)
+Y = 0.7 * X + np.random.normal(0, 0.3, 100)
+
+# Correlation matrix
+data = pd.DataFrame({'X': X, 'Y': Y})
+correlation_matrix = data.corr()
+
+print("Correlation Matrix:")
+print(correlation_matrix)
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: Correlation Analysis</strong>
+
+Given a dataset with variables: age, years of education, income, and job satisfaction score.
+
+```python
+# Simulated data
+n = 200
+age = np.random.uniform(20, 65, n)
+education = np.random.randint(8, 20, n)
+income = 15000 + 500 * education + 100 * age + np.random.normal(0, 5000, n)
+satisfaction = 3 + 0.02 * age + 0.1 * education + np.random.normal(0, 0.5, n)
+```
+
+**Tasks:**
+1. Create a correlation matrix
+2. Interpret the relationships
+3. Identify which variables are most strongly correlated
+4. Discuss possible causal relationships (or lack thereof)
+5. Create a scatterplot matrix
+
+</div>
+
+---
+
+## Week 6: Goodness-of-Fit and Normality Tests
+
+Testing whether data follows a specific distribution is crucial for many statistical procedures.
+
+### Chi-Square Goodness-of-Fit Test
+
+Tests whether observed frequencies match expected frequencies from a theoretical distribution.
+
+**Test Statistic:**
+```
+χ² = Σ (Oᵢ - Eᵢ)² / Eᵢ
+```
+
+**Degrees of freedom:** `df = k - 1 - m` where:
+- k = number of categories
+- m = number of estimated parameters
+
+### Tests of Normality
+
+**Shapiro-Wilk Test:**
+- Best for small to medium samples
+- H₀: data comes from a normal distribution
+
+**Anderson-Darling Test:**
+- More sensitive to deviations in tails
+- Used in many statistical packages
+
+**Kolmogorov-Smirnov Test:**
+- Compares empirical CDF to theoretical CDF
+- Can be used for any continuous distribution
+
+```python
+from scipy import stats
+
+# Test for normality
+data = np.random.normal(0, 1, 100)
+
+# Shapiro-Wilk test
+stat, p_value = stats.shapiro(data)
+print(f"Shapiro-Wilk: statistic={stat:.3f}, p-value={p_value:.3f}")
+
+# Anderson-Darling test
+result = stats.anderson(data, dist='norm')
+print(f"Anderson-Darling: statistic={result.statistic:.3f}")
+
+# Kolmogorov-Smirnov test
+stat, p_value = stats.kstest(data, 'norm')
+print(f"K-S test: statistic={stat:.3f}, p-value={p_value:.3f}")
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: Comprehensive Normality Assessment</strong>
+
+You have collected 150 measurements of a manufacturing process:
+
+```python
+measurements = np.random.exponential(2, 150)  # Not normal!
+```
+
+**Tasks:**
+1. Apply all three normality tests
+2. Create visual diagnostics (histogram, Q-Q plot)
+3. Determine if a transformation might help achieve normality
+4. Try log transformation and re-test
+5. Write a conclusion about whether the process is normally distributed
+
+</div>
+
+---
+
+## Week 7: Nonparametric Tests
+
+Nonparametric tests don't assume a specific distribution, making them robust for real-world data.
+
+### Sign Test
+
+Simple test comparing matched pairs. Count positive vs. negative differences.
+
+**Test statistic:** Number of positive signs
+**H₀:** Median difference = 0
+
+### Wilcoxon Signed-Rank Test
+
+More powerful than the sign test as it considers the magnitude of differences.
+
+**Steps:**
+1. Calculate differences Dᵢ = Xᵢ - Yᵢ
+2. Rank absolute values
+3. Sum ranks for positive and negative differences
+4. Test statistic: min(W⁺, W⁻)
+
+### Kruskal-Wallis Test
+
+Nonparametric alternative to one-way ANOVA.
+
+**Test statistic:**
+```
+H = [12/(N(N+1))] · Σ [Rᵢ²/nᵢ] - 3(N+1)
+```
+
+Where Rᵢ is the sum of ranks for group i.
+
+### Friedman Test
+
+Nonparametric test for repeated measures or matched groups.
+
+```python
+from scipy import stats
+
+# Example: Kruskal-Wallis test
+group1 = np.random.normal(10, 2, 30)
+group2 = np.random.normal(12, 2, 30)
+group3 = np.random.normal(11, 2, 30)
+
+stat, p_value = stats.kruskal(group1, group2, group3)
+print(f"Kruskal-Wallis: H={stat:.3f}, p={p_value:.3f}")
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: Comparing Medical Treatments</strong>
+
+A study compares three pain relief treatments. The dataset contains pain scores (1-10) for 40 patients using each treatment:
+
+```python
+treatment_A = np.random.normal(5, 1.5, 40)
+treatment_B = np.random.normal(4.2, 1.8, 40)
+treatment_C = np.random.normal(4.8, 1.6, 40)
+```
+
+**Tasks:**
+1. Use the Kruskal-Wallis test to determine if treatments differ
+2. Perform post-hoc pairwise comparisons
+3. Compare results with parametric ANOVA
+4. Discuss which test is more appropriate and why
+5. Write a conclusion for a medical audience
+
+</div>
+
+---
+
+## Week 8: Price Indices and Time Series
+
+This week introduces economic indices and basic time series concepts.
+
+### Price Indices
+
+**Laspeyres Index:**
+```
+L = (Σ pᵢₜ · qᵢ₀) / (Σ pᵢ₀ · qᵢ₀) × 100
+```
+Uses base-year quantities as weights.
+
+**Paasche Index:**
+```
+P = (Σ pᵢₜ · qᵢₜ) / (Σ pᵢ₀ · qᵢₜ) × 100
+```
+Uses current-year quantities as weights.
+
+**Fisher's Ideal Index:**
+```
+F = √(L × P)
+```
+
+### Goods Baskets
+
+A **goods basket** (koš zboží) is a fixed set of goods and services used to track price changes over time.
+
+```python
+def laspeyres(prices_t, prices_0, quantities_0):
+    """Calculate Laspeyres price index"""
+    numerator = sum(prices_t * quantities_0)
+    denominator = sum(prices_0 * quantities_0)
+    return (numerator / denominator) * 100
+
+def paasche(prices_t, prices_0, quantities_t):
+    """Calculate Paasche price index"""
+    numerator = sum(prices_t * quantities_t)
+    denominator = sum(prices_0 * quantities_t)
+    return (numerator / denominator) * 100
+
+# Example
+p0 = np.array([10, 20, 30])  # base prices
+p1 = np.array([12, 22, 28])  # current prices
+q0 = np.array([5, 3, 4])     # base quantities
+q1 = np.array([6, 4, 3])     # current quantities
+
+L = laspeyres(p1, p0, q0)
+P = paasche(p1, p0, q1)
+F = np.sqrt(L * P)
+
+print(f"Laspeyres: {L:.2f}")
+print(f"Paasche: {P:.2f}")
+print(f"Fisher: {F:.2f}")
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: Computing a Consumer Price Index</strong>
+
+You have the following data for a simple economy with 4 goods:
+
+| Good | p₀ | p₁ | q₀ | q₁ |
+|------|----|----|----|----|
+| Food | 100| 110| 50 | 48 |
+| Clothing| 200| 220| 20 | 18 |
+| Housing | 500| 550| 10 | 12 |
+| Transport| 50 | 60 | 100| 95 |
+
+**Tasks:**
+1. Calculate Laspeyres, Paasche, and Fisher indices
+2. Interpret the differences between indices
+3. Explain why the Fisher index is called "ideal"
+4. Discuss the limitations of fixed-weight indices
+
+</div>
+
+---
+
+## Week 9: Time Series Analysis
+
+Time series analysis involves studying data points collected over time.
+
+### Moving Averages
+
+Simple Moving Average (SMA):
+```
+MAₜ = (1/k) Σᵢ₌₀ᵏ⁻¹ Xₜ₋ᵢ
+```
+
+**Centered Moving Average** - used for seasonal adjustment.
+
+### Exponential Smoothing
+
+**Single Exponential Smoothing:**
+```
+Sₜ = α · Xₜ + (1-α) · Sₜ₋₁
+```
+
+**Holt's Method** - adds trend component:
+```
+Sₜ = α·Xₜ + (1-α)·(Sₜ₋₁ + Tₜ₋₁)
+Tₜ = β·(Sₜ - Sₜ₋₁) + (1-β)·Tₜ₋₁
+```
+
+**Holt-Winters Method** - adds seasonal component.
+
+### Technical Indicators
+
+**Relative Strength Index (RSI):**
+```
+RSI = 100 - 100/(1 + RS)
+```
+Where RS = average gain / average loss over a period.
+
+**Moving Average Convergence Divergence (MACD)** - difference between two EMAs.
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Generate time series data
+dates = pd.date_range('2023-01-01', periods=100, freq='D')
+values = 100 + np.cumsum(np.random.normal(0, 0.5, 100))
+
+# Calculate moving averages
+window = 7
+ma = np.convolve(values, np.ones(window)/window, mode='valid')
+
+# Plot
+plt.figure(figsize=(12, 6))
+plt.plot(dates, values, label='Original')
+plt.plot(dates[window-1:], ma, label=f'MA({window})')
+plt.legend()
+plt.show()
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: Sales Forecasting</strong>
+
+Given quarterly sales data for 5 years:
+
+```python
+sales = np.array([120, 135, 140, 130, 125, 140, 150, 138, 
+                  130, 145, 155, 142, 135, 150, 160, 148, 
+                  140, 155, 165, 152])
+```
+
+**Tasks:**
+1. Apply single exponential smoothing with different α values
+2. Identify the best smoothing parameter using MSE
+3. Make predictions for the next two years
+4. Compare with a simple moving average approach
+5. Discuss the seasonal pattern and how to handle it
+
+</div>
+
+---
+
+## Week 10: Linear Regression
+
+Linear regression models the relationship between variables using a linear equation.
+
+### History of Regression Methods
+
+**Bošković Method (1757):**
+- Minimize sum of absolute deviations
+- Precursor to modern L1 regression
+
+**Lambert Method (1760):**
+- Contribution to the method of least squares
+
+**Laplace Method (1774):**
+- Minimize sum of absolute errors
+- Rediscovered multiple times
+
+**Method of Least Squares (Gauss, Legendre):**
+- Minimize sum of squared errors
+- This became the standard
+
+### Ordinary Least Squares (OLS)
+
+Model: `Y = Xβ + ε`
+
+Estimator: `β̂ = (X'X)⁻¹X'Y`
+
+**Assumptions:**
+1. Linearity
+2. Independence of errors
+3. Homoscedasticity
+4. No multicollinearity
+5. Normality of errors (for inference)
+
+```python
+import statsmodels.api as sm
+import pandas as pd
+
+# Generate data
+X = np.random.normal(0, 1, (100, 2))
+beta = np.array([2.0, 3.0])
+y = X @ beta + np.random.normal(0, 0.5, 100)
+
+# Fit OLS model
+X_with_const = sm.add_constant(X)
+model = sm.OLS(y, X_with_const).fit()
+
+# Summary
+print(model.summary())
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: Real Estate Price Modeling</strong>
+
+Using the following housing data:
+
+| Size (m²) | Bedrooms | Age (years) | Price (000 CZK) |
+|-----------|----------|-------------|-----------------|
+| 65 | 2 | 5 | 2500 |
+| 85 | 3 | 8 | 3200 |
+| 72 | 2 | 3 | 2800 |
+| 95 | 4 | 10| 3800 |
+| ... | ... | ... | ... |
+
+**Tasks:**
+1. Build a multiple linear regression model
+2. Interpret all coefficients
+3. Check model assumptions
+4. Identify important variables
+5. Make predictions for new properties
+6. Discuss potential issues (multicollinearity, outliers)
+
+</div>
+
+---
+
+## Week 11: Nonlinear and Orthogonal Regression
+
+### Nonlinear Regression
+
+Models where the relationship isn't linear in parameters:
+
+Examples:
+- **Exponential:** `y = a·exp(b·x)`
+- **Power:** `y = a·xᵇ`
+- **Logistic:** `y = L/(1 + exp(-k·(x - x₀)))`
+
+**Methods:**
+1. Linearization via transformation
+2. Iterative methods (Newton-Raphson, Gauss-Newton)
+
+### Orthogonal Regression
+
+When both x and y have measurement errors:
+
+**Total Least Squares (TLS):**
+- Minimizes perpendicular distances to the regression line
+- Appropriate when both variables are measured with error
+
+**Principal Component Analysis approach:**
+- First principal component gives the regression direction
+
+```python
+from scipy.optimize import curve_fit
+
+# Nonlinear model: exponential growth
+def exp_model(x, a, b):
+    return a * np.exp(b * x)
+
+# Generate data
+x_data = np.linspace(0, 5, 50)
+y_data = 2 * np.exp(0.3 * x_data) + np.random.normal(0, 0.1, 50)
+
+# Fit nonlinear model
+popt, pcov = curve_fit(exp_model, x_data, y_data)
+a_est, b_est = popt
+
+print(f"Estimated a: {a_est:.3f}, b: {b_est:.3f}")
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: Growth Curve Modeling</strong>
+
+You have bacterial growth data:
+
+```python
+time = np.array([0, 1, 2, 3, 4, 5, 6, 7, 8])
+population = np.array([100, 150, 210, 320, 480, 680, 900, 1100, 1350])
+```
+
+**Tasks:**
+1. Fit an exponential growth model
+2. Compare with a linear model
+3. Determine which model fits better
+4. Estimate the doubling time
+5. Fit a logistic growth model (adds carrying capacity)
+6. Discuss which model is most appropriate
+
+</div>
+
+---
+
+## Week 12: ANOVA and Experimental Design
+
+### Analysis of Variance (ANOVA)
+
+ANOVA partitions total variance into components:
+
+**Total Sum of Squares:**
+```
+SST = Σ(Yᵢⱼ - Ȳ)²
+```
+
+**Between Groups:**
+```
+SSB = Σ nⱼ(Ȳⱼ - Ȳ)²
+```
+
+**Within Groups:**
+```
+SSW = Σ(Yᵢⱼ - Ȳⱼ)²
+```
+
+**F-statistic:**
+```
+F = (SSB/(k-1)) / (SSW/(n-k))
+```
+
+### Planned Experiments
+
+**One-way ANOVA:** One factor at multiple levels
+
+**Two-way ANOVA:** Two factors with possible interaction
+
+**Repeated Measures:** Same subjects measured multiple times
+
+**Design Principles:**
+1. Randomization
+2. Replication
+3. Blocking
+4. Factorial design
+
+```python
+from scipy import stats
+
+# One-way ANOVA example
+groups = [
+    np.random.normal(10, 2, 30),
+    np.random.normal(12, 2, 30),
+    np.random.normal(11, 2, 30)
+]
+
+f_stat, p_value = stats.f_oneway(*groups)
+print(f"F-statistic: {f_stat:.3f}, p-value: {p_value:.3f}")
+
+# Post-hoc tests (Tukey HSD)
+from statsmodels.stats.multicomp import pairwise_tukeyhsd
+
+# Combine data
+all_data = np.concatenate(groups)
+all_groups = np.repeat(['A', 'B', 'C'], [30, 30, 30])
+
+tukey = pairwise_tukeyhsd(all_data, all_groups, alpha=0.05)
+print(tukey)
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: Agricultural Experiment Analysis</strong>
+
+Four fertilizer treatments were tested on crop yield (kg/plot):
+
+| Treatment | Yield |
+|-----------|-------|
+| Control | 25, 28, 23, 27, 26 |
+| Fertilizer A | 32, 35, 30, 33, 31 |
+| Fertilizer B | 29, 31, 28, 32, 30 |
+| Fertilizer C | 36, 38, 34, 37, 35 |
+
+**Tasks:**
+1. Perform one-way ANOVA
+2. Check assumptions (normality, homoscedasticity)
+3. Apply Tukey's HSD for pairwise comparisons
+4. Determine which treatments are significantly different
+5. Design a more efficient experiment for next season
+6. Write a report for agricultural researchers
+
+</div>
+
+---
+
+## Week 13: Multivariate Methods
+
+### Principal Component Analysis (PCA)
+
+**Goal:** Reduce dimensionality while preserving variance.
+
+**Steps:**
+1. Standardize variables
+2. Compute correlation matrix (or covariance matrix)
+3. Find eigenvectors and eigenvalues
+4. Sort components by eigenvalue
+5. Project data onto principal components
+
+```python
+from sklearn.decomposition import PCA
+from sklearn.preprocessing import StandardScaler
+
+# Sample data (multiple variables)
+X = np.random.randn(100, 5)
+
+# Standardize
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+# Apply PCA
+pca = PCA(n_components=3)
+X_pca = pca.fit_transform(X_scaled)
+
+# Explained variance
+print(f"Explained variance: {pca.explained_variance_ratio_}")
+print(f"Loadings: \n{pca.components_}")
+```
+
+### Factor Analysis
+
+**Goal:** Identify latent (unobserved) factors underlying observed variables.
+
+**Model:** `X = ΛF + ε`
+- X: observed variables
+- Λ: factor loadings matrix
+- F: common factors
+- ε: unique factors
+
+### Cluster Analysis
+
+**Purpose:** Group similar observations together.
+
+**Distance Measures:**
+- Euclidean: `√[Σ(xᵢ - yᵢ)²]`
+- Manhattan: `Σ|xᵢ - yᵢ|`
+- Minkowski: `[Σ|xᵢ - yᵢ|ᵖ]¹/ᵖ`
+- Mahalanobis: accounts for covariance
+
+**Hierarchical Clustering:**
+1. Agglomerative (bottom-up)
+2. Divisive (top-down)
+
+**Non-hierarchical Clustering:**
+- K-means
+- K-medoids (PAM)
+
+```python
+from sklearn.cluster import KMeans
+from scipy.cluster.hierarchy import dendrogram, linkage
+
+# K-means clustering
+kmeans = KMeans(n_clusters=3, random_state=42)
+clusters = kmeans.fit_predict(X_scaled)
+
+# Hierarchical clustering
+linkage_matrix = linkage(X_scaled, method='ward')
+dendrogram(linkage_matrix)
+
+plt.title('Dendrogram')
+plt.show()
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: Customer Segmentation Analysis</strong>
+
+A retail company has customer data with 10 features: age, income, spending score, frequency of purchase, average basket size, etc.
+
+```python
+# Simulated customer data (1000 customers, 10 features)
+np.random.seed(42)
+n_customers = 1000
+n_features = 10
+
+# Generate data with 3 underlying segments
+X = np.zeros((n_customers, n_features))
+# Segment 1: High income, low spending
+X[:333, :3] = np.random.normal([50, 80000, 60], [10, 15000, 15], (333, 3))
+# Segment 2: Moderate income, high spending
+X[333:666, :3] = np.random.normal([40, 50000, 85], [8, 10000, 10], (333, 3))
+# Segment 3: Low income, moderate spending
+X[666:, :3] = np.random.normal([30, 30000, 70], [7, 8000, 12], (334, 3))
+# Fill remaining features with noise
+X[:, 3:] = np.random.normal(0, 1, (n_customers, 7))
+```
+
+**Tasks:**
+1. Apply PCA to reduce dimensionality
+2. Determine the optimal number of principal components
+3. Perform k-means clustering (find optimal k)
+4. Compare hierarchical vs k-means results
+5. Profile the customer segments
+6. Provide business recommendations for each segment
+7. Validate results with factor analysis
+
+</div>
+
+---
+
+## Semester Project Requirements
+
+<div class="exercise-box">
+
+<strong>📋 Semester Project Guidelines</strong>
+
+Your semester project must demonstrate the application of mathematical/statistical methods to real data. You will be evaluated on both technical execution and clarity of written communication.
+
+**Project Components:**
+
+1. **Data Selection**
+   - Choose a dataset with at least 100 observations and 5 variables
+   - Can be from Kaggle, UCI repository, or personal collection
+   - Justify your choice and provide context
+
+2. **Exploratory Data Analysis**
+   - Descriptive statistics
+   - Visualizations (histograms, boxplots, scatterplots, etc.)
+   - Missing data handling
+
+3. **Statistical Analysis**
+   - Apply at least 3 different methods from the course
+   - Examples: regression, ANOVA, hypothesis testing, PCA, clustering
+   - Interpret all results
+
+4. **Report**
+   - Formal mathematical/statistical writing style
+   - Clear structure (introduction, methods, results, discussion, conclusion)
+   - Include all code in an appendix
+
+5. **Code Submission**
+   - Reproducible analysis in Python or R
+   - Clean, well-documented code
+   - Include comments explaining statistical decisions
+
+</div>
+
+### Submission Checklist
+
+<div class="checklist">
+
+- [ ] Dataset chosen and described (with source)
+- [ ] 3+ statistical methods applied
+- [ ] All code is reproducible
+- [ ] Visualizations are clear and labeled
+- [ ] Results are interpreted in context
+- [ ] Report is well-structured
+- [ ] Code includes documentation/comments
+- [ ] Presentation (5-10 min) prepared
+
+</div>
+
+---
+
+## Code Review Guide
+
+### What to Look For
+
+When reviewing statistical code, focus on:
+
+1. **Correctness**
+   - Are the formulas implemented correctly?
+   - Are degrees of freedom appropriate?
+   - Are assumptions checked?
+
+2. **Efficiency**
+   - Avoid loops where vectorized operations exist
+   - Use appropriate data structures
+
+3. **Readability**
+   - Clear variable names
+   - Comments explaining statistical choices
+   - Logical organization
+
+4. **Reproducibility**
+   - Random seeds set when needed
+   - Data preprocessing documented
+   - Dependencies listed
+
+### Example Code Review
+
+<div class="review-note">
+
+<strong>🔍 Code Review Example</strong>
+
+**Original Code:**
+```python
+# This is my regression code
+X = data[['x1','x2','x3']]
+y = data['y']
+b = np.linalg.inv(X.T@X)@X.T@y
+```
+
+**Reviewed Code:**
+```python
+import numpy as np
+import statsmodels.api as sm
+import pandas as pd
+
+# Prepare data for regression
+X = data[['x1', 'x2', 'x3']]
+X = sm.add_constant(X)  # Add intercept
+y = data['y']
+
+# Fit OLS model
+model = sm.OLS(y, X).fit()
+
+# Check assumptions
+print("VIF:", pd.DataFrame(vif(X)).T)  # Check multicollinearity
+print("Durbin-Watson:", sm.stats.durbin_watson(model.resid))  # Check independence
+
+# Model summary
+print(model.summary())
+```
+
+**Changes Made:**
+1. <span class="badge">Good</span> Added proper library imports
+2. <span class="badge">Good</span> Included intercept term
+3. <span class="badge">Good</span> Used statsmodels for reliable inference
+4. <span class="badge">Good</span> Added assumption checks
+5. <span class="badge danger">Bad</span> Original used direct matrix inversion - numerically unstable
+
+</div>
+
+---
+
+## Exam Preparation
+
+### Exam Structure
+
+**Written Part (60%):**
+- 5 theoretical questions (short answer, 5-10 lines each)
+- 3 practical problems requiring calculations
+- 1 extended problem (full statistical analysis)
+
+**Oral Part (40%):**
+- 15-minute presentation of semester project
+- 5-10 minutes of Q&A
+- Discussion of 2 random topics from the course
+
+### Topics to Review
+
+**Probability Foundations:**
+- Kolmogorov axioms
+- Conditional probability and independence
+- Bayes' theorem
+
+**Distributions:**
+- Normal, Binomial, Poisson, Exponential, Chi-squared
+- Distribution parameters and moments
+- Central limit theorem
+
+**Descriptive Statistics:**
+- Measures of central tendency and dispersion
+- Histograms, boxplots, ogives
+- Empirical distribution function
+
+**Correlation:**
+- Pearson, Spearman, Kendall
+- Correlation vs. causation
+- Interpretation of correlation matrix
+
+**Hypothesis Testing:**
+- Parametric vs. nonparametric
+- One-sample, two-sample tests
+- Power and significance level
+
+**Regression:**
+- OLS assumptions and diagnostics
+- Interpretation of coefficients
+- Model selection criteria
+
+**Multivariate Analysis:**
+- PCA interpretation
+- Clustering methods and validation
+- Factor analysis
+
+### Practice Questions
+
+<div class="exercise-box">
+
+<strong>📝 Sample Exam Questions</strong>
+
+**Question 1:** (Theoretical)
+Explain the difference between parametric and nonparametric tests. Give examples of each and discuss when you would prefer one over the other.
+
+**Question 2:** (Calculations)
+Given the following dataset: 12, 15, 14, 13, 16, 14, 15, 13, 12, 14
+- Calculate the mean, median, variance, and standard deviation
+- Construct a boxplot and identify any outliers
+- Test whether the data is normally distributed
+
+**Question 3:** (Applied)
+You have data on student performance with variables: hours studied, previous GPA, attendance, and final grade.
+- Propose a statistical model
+- Describe how you would test its assumptions
+- Suggest alternative approaches if assumptions are violated
+
+**Question 4:** (Extended)
+A company wants to segment its customers for targeted marketing. They have 20 features per customer including demographic, purchasing, and behavioral data.
+- Design a complete analysis workflow
+- Justify your choice of methods
+- Discuss potential pitfalls and how to avoid them
+- Describe how you would validate the results
+
+</div>
+
+---
+
+## Quick Reference Cards
+
+### Git Commands
+
+```bash
+# Clone repository
+git clone [url]
+
+# Check status
+git status
+
+# Add changes
+git add [file]
+git add .
+
+# Commit changes
+git commit -m "message"
+
+# Push to remote
+git push origin [branch]
+
+# Pull updates
+git pull origin [branch]
+```
+
+### Testing Annotations
+
+```python
+import unittest
+
+class TestStatisticalMethods(unittest.TestCase):
+    def test_mean_calculation(self):
+        self.assertEqual(calculate_mean([1,2,3,4,5]), 3.0)
+    
+    def test_variance_formula(self):
+        result = calculate_variance([1,2,3,4,5])
+        expected = 2.5
+        self.assertAlmostEqual(result, expected, places=2)
+    
+    @unittest.expectedFailure
+    def test_known_failing_case(self):
+        # Test a case we know should fail
+        self.assertTrue(calculate_p_value(0.05) < 0.05)
+```
+
+### Design Pattern Summary
+
+| Pattern | Type | Use Case | Example |
+|---------|------|----------|---------|
+| Singleton | Creational | Only one instance | Configuration |
+| Factory | Creational | Object creation | Model creation |
+| Observer | Behavioral | State changes | Event handling |
+| Strategy | Behavioral | Algorithm selection | Test selection |
+| Adapter | Structural | Interface compatibility | Data transformation |
+
+### Common Statistical Formulas
+
+**Standard Error:**
+```
+SE = σ / √n
+```
+
+**Confidence Interval (95%):**
+```
+x̄ ± 1.96 · SE
+```
+
+**t-statistic:**
+```
+t = (x̄ - μ₀) / (s/√n)
+```
+
+**Sample Variance:**
+```
+s² = Σ(xᵢ - x̄)² / (n-1)
+```
+
+**F-statistic (ANOVA):**
+```
+F = MSB / MSW
+```
+
+**Correlation Coefficient:**
+```
+r = Σ(xᵢ - x̄)(yᵢ - ȳ) / √[Σ(xᵢ - x̄)² · Σ(yᵢ - ȳ)²]
+```
+
+### Python Libraries for Statistics
+
+| Library | Purpose |
+|---------|---------|
+| NumPy | Base numerical operations |
+| SciPy | Advanced statistical functions |
+| Pandas | Data manipulation |
+| Statsmodels | Statistical modeling |
+| Scikit-learn | Machine learning |
+| Matplotlib | Basic plotting |
+| Seaborn | Advanced visualization |
+
+---
+
+*End of Course Documentation*
+
+Good luck with your studies! 🎓📊

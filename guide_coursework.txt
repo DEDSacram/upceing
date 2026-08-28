@@ -1,0 +1,266 @@
+# Instructions for Creating Course Documentation in Astro Starlight MDX Format
+
+Use these instructions to generate a complete, single‑file MDX documentation page for a university‑level programming course, following the same structure and style as the provided example for "Advanced Programming Techniques (KST/NNPTP)".
+
+---
+
+## 1. Overall Structure
+
+The output must be **a single `.mdx` file** that includes:
+
+- **Frontmatter** (YAML block at the top) with `title`, `description`, and `template: doc`.
+- **A Table of Contents** (manual list of links to every major section).
+- **Course Overview** (objectives, assessment, schedule, etc.).
+- **Weekly Lectures** (13 weeks, each with key concepts, code examples, and an exercise).
+- **Assignments & Exam sections** (requirements, checklists, review guides, preparation).
+- **Quick Reference Cards** (optional but recommended).
+
+All content must be **self‑contained** – no external images, only inline code and Markdown.
+
+---
+
+## 2. Frontmatter
+
+```yaml
+---
+title: "Your Course Title (with course code)"
+description: "Brief description of the course content"
+template: doc
+---
+```
+
+Example:
+```yaml
+---
+title: "Advanced Programming Techniques (KST/NNPTP)"
+description: "Complete course materials for advanced object-oriented programming"
+template: doc
+---
+```
+
+---
+
+## 3. Table of Contents
+
+Immediately after the frontmatter, include a **manual Table of Contents** using Markdown links. Use a heading `## 📑 Table of Contents` and group items into:
+
+- **Course Overview** (objectives, assessment, schedule)
+- **Lecture Materials (Weeks 1–13)** – list each week with its topic
+- **Assignments & Exam** – assignment requirements, code review, exam prep
+
+All links must point to corresponding `#week-1-...` anchors (generated from heading text). Use lower‑case with hyphens.
+
+---
+
+## 4. Section Structure
+
+### 4.1 Course Overview
+- **Course Objectives** – bullet list of key skills (use `<span class="badge">` for tags if useful).
+- **Assessment & Credit Requirements** – use a `<div class="exercise-box">` to highlight the patch requirements.
+- **Examination Structure** – describe in‑person and distance formats, passing criteria.
+- **Schedule** – a table with weeks, lecture topics, and exercise focus.
+
+### 4.2 Weekly Lectures (Weeks 1–13)
+
+For **each week**, create a heading like `## Week X: Topic Name`.
+
+Inside each week, include:
+- **Brief introduction** (1–2 sentences).
+- **Key concepts** – use subheadings (`###`), bullet lists, and tables where appropriate.
+- **Code examples** – use fenced code blocks with language specifiers (e.g., ` ```java`, ` ```csharp`, ` ```javascript`).
+- **An exercise** – wrapped in a `<div class="exercise-box">` with a clear task description and optional hints.
+
+You can also include:
+- **Comparison tables** (e.g., pattern types, GC algorithms, DI methods).
+- **Badges** like `<span class="badge">Good</span>` or `<span class="badge danger">Bad</span>` for emphasis.
+- **Blockquotes** for rules or important notes.
+
+### 4.3 Assignments & Exam
+
+- **Assignment Requirements** – patch description, process, and a submission checklist (use `<div class="checklist">` with `- [ ]` items).
+- **Code Review Guide** – what to look for, plus an example review block (use `<div class="review-note">`).
+- **Exam Preparation** – structure, topics to review, practice questions (use `<div class="exercise-box">` for sample questions).
+
+### 4.4 Quick Reference Cards (Optional)
+
+Add a final section with compact tables or code snippets for quick revision – e.g., Git commands, test annotations, design pattern summaries.
+
+---
+
+## 5. Styling and Formatting Conventions
+
+### 5.1 Custom Divs
+
+Use these custom HTML `<div>` blocks (they will be styled in the Starlight theme):
+
+| Div Class | Purpose |
+|-----------|---------|
+| `<div class="exercise-box">` | For exercises and tasks. Usually contains a bold `<strong>` title. |
+| `<div class="review-note">` | For code review examples and notes. |
+| `<div class="checklist">` | For checklists – use Markdown `- [ ]` items inside. |
+
+### 5.2 Badges
+
+Use `<span class="badge">Text</span>` for coloured labels. Additional variants: `badge.warn`, `badge.danger`, `badge.info`.
+
+Example:
+```html
+<span class="badge">Good</span> Legal comments
+<span class="badge danger">Bad</span> Redundant comments
+```
+
+### 5.3 Tables
+
+Use standard Markdown tables with a header row. Keep them simple.
+
+### 5.4 Code Blocks
+
+- Use triple backticks with a language identifier (`java`, `csharp`, `javascript`, `bash`, `yaml`, etc.).
+- Provide clear comments or explanations outside the block.
+
+### 5.5 Emojis
+
+Use emojis to add visual interest – e.g., 📋, 🎯, 📝, 🔍, ✅, ✗, etc. (but don’t overdo).
+
+### 5.6 Headings
+
+- `#` only for the main title (already in frontmatter).
+- `##` for top‑level sections (e.g., Course Overview, each week, Assignments).
+- `###` for subsections inside a week.
+- `####` if needed for deeper nesting (rare).
+
+---
+
+## 6. Content Depth Guidelines
+
+- **Each week** should cover **3–5 key subtopics** with explanations.
+- Include **at least one concrete code example** per week.
+- Include **exactly one exercise** per week, wrapped in an exercise box.
+- Exercises should be **practical** – ask students to write code, refactor, test, or analyse.
+- Keep descriptions **concise** – aim for ~200–400 words per week (excluding code/exercises).
+- The overall file should be **comprehensive** but not overwhelming (approx. 800–1200 lines of Markdown).
+
+---
+
+## 7. Example Skeleton (with Placeholders)
+
+Below is a minimal skeleton you can adapt. Replace `[Course Name]`, `[Course Code]`, etc.
+
+```mdx
+---
+title: "[Course Name] ([Course Code])"
+description: "Complete course materials for [brief description]"
+template: doc
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+# [Course Name] ([Course Code])
+
+[Brief welcome paragraph.]
+
+## 📑 Table of Contents
+
+### Course Overview
+- [Course Objectives](#course-objectives)
+- [Assessment & Credit Requirements](#assessment--credit-requirements)
+- [Examination Structure](#examination-structure)
+- [Schedule](#schedule)
+
+### Lecture Materials
+1. [Week 1: Topic](#week-1-topic)
+2. [Week 2: Topic](#week-2-topic)
+...
+13. [Week 13: Topic](#week-13-topic)
+
+### Assignments & Exam
+- [Assignment Requirements](#assignment-requirements)
+- [Code Review Guide](#code-review-guide)
+- [Exam Preparation](#exam-preparation)
+
+---
+
+## Course Overview
+
+### Course Objectives
+
+[List bullet points of skills.]
+
+### Assessment & Credit Requirements
+
+<div class="exercise-box">
+
+<strong>📋 To receive credit, students must:</strong>
+
+[List requirements, e.g., number of patches, deliverables.]
+
+</div>
+
+### Examination Structure
+
+[Describe format and criteria.]
+
+### Schedule
+
+| Week | Lecture Topic | Exercise Focus |
+|------|---------------|----------------|
+| 1 | [Topic] | [Focus] |
+| ... | ... | ... |
+
+---
+
+## Week 1: [Topic]
+
+### Key Concept 1
+
+[Explanation and code.]
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> [Describe task.]
+
+```[language]
+// code stub
+```
+
+</div>
+
+...
+
+[Repeat for weeks 2-13]
+
+---
+
+## Assignment Requirements
+
+[Description, checklist, process.]
+
+## Code Review Guide
+
+[Guidelines and example.]
+
+## Exam Preparation
+
+[Structure, topics, practice questions.]
+
+---
+
+*End of Course Documentation*
+```
+
+---
+
+## 8. Final Checks
+
+Before finalising the MDX:
+
+- Ensure all internal links in the TOC point to valid headings (use lower‑case, hyphenated).
+- Verify that code blocks have the correct language identifiers.
+- Check that custom `<div>` classes are correctly closed.
+- Confirm that the frontmatter is valid YAML.
+
+---
+
+**These instructions should be given to an AI to generate a complete course documentation file in the same style.** The AI must produce a single `.mdx` file that can be directly used in an Astro Starlight project.

@@ -1,3 +1,2029 @@
 ---
-title: Designing of Software Systems (KST/NNPSW)
+title: "Designing of Software Systems (KST/NNPSW)"
+description: "Complete course materials for object-oriented analysis, design, and UML modeling of software systems"
+template: doc
 ---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+# Designing of Software Systems (KST/NNPSW)
+
+Welcome to the comprehensive course documentation for Designing of Software Systems. This course covers the complete lifecycle of software system design, from requirements gathering through to detailed design using UML (Unified Modeling Language), with emphasis on practical application in iterative development processes.
+
+## 📑 Table of Contents
+
+### Course Overview
+- [Course Objectives](#course-objectives)
+- [Assessment & Credit Requirements](#assessment--credit-requirements)
+- [Examination Structure](#examination-structure)
+- [Schedule](#schedule)
+
+### Lecture Materials
+1. [Week 1: Introduction to Software Engineering](#week-1-introduction-to-software-engineering)
+2. [Week 2: Development Methodologies](#week-2-development-methodologies)
+3. [Week 3: Requirements Engineering](#week-3-requirements-engineering)
+4. [Week 4: Use Case Modeling Fundamentals](#week-4-use-case-modeling-fundamentals)
+5. [Week 5: Advanced Use Case Modeling](#week-5-advanced-use-case-modeling)
+6. [Week 6: Analysis and Design Fundamentals](#week-6-analysis-and-design-fundamentals)
+7. [Week 7: Classes and Objects](#week-7-classes-and-objects)
+8. [Week 8: Identifying Analytical Classes](#week-8-identifying-analytical-classes)
+9. [Week 9: Class Relationships](#week-9-class-relationships)
+10. [Week 10: Inheritance and Polymorphism](#week-10-inheritance-and-polymorphism)
+11. [Week 11: Analytical Packages](#week-11-analytical-packages)
+12. [Week 12: Use Case Realization](#week-12-use-case-realization)
+13. [Week 13: Activity Diagrams](#week-13-activity-diagrams)
+
+### Assignments & Exam
+- [Semester Project Requirements](#semester-project-requirements)
+- [Code Review Guide](#code-review-guide)
+- [Exam Preparation](#exam-preparation)
+
+---
+
+## Course Overview
+
+### Course Objectives
+
+By the end of this course, students will be able to:
+
+<span class="badge">Core</span> Understand and apply the Unified Modeling Language (UML) in system design
+
+<span class="badge info">Process</span> Master iterative development processes and project planning methodologies
+
+<span class="badge warn">Analysis</span> Identify and specify requirements for information systems
+
+<span class="badge">Modeling</span> Create comprehensive object-oriented models including use case, class, and activity diagrams
+
+<span class="badge danger">Implementation</span> Validate designs through use case realization and traceability
+
+### Assessment & Credit Requirements
+
+<div class="exercise-box">
+
+<strong>📋 To receive credit (zápočet), students must:</strong>
+
+- Submit **one semester project** demonstrating UML modeling of a complete information system
+- Participate actively in **practical sessions** (cvičení)
+- Pass the **oral examination** demonstrating understanding of design principles
+
+**Project Deliverables:**
+- Complete UML model including use case, class, sequence, and activity diagrams
+- Requirements specification document
+- Design rationale and traceability matrix
+- Final presentation of the design
+
+</div>
+
+### Examination Structure
+
+The exam consists of:
+
+| Component | Weight | Description |
+|-----------|--------|-------------|
+| **Semester Project** | 50% | Complete UML design of an information system |
+| **Oral Examination** | 50% | Discussion of design decisions and theoretical concepts |
+
+**Passing Criteria:**
+- Minimum 50% in each component
+- Successful defense of the semester project
+- Demonstrated understanding of UML and design principles
+
+### Schedule
+
+| Week | Lecture Topic | Exercise Focus |
+|------|---------------|----------------|
+| 1 | Introduction to Software Engineering | Historical context and principles |
+| 2 | Development Methodologies | UP vs. Agile comparison |
+| 3 | Requirements Engineering | Gathering and documenting requirements |
+| 4 | Use Case Fundamentals | Writing basic use cases |
+| 5 | Advanced Use Cases | Include, extend, and generalization |
+| 6 | Analysis and Design | Transition from analysis to design |
+| 7 | Classes and Objects | OOP fundamentals |
+| 8 | Identifying Analytical Classes | Finding domain classes |
+| 9 | Class Relationships | Associations, aggregation, composition |
+| 10 | Inheritance and Polymorphism | Advanced OOP concepts |
+| 11 | Analytical Packages | Organizing the model |
+| 12 | Use Case Realization | Validating the design |
+| 13 | Activity Diagrams | Modeling workflows |
+
+---
+
+## Week 1: Introduction to Software Engineering
+
+This week provides historical context and introduces the fundamental principles of software engineering that underpin modern system design.
+
+### Historical Evolution of Software Engineering
+
+**The Software Crisis (1960s-1970s):**
+- Projects running over budget and schedule
+- Low-quality software with numerous defects
+- Difficulty in maintaining and evolving systems
+
+**Key Milestones:**
+- 1968: NATO Software Engineering Conference
+- 1970s: Waterfall model
+- 1980s: Object-oriented programming
+- 1990s: UML and Unified Process
+- 2000s: Agile methodologies
+- 2010s: DevOps and continuous delivery
+
+### What is Software Engineering?
+
+Software engineering is the application of engineering principles to software development:
+
+1. **Systematic approach** - disciplined methodologies and processes
+2. **Quantifiable** - measurable outcomes and progress
+3. **Economic** - cost-effective solutions
+4. **Quality focus** - reliability, maintainability, usability
+
+```java
+// Example: A well-structured Java class demonstrating design principles
+public class BankAccount {
+    // Encapsulation - private fields
+    private String accountNumber;
+    private double balance;
+    private String ownerName;
+    
+    // Constructor
+    public BankAccount(String accountNumber, String ownerName) {
+        this.accountNumber = accountNumber;
+        this.ownerName = ownerName;
+        this.balance = 0.0;
+    }
+    
+    // Public interface - well-defined methods
+    public void deposit(double amount) {
+        if (amount <= 0) {
+            throw new IllegalArgumentException("Deposit amount must be positive");
+        }
+        this.balance += amount;
+    }
+    
+    public boolean withdraw(double amount) {
+        if (amount <= 0 || amount > balance) {
+            return false;
+        }
+        this.balance -= amount;
+        return true;
+    }
+    
+    public double getBalance() {
+        return balance;
+    }
+}
+```
+
+### Key Principles
+
+**The "No Silver Bullet" Concept (Brooks, 1986):**
+- No single technology can solve all software problems
+- Essential complexity is inherent
+- Accidental complexity can be reduced
+
+**Separation of Concerns:**
+- Divide complex systems into manageable parts
+- Each part addresses a specific concern
+- Reduces cognitive load and improves maintainability
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: The Software Crisis Case Study</strong>
+
+Research a famous software project failure from history (e.g., Therac-25, Ariane 5, London Ambulance Service).
+
+**Tasks:**
+1. Identify the main causes of failure
+2. Map each cause to a software engineering principle that could have prevented it
+3. Write a brief analysis (500 words) discussing:
+   - What went wrong
+   - Which software engineering practices were missing
+   - How the failure could be prevented today
+4. Present your findings to the class
+
+**Resources:**
+- Use academic sources or reputable case studies
+- Cite your references properly
+
+</div>
+
+---
+
+## Week 2: Development Methodologies
+
+This week covers the spectrum of software development methodologies from traditional to agile approaches.
+
+### The Unified Process (UP)
+
+**Characteristics:**
+- Iterative and incremental
+- Use case driven
+- Architecture-centric
+- Risk-focused
+
+**Phases of UP:**
+
+| Phase | Purpose | Key Activities |
+|-------|---------|----------------|
+| Inception | Establish scope | Vision, feasibility, business case |
+| Elaboration | Plan architecture | Detailed requirements, architectural baseline |
+| Construction | Build product | Incremental development, testing |
+| Transition | Deploy system | User training, deployment, maintenance |
+
+**Core Workflows:**
+1. Business Modeling
+2. Requirements
+3. Analysis & Design
+4. Implementation
+5. Test
+6. Deployment
+7. Configuration & Change Management
+8. Project Management
+9. Environment
+
+### Agile Methodologies
+
+**Agile Manifesto (2001):**
+- Individuals and interactions over processes and tools
+- Working software over comprehensive documentation
+- Customer collaboration over contract negotiation
+- Responding to change over following a plan
+
+**Scrum Framework:**
+- **Roles:** Product Owner, Scrum Master, Development Team
+- **Artifacts:** Product Backlog, Sprint Backlog, Increment
+- **Events:** Sprint Planning, Daily Scrum, Sprint Review, Sprint Retrospective
+
+**Comparison of Methodologies:**
+
+| Aspect | Unified Process | Agile (Scrum) |
+|--------|-----------------|---------------|
+| Approach | Predictive | Adaptive |
+| Planning | Detailed upfront | Continuous |
+| Documentation | Comprehensive | Minimal/just-in-time |
+| Customer involvement | Milestone-based | Continuous |
+| Team structure | Hierarchical | Self-organizing |
+| Focus | Architecture | Delivering value |
+
+```javascript
+// Example: Agile user story format
+/*
+As a [type of user],
+I want [some goal],
+so that [some reason/reward].
+
+Acceptance Criteria:
+- Criterion 1
+- Criterion 2
+- Criterion 3
+
+Priority: High/Medium/Low
+Estimate: X story points
+*/
+const userStory = {
+    as: "Registered Customer",
+    want: "to view my order history",
+    soThat: "I can track my previous purchases",
+    acceptanceCriteria: [
+        "Orders are displayed in reverse chronological order",
+        "Each order shows date, total, and status",
+        "Can filter by date range",
+        "Can click through to order details"
+    ],
+    priority: "High",
+    estimate: 3,
+    sprint: 5
+};
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: Methodology Selection</strong>
+
+You are tasked with developing a system for a hospital's patient records management. The system must integrate with existing systems and comply with strict data protection regulations.
+
+**Tasks:**
+1. Compare UP and Agile approaches for this project
+2. Identify which methodology would be more suitable and why
+3. Consider factors such as:
+   - Regulatory requirements
+   - Stakeholder involvement
+   - System complexity
+   - Team size and distribution
+   - Time constraints
+4. Propose a hybrid approach if appropriate
+5. Justify your recommendations
+
+</div>
+
+---
+
+## Week 3: Requirements Engineering
+
+Requirements engineering is the foundation of successful software development. This week focuses on finding and specifying requirements.
+
+### Types of Requirements
+
+**Functional Requirements:**
+- What the system should do
+- Specific behaviors and functions
+- Example: "The system shall allow users to reset their password"
+
+**Non-functional Requirements:**
+- How the system should perform
+- Quality attributes and constraints
+- Categories:
+  - Performance: response time, throughput
+  - Security: authentication, authorization
+  - Usability: user interface, accessibility
+  - Reliability: availability, fault tolerance
+  - Maintainability: modularity, testability
+  - Portability: platform compatibility
+
+### Requirements Elicitation Techniques
+
+**Interviews:**
+- Structured vs. unstructured
+- Individual vs. group
+- Active listening and probing
+
+**Workshops:**
+- Joint Application Development (JAD)
+- Facilitated sessions with stakeholders
+- Rapid requirements gathering
+
+**Observation:**
+- Contextual inquiry
+- Shadowing users
+- Understanding workflows
+
+**Prototyping:**
+- Low-fi (paper, wireframes)
+- High-fi (interactive mockups)
+- Validate understanding early
+
+### Requirements Specification
+
+**IEEE 830 Standard Structure:**
+1. Introduction
+2. General Description
+3. Specific Requirements
+4. Appendices
+
+**Writing Quality Requirements:**
+- **C**orrect - accurate and truthful
+- **U**nambiguous - clear and precise
+- **C**omplete - includes all necessary information
+- **C**onsistent - no contradictions
+- **V**erifiable - testable
+- **R**ankable - prioritized
+- **T**raceable - linked to source
+
+```yaml
+# Example: Requirements specification in YAML format
+functional_requirements:
+  - id: FR-001
+    title: User Registration
+    description: New users can register with email and password
+    priority: High
+    status: Approved
+  
+  - id: FR-002
+    title: User Login
+    description: Registered users can log in using email and password
+    priority: High
+    status: Approved
+    dependencies:
+      - FR-001
+  
+  - id: FR-003
+    title: Password Reset
+    description: Users can reset forgotten password via email
+    priority: Medium
+    status: Draft
+
+non_functional_requirements:
+  - id: NFR-001
+    category: Performance
+    description: Response time must be under 2 seconds for 95% of requests
+    metric: Response time < 2s for 95th percentile
+  
+  - id: NFR-002
+    category: Security
+    description: All passwords must be encrypted using bcrypt
+    metric: Passwords stored with bcrypt hash
+
+  - id: NFR-003
+    category: Availability
+    description: System must be available 99.9% of the time
+    metric: Uptime ≥ 99.9% annually
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: Requirements Elicitation</strong>
+
+You are developing a system for an online bookstore. The bookstore currently operates offline but wants to expand online.
+
+**Stakeholders:**
+- Store owner
+- Customers
+- Warehouse manager
+- Delivery partner
+- IT support
+
+**Tasks:**
+1. Plan a requirements elicitation strategy
+2. Create interview questions for at least two stakeholders
+3. Write functional and non-functional requirements (minimum 10 functional, 5 non-functional)
+4. Prioritize requirements using MoSCoW (Must, Should, Could, Won't)
+5. Create a traceability matrix linking requirements to stakeholders
+
+</div>
+
+---
+
+## Week 4: Use Case Modeling Fundamentals
+
+Use case modeling captures functional requirements from the user's perspective, forming the foundation for system design.
+
+### What is a Use Case?
+
+A **use case** describes a sequence of actions that a system performs to produce a measurable result of value to an actor.
+
+**Components:**
+- **Actor:** External entity interacting with the system (person, system, hardware)
+- **Use Case:** Goal-oriented functionality
+- **Relationship:** Association between actor and use case
+
+### Creating Use Cases
+
+**Use Case Template:**
+
+| Element | Description |
+|---------|-------------|
+| Name | Unique identifier and descriptive name |
+| ID | Unique number for traceability |
+| Actor(s) | Primary and secondary actors |
+| Brief Description | One-sentence summary |
+| Preconditions | State before the use case starts |
+| Flow of Events | Step-by-step interaction |
+| Alternative Flows | Variations and exceptions |
+| Postconditions | State after the use case completes |
+
+### Use Case Diagram
+
+The use case diagram provides a high-level view of system functionality:
+
+```
+┌─────────────────────────────────────┐
+│           Online Bookstore          │
+│                                     │
+│  ┌───────────┐    ┌──────────┐     │
+│  │  Customer  │───▶│   Browse │     │
+│  └───────────┘    └──────────┘     │
+│       │            ┌──────────┐     │
+│       └───────────▶│ Search   │     │
+│                    └──────────┘     │
+│                    ┌──────────┐     │
+│                    │ Purchase │◀────┐
+│                    └──────────┘     │
+│                    ┌──────────┐     │
+│                    │ Register │◀────┤  ┌────────┐
+│                    └──────────┘     │  │ Admin  │
+│                    ┌──────────┐     │  └────────┘
+│                    │ Login    │◀────┘
+│                    └──────────┘
+└─────────────────────────────────────┘
+```
+
+```yaml
+# Example: Use case specification in YAML
+use_case:
+  id: UC-004
+  name: Purchase Books
+  actor:
+    primary: Customer
+    secondary: 
+      - Payment Gateway
+      - Inventory System
+  description: "Customer selects books, adds to cart, and completes payment"
+  preconditions:
+    - Customer is logged in
+    - Customer has items in cart
+    - Payment method is configured
+  flow_of_events:
+    - Customer initiates checkout process
+    - System displays cart summary and total
+    - Customer confirms order details and shipping address
+    - System processes payment through Payment Gateway
+    - System confirms payment and generates order confirmation
+    - System updates inventory
+    - System sends order confirmation email to Customer
+  alternative_flows:
+    - Payment fails: System displays error and prompts retry/alternative payment
+    - Out of stock: System notifies Customer and removes item from cart
+    - Guest checkout: System creates temporary account
+  postconditions:
+    - Order is created in system
+    - Inventory is updated
+    - Payment transaction is recorded
+    - Customer receives confirmation
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: Library Management System Use Cases</strong>
+
+Design use cases for a university library management system that handles:
+- Book borrowing and returns
+- Book reservations
+- Catalog searching
+- Fines management
+- Staff functions (add/remove books, manage users)
+
+**Tasks:**
+1. Identify all actors and their goals
+2. Create a use case diagram
+3. Write detailed use case specifications for:
+   - Borrow a book
+   - Search the catalog
+   - Manage fines
+4. Identify actors that may have overlapping responsibilities
+5. Draw a use case diagram using plantUML or similar notation
+
+</div>
+
+---
+
+## Week 5: Advanced Use Case Modeling
+
+This week explores advanced use case concepts including include, extend, and generalization relationships.
+
+### Use Case Relationships
+
+**Include Relationship (`<<include>>`):**
+- Mandatory sub-flow
+- Used to factor out common behavior
+- "Always executes" as part of base use case
+- Example: `Login` is included in `Purchase Books`
+
+**Extend Relationship (`<<extend>>`):**
+- Optional behavior
+- Adds functionality under certain conditions
+- "May execute" based on extension points
+- Example: `Apply Discount` extends `Purchase Books`
+
+**Generalization:**
+- Inheritance relationship between use cases
+- Child use case inherits parent's behavior
+- Can override or extend parent's behavior
+
+```
+┌─────────────────────────────────────────────────────┐
+│  <<include>>      ┌─────────────┐                  │
+│  ┌─────────────┐  │   Purchase   │                  │
+│  │   Login     │──│   Books     │                  │
+│  └─────────────┘  └─────────────┘                  │
+│                          │                         │
+│                          │ <<extend>>              │
+│                          ▼                         │
+│                     ┌─────────────┐                │
+│                     │   Apply     │                │
+│                     │  Discount   │                │
+│                     └─────────────┘                │
+│                          │                         │
+│                          │ Generalization          │
+│                          ▼                         │
+│                     ┌─────────────┐                │
+│                     │   Express   │                │
+│                     │  Purchase   │                │
+│                     └─────────────┘                │
+└─────────────────────────────────────────────────────┘
+```
+
+### Extension Points
+
+Extension points define where an extending use case can be inserted:
+
+```java
+// Example: Use case with extension points in code
+public class PurchaseBooks {
+    // Extension point: apply discount before payment
+    @ExtensionPoint("BeforePayment")
+    public void beforePayment() {
+        // Standard behavior
+    }
+    
+    @ExtensionPoint("BeforePayment")
+    public void applyDiscount() {
+        // Extending behavior
+        // Check for applicable discounts
+        // Apply discount to order total
+    }
+}
+```
+
+### Use Case Documentation Best Practices
+
+1. **Level of Detail:** Vary detail based on importance and risk
+2. **Actor Goals:** Focus on business value
+3. **Technology Neutral:** Avoid implementation details
+4. **Clear Language:** Write for all stakeholders
+5. **Consistent Structure:** Use templates
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: E-Commerce Platform Use Cases</strong>
+
+Design a complete use case model for an e-commerce platform with the following features:
+- Product browsing and search
+- Shopping cart management
+- Checkout and payment
+- Order tracking
+- Reviews and ratings
+- Promotions and discounts
+
+**Tasks:**
+1. Identify all actors and their goals
+2. Create a comprehensive use case diagram showing all relationships
+3. Write detailed use case specifications for:
+   - Checkout (including discount application)
+   - Product review
+   - Order tracking
+4. Create a use case glossary
+5. Document extension points and conditions
+6. Discuss how use cases would be prioritized
+
+</div>
+
+---
+
+## Week 6: Analysis and Design Fundamentals
+
+This week covers the transition from analysis to design, introducing the concept of architectural layers and design principles.
+
+### Analysis vs. Design
+
+| Aspect | Analysis | Design |
+|--------|----------|--------|
+| Focus | What the system should do | How the system will do it |
+| Perspective | Problem domain | Solution domain |
+| Models | Conceptual, platform-independent | Detailed, platform-specific |
+| Level | High-level understanding | Implementation details |
+| Audience | Domain experts, stakeholders | Developers, architects |
+
+### The Four-Layer Architecture
+
+**Layer 1: User Interface (UI)**
+- Presentation of information
+- User interaction handling
+- Input validation at the boundary
+
+**Layer 2: Application Logic (Business Logic)**
+- Domain rules and policies
+- Workflow management
+- Use case implementation
+
+**Layer 3: Domain Model**
+- Core business objects
+- Business relationships
+- Business rules
+
+**Layer 4: Technical Services (Persistence, Communication)**
+- Database access
+- External system integration
+- Infrastructure services
+
+```java
+// Example: Layered architecture implementation
+// Layer 4: Technical Services
+public class BookRepository {
+    private JdbcTemplate jdbcTemplate;
+    
+    public Book findById(Long id) {
+        // Database access code
+    }
+}
+
+// Layer 3: Domain Model
+public class Book {
+    private Long id;
+    private String title;
+    private String author;
+    private ISBN isbn;
+    private Money price;
+    private int stockQuantity;
+    
+    // Domain methods
+}
+
+// Layer 2: Application Logic
+public class OrderService {
+    private BookRepository bookRepository;
+    private OrderRepository orderRepository;
+    
+    @Transactional
+    public Order createOrder(OrderRequest request) {
+        // Business logic - orchestrating domain objects
+    }
+}
+
+// Layer 1: User Interface
+@RestController
+public class OrderController {
+    private OrderService orderService;
+    
+    @PostMapping("/api/orders")
+    public ResponseEntity<Order> createOrder(@RequestBody OrderRequest request) {
+        // HTTP handling and input validation
+    }
+}
+```
+
+### Design Principles
+
+**GRASP Principles:**
+- Information Expert
+- Creator
+- Controller
+- Low Coupling
+- High Cohesion
+- Polymorphism
+- Pure Fabrication
+- Indirection
+- Protected Variations
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: Hospital System Architecture</strong>
+
+Design the architecture for a hospital management system with:
+- Patient registration and records
+- Appointment scheduling
+- Billing and insurance
+- Doctor management
+- Pharmacy integration
+
+**Tasks:**
+1. Identify appropriate architectural layers
+2. Create a high-level component diagram
+3. Assign responsibilities to each layer
+4. Apply GRASP principles to distribute responsibilities
+5. Identify key design decisions and tradeoffs
+6. Document your architecture decision record
+
+</div>
+
+---
+
+## Week 7: Classes and Objects
+
+This week covers the fundamental concepts of object-oriented modeling - classes and objects.
+
+### Understanding Classes
+
+A **class** is a template that describes the state and behavior of objects.
+
+**Components of a Class:**
+- **Name:** Unique identifier
+- **Attributes:** Data or state
+- **Methods:** Behavior or operations
+
+**Visibility:**
+- `+` Public: Accessible to all
+- `-` Private: Accessible only within the class
+- `#` Protected: Accessible to subclasses
+- `~` Package: Accessible within the package
+
+### UML Class Notation
+
+```
+┌─────────────────────────────┐
+│          Order               │
+├─────────────────────────────┤
+│ - orderNumber: String       │
+│ - orderDate: Date           │
+│ - status: OrderStatus       │
+│ - totalAmount: Money        │
+├─────────────────────────────┤
+│ + createOrder()             │
+│ + addItem(Item)             │
+│ + removeItem(Item)          │
+│ + calculateTotal()          │
+│ + changeStatus(Status)      │
+└─────────────────────────────┘
+```
+
+### Object State
+
+An **object** is an instance of a class with specific state:
+
+```java
+// Class definition
+public class Order {
+    private String orderNumber;
+    private Date orderDate;
+    private OrderStatus status;
+    private List<OrderItem> items;
+    private Money totalAmount;
+    
+    public Order(String orderNumber) {
+        this.orderNumber = orderNumber;
+        this.orderDate = new Date();
+        this.status = OrderStatus.NEW;
+        this.items = new ArrayList<>();
+        this.totalAmount = Money.zero();
+    }
+    
+    public void addItem(Item item) {
+        items.add(new OrderItem(item));
+        recalculateTotal();
+    }
+    
+    private void recalculateTotal() {
+        totalAmount = items.stream()
+            .map(OrderItem::calculateSubtotal)
+            .reduce(Money.zero(), Money::add);
+    }
+}
+
+// Object creation and use
+Order order = new Order("ORD-2024-001");
+order.addItem(new Book("Design Patterns", 49.99));
+order.addItem(new Book("Clean Code", 39.99));
+System.out.println(order.getTotalAmount());
+```
+
+### Object-Oriented Principles
+
+**Encapsulation:**
+- Bundle data and methods together
+- Hide internal state
+- Provide controlled access
+
+**Abstraction:**
+- Focus on essential features
+- Hide implementation details
+- Provide simple interfaces
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: University Registration System Design</strong>
+
+Design classes for a university registration system that handles:
+- Students
+- Courses
+- Enrollments
+- Professors
+- Grades
+
+**Tasks:**
+1. Identify all necessary classes
+2. Define attributes and methods for each class
+3. Create UML class diagrams
+4. Implement one class in a language of your choice
+5. Demonstrate how objects would interact for enrollment
+6. Create at least two object instances with specific state
+
+</div>
+
+---
+
+## Week 8: Identifying Analytical Classes
+
+This week focuses on discovering classes from requirements and use cases.
+
+### Methods for Finding Classes
+
+**Noun Extraction (Textual Analysis):**
+- Read requirements documents
+- Underline nouns and noun phrases
+- Classify as likely classes, attributes, or relationships
+
+**CRC Cards (Class-Responsibility-Collaboration):**
+- **Class:** What is the class name?
+- **Responsibilities:** What does it know and do?
+- **Collaborators:** Who does it work with?
+
+**Use Case Analysis:**
+- Look for nouns in use case descriptions
+- Identify boundaries and interfaces
+- Find entities that persist
+
+### CRC Card Example
+
+```
+┌─────────────────────────────────┐
+│        Class: Order             │
+├─────────────────────────────────┤
+│ Responsibilities:               │
+│ - Knows its items and totals    │
+│ - Calculates order total        │
+│ - Manages order status          │
+│ - Validates order data          │
+├─────────────────────────────────┤
+│ Collaborators:                  │
+│ - Customer                      │
+│ - OrderItem                     │
+│ - Payment                       │
+│ - Inventory                     │
+└─────────────────────────────────┘
+```
+
+### Identifying Abstraction Boundaries
+
+**Guidelines for Class Selection:**
+1. **Significance:** Does it represent an important concept?
+2. **State:** Does it have significant state to track?
+3. **Behavior:** Does it have distinct behavior?
+4. **Identity:** Can we distinguish instances?
+5. **Independence:** Can it exist independently?
+
+### Domain Modeling Example
+
+```java
+// Analytical class identification example
+public class DomainModel {
+    // Identified from requirements
+    
+    // Core domain classes
+    public class Customer {
+        private CustomerId id;
+        private Name name;
+        private ContactInfo contact;
+        private List<Order> orders;
+    }
+    
+    public class Order {
+        private OrderNumber orderNumber;
+        private Customer customer;
+        private OrderStatus status;
+        private List<OrderLine> lines;
+        private Money total;
+    }
+    
+    public class Product {
+        private ProductId id;
+        private String name;
+        private String description;
+        private Money price;
+        private int stockQuantity;
+    }
+    
+    // Value objects
+    public class Money {
+        private BigDecimal amount;
+        private Currency currency;
+    }
+    
+    public class OrderLine {
+        private Product product;
+        private int quantity;
+        private Money lineTotal;
+    }
+}
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: Library System Class Identification</strong>
+
+Using the following library system requirements:
+
+"Library users can search for books by title, author, or ISBN. They can borrow available books, reserve books that are currently borrowed, and return books. The system tracks due dates and calculates fines for late returns. Librarians can manage the book inventory, add new users, and view reports on circulation. The system also allows users to renew their borrowed books online."
+
+**Tasks:**
+1. Extract nouns from the requirements
+2. Categorize nouns as classes, attributes, or relationships
+3. Create CRC cards for at least 5 classes
+4. Draw a preliminary domain model
+5. Identify potential missing classes
+6. Validate classes against use cases
+
+</div>
+
+---
+
+## Week 9: Class Relationships
+
+This week explores the fundamental relationships between classes in object-oriented design.
+
+### Association
+
+A **association** is a relationship where one class knows about another.
+
+**Multiplicity:**
+- 1: Exactly one
+- * (0..*): Zero or more
+- 1..*: One or more
+- 0..1: Zero or one
+- m..n: Range from m to n
+
+### Aggregation and Composition
+
+**Aggregation (`<>`):**
+- "Has-a" relationship
+- Part can exist independently of the whole
+- Weak ownership
+- Example: Department has Employees (employee can exist without department)
+
+**Composition (`<*>`):**
+- "Contains" relationship
+- Part cannot exist without the whole
+- Strong ownership
+- Example: Order contains OrderLines (lines cannot exist without order)
+
+```
+┌──────────────┐     ┌──────────────┐
+│   Order      │▸---▶│  OrderLine   │
+├──────────────┤ 1  *├──────────────┤
+│ - orderNumber│     │ - quantity   │
+│ - orderDate  │     │ - unitPrice  │
+│ - status     │     │ - lineTotal  │
+└──────────────┘     └──────────────┘
+        │                    │
+        │ 1                  │ 1
+        │                    │
+        ▼ 0..1               ▼
+┌──────────────┐     ┌──────────────┐
+│  Customer    │     │   Product    │
+├──────────────┤     ├──────────────┤
+│ - name       │     │ - name       │
+│ - email      │     │ - description│
+│ - address    │     │ - price      │
+└──────────────┘     │ - stock      │
+                     └──────────────┘
+```
+
+```java
+// Java implementation of relationships
+public class Order {
+    // Composition: OrderLine cannot exist without Order
+    private List<OrderLine> lines; 
+    
+    // Association: Customer can exist independently
+    private Customer customer;
+    
+    public void addLine(Product product, int quantity) {
+        OrderLine line = new OrderLine(product, quantity);
+        lines.add(line);
+    }
+}
+
+public class OrderLine {
+    // Association: Product exists independently
+    private Product product;
+    private int quantity;
+    private Money lineTotal;
+    
+    public OrderLine(Product product, int quantity) {
+        this.product = product;
+        this.quantity = quantity;
+        this.lineTotal = product.getPrice().multiply(quantity);
+    }
+}
+
+public class Customer {
+    private CustomerId id;
+    private Name name;
+    private Email email;
+    private List<Order> orderHistory;
+}
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: E-Commerce Class Relationships</strong>
+
+Design the class relationships for an e-commerce system with:
+- Products (with categories and attributes)
+- Customers (with addresses and order history)
+- Orders (with items and payment information)
+- Shopping carts
+- Reviews and ratings
+
+**Tasks:**
+1. Identify all relationships (association, aggregation, composition)
+2. Specify multiplicities for each relationship
+3. Create a complete UML class diagram
+4. Implement at least 3 classes showing the relationships in code
+5. Discuss the implications of composition vs. aggregation
+6. Identify any circular dependencies and propose solutions
+
+</div>
+
+---
+
+## Week 10: Inheritance and Polymorphism
+
+This week covers inheritance and polymorphism, two key pillars of object-oriented design.
+
+### Inheritance (`<>`)
+
+Inheritance represents an "is-a" relationship where a subclass inherits from a superclass.
+
+**Benefits:**
+- Code reuse
+- Polymorphism
+- Extensibility
+
+**Drawbacks:**
+- Tight coupling
+- Fragile base class problem
+- Deep hierarchies can be complex
+
+```
+┌─────────────────────────────┐
+│      BaseEntity             │
+├─────────────────────────────┤
+│ - id: Long                  │
+│ - createdAt: Date           │
+│ - updatedAt: Date           │
+├─────────────────────────────┤
+│ + getId(): Long             │
+│ + getCreatedAt(): Date      │
+│ + getUpdatedAt(): Date      │
+└─────────────────────────────┘
+           ▲
+           │
+           ├──────────────────────┐
+           │                      │
+┌──────────┴──────────┐ ┌────────┴──────────┐
+│    User             │ │   Product         │
+├─────────────────────┤ ├───────────────────┤
+│ - username: String  │ │ - name: String    │
+│ - email: String     │ │ - description: String│
+│ - password: String  │ │ - price: Money    │
+├─────────────────────┤ ├───────────────────┤
+│ + login()           │ │ + calculateDiscount()│
+│ + changePassword()  │ │ + updateStock()   │
+└─────────────────────┘ └───────────────────┘
+```
+
+```java
+// Inheritance example
+public abstract class BaseEntity {
+    protected Long id;
+    protected Date createdAt;
+    protected Date updatedAt;
+    
+    public Long getId() { return id; }
+    public Date getCreatedAt() { return createdAt; }
+    public Date getUpdatedAt() { return updatedAt; }
+}
+
+// Subclass User
+public class User extends BaseEntity {
+    private String username;
+    private String email;
+    private String passwordHash;
+    private Role role;
+    
+    public boolean authenticate(String password) {
+        // Authentication logic
+        return passwordHash.equals(hash(password));
+    }
+}
+
+// Subclass Product
+public class Product extends BaseEntity {
+    private String name;
+    private String description;
+    private Money price;
+    private Category category;
+    
+    public Money calculateDiscount(double percentage) {
+        return price.multiply(1 - percentage / 100);
+    }
+}
+```
+
+### Polymorphism
+
+Polymorphism allows objects of different types to be treated uniformly.
+
+```java
+// Polymorphism example
+public interface PaymentProcessor {
+    PaymentResult processPayment(Money amount);
+}
+
+public class CreditCardProcessor implements PaymentProcessor {
+    @Override
+    public PaymentResult processPayment(Money amount) {
+        // Process credit card payment
+        return new PaymentResult(true, "Payment successful");
+    }
+}
+
+public class PayPalProcessor implements PaymentProcessor {
+    @Override
+    public PaymentResult processPayment(Money amount) {
+        // Process PayPal payment
+        return new PaymentResult(true, "Payment successful");
+    }
+}
+
+public class PaymentService {
+    private PaymentProcessor processor;
+    
+    public void setProcessor(PaymentProcessor processor) {
+        this.processor = processor;
+    }
+    
+    public PaymentResult pay(Money amount) {
+        // Polymorphic call
+        return processor.processPayment(amount);
+    }
+}
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: Employee System Hierarchy</strong>
+
+Design an employee management system with:
+- Different employee types (full-time, part-time, contractor, intern)
+- Different compensation structures
+- Different benefits eligibility
+- Performance evaluation methods
+
+**Tasks:**
+1. Design an inheritance hierarchy
+2. Use abstract classes and interfaces appropriately
+3. Implement polymorphic methods (e.g., calculateSalary, getBenefits)
+4. Create a UML diagram showing the hierarchy
+5. Implement in Java or C#
+6. Discuss when to use inheritance vs. composition
+7. Identify Liskov Substitution Principle violations, if any
+
+</div>
+
+---
+
+## Week 11: Analytical Packages
+
+Packages organize the model into manageable units, improving understanding and maintainability.
+
+### Package Organization
+
+**Purpose of Packages:**
+- Group related classes
+- Reduce complexity
+- Manage dependencies
+- Support different views
+
+**Package Structure Example:**
+
+```
+┌─────────────────────────────────────────────────────┐
+│                   Online Store                      │
+├─────────────────────────────────────────────────────┤
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────┐ │
+│  │   Core       │  │  Inventory   │  │ Customer │ │
+│  │  Domain      │  │  Management  │  │Management│ │
+│  ├──────────────┤  ├──────────────┤  ├──────────┤ │
+│  │ - Product    │  │ - Stock      │  │ - User   │ │
+│  │ - Order      │  │ - Warehouse  │  │ - Profile│ │
+│  │ - OrderLine  │  │ - Supplier   │  │ - Address│ │
+│  │ - Payment    │  │ - Shipment   │  └──────────┘ │
+│  └──────────────┘  └──────────────┘               │
+│                                                  │
+│  ┌──────────────┐  ┌──────────────┐              │
+│  │   Order      │  │  Reporting   │              │
+│  │  Processing  │  │  & Analytics │              │
+│  ├──────────────┤  ├──────────────┤              │
+│  │ - OrderSvc   │  │ - SalesReport│              │
+│  │ - PaymentSvc │  │ - Dashboard  │              │
+│  │ - Notification│  │ - Metrics    │              │
+│  └──────────────┘  └──────────────┘              │
+└─────────────────────────────────────────────────────┘
+```
+
+### Package Relationships
+
+**Dependency:**
+- One package depends on another
+- Changes in dependency affect dependent packages
+- Minimize cyclic dependencies
+
+**Import:**
+- Access classes from another package
+- Public elements are accessible
+- Private elements are hidden
+
+```java
+// Package declaration
+package com.bookstore.core.domain;
+
+import com.bookstore.inventory.management.Product;
+import com.bookstore.customer.management.Customer;
+
+public class Order {
+    private Product product;
+    private Customer customer;
+    private int quantity;
+    
+    // Domain logic
+}
+
+// Using packages
+import com.bookstore.core.domain.Order;
+import com.bookstore.reporting.analytics.SalesReport;
+
+public class ReportingService {
+    private SalesReport report;
+    private List<Order> orders;
+    
+    public void generateReport() {
+        report.generate(orders);
+    }
+}
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: University System Package Design</strong>
+
+Design the package structure for a university management system with:
+- Student management
+- Course management
+- Enrollment processing
+- Faculty management
+- Grade management
+- Financial management
+- Academic advising
+
+**Tasks:**
+1. Identify logical packages
+2. Create a package diagram showing dependencies
+3. Define visibility rules between packages
+4. Assign classes to packages
+5. Identify and resolve potential cyclic dependencies
+6. Justify your package organization
+7. Create package import guidelines
+
+</div>
+
+---
+
+## Week 12: Use Case Realization
+
+Use case realization validates the design by demonstrating how use cases are implemented by the analysis model.
+
+### What is Use Case Realization?
+
+**Purpose:**
+- Validate the analysis model
+- Trace use cases to design elements
+- Identify missing classes or responsibilities
+- Verify interactions
+
+**Techniques:**
+- **Sequence Diagrams:** Show message flow over time
+- **Collaboration Diagrams:** Show structural relationships
+- **Interaction Overview Diagrams:** Show high-level flow
+
+### Sequence Diagrams
+
+```
+┌────────────────────────────────────────────────────────────────────┐
+│                        Place Order Sequence                      │
+├────────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  Customer    OrderController     OrderService    OrderRepository │
+│    │              │                 │                │          │
+│    │  submitOrder │                 │                │          │
+│    ├─────────────>│                 │                │          │
+│    │              │  createOrder    │                │          │
+│    │              ├────────────────>│                │          │
+│    │              │                 │  validate     │          │
+│    │              │                 │  ────────────>│          │
+│    │              │                 │  validated    │          │
+│    │              │                 │<─────────────│          │
+│    │              │                 │  processPay   │          │
+│    │              │                 │  ────────────>│          │
+│    │              │                 │  paymentDone  │          │
+│    │              │                 │<─────────────│          │
+│    │              │                 │  saveOrder    │          │
+│    │              │                 │  ────────────>│          │
+│    │              │                 │  saved        │          │
+│    │              │                 │<─────────────│          │
+│    │              │  orderCreated   │                │          │
+│    │              │<────────────────│                │          │
+│    │  confirmation│                 │                │          │
+│    │<─────────────│                 │                │          │
+└────────────────────────────────────────────────────────────────────┘
+```
+
+### Traceability Matrix
+
+The traceability matrix links use cases to design elements:
+
+| Use Case ID | Use Case Name | Classes Involved | Methods |
+|-------------|---------------|------------------|---------|
+| UC-001 | Browse Products | Product, ProductCatalog | search(), filter(), sort() |
+| UC-002 | Add to Cart | ShoppingCart, CartItem | addItem(), updateQuantity() |
+| UC-003 | Place Order | Order, OrderService, PaymentService, Customer | createOrder(), processPayment() |
+| UC-004 | Manage Inventory | Inventory, Supplier, PurchaseOrder | checkStock(), reorder() |
+
+```java
+// Use case realization example
+public class PlaceOrderRealization {
+    public static class OrderController {
+        private OrderService orderService;
+        private PaymentService paymentService;
+        
+        public OrderResponse createOrder(OrderRequest request) {
+            // Step 1: Create order from request
+            Order order = orderService.createOrder(request);
+            
+            // Step 2: Process payment
+            PaymentResult paymentResult = paymentService.processPayment(
+                order.getTotal(), request.getPaymentDetails()
+            );
+            
+            if (paymentResult.isSuccessful()) {
+                // Step 3: Confirm order
+                orderService.confirmOrder(order);
+                return OrderResponse.success(order);
+            } else {
+                return OrderResponse.failure(paymentResult.getMessage());
+            }
+        }
+    }
+}
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: Withdraw Funds Use Case Realization</strong>
+
+Given the following use case description:
+
+"Customer withdraws funds from ATM. The system validates the card and PIN. The customer selects an account and enters the amount. The system checks available balance and dispenses cash. The system updates the balance and prints a receipt."
+
+**Tasks:**
+1. Create a sequence diagram for this use case
+2. Create a collaboration diagram
+3. Create a traceability matrix
+4. Identify potential failure scenarios
+5. Add alternative flows to the sequence diagram
+6. Discuss how design decisions would affect the realization
+
+</div>
+
+---
+
+## Week 13: Activity Diagrams
+
+Activity diagrams model workflows, business processes, and complex algorithms.
+
+### Activity Diagram Elements
+
+**Basic Elements:**
+- **Activity:** A state of the workflow
+- **Action:** Atomic unit of work
+- **Control Flow:** Flow of execution
+- **Decision:** Branching point
+- **Merge:** Joining branches
+- **Fork:** Parallel execution
+- **Join:** Synchronizing parallel flows
+- **Object Node:** Data flow
+
+### Modeling Workflows
+
+```
+┌────────────────────────────────────────────────────────────────────┐
+│                     Order Processing Workflow                     │
+├────────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  [Start] ──► ┌──────────────┐                                   │
+│              │   Receive     │                                   │
+│              │   Order       │                                   │
+│              └───────┬───────┘                                   │
+│                      │                                          │
+│                      ▼                                          │
+│               ┌─────────────┐                                   │
+│               │  Validate   │                                   │
+│               │   Payment   │                                   │
+│               └──────┬──────┘                                   │
+│                      │                                          │
+│               ┌──────┴──────┐                                   │
+│               ▼             ▼                                   │
+│          ┌──────────┐ ┌──────────┐                              │
+│          │ Valid    │ │ Invalid  │                              │
+│          └────┬─────┘ └────┬─────┘                              │
+│               │            │                                    │
+│               │            ▼                                    │
+│               │      ┌──────────────┐                           │
+│               │      │ Notify       │                           │
+│               │      │ Customer     │                           │
+│               │      └──────┬───────┘                           │
+│               │             │                                   │
+│               ▼             ▼                                   │
+│          ┌─────────────────────────────┐                        │
+│          │   Check Inventory           │                        │
+│          └─────────┬───────────────────┘                        │
+│                    │                                            │
+│             ┌──────┴──────┐                                     │
+│             ▼             ▼                                     │
+│        ┌──────────┐  ┌──────────┐                              │
+│        │ In Stock │  │Out of    │                              │
+│        └────┬─────┘  │Stock     │                              │
+│             │        └────┬─────┘                              │
+│             │             │                                    │
+│             │             ▼                                    │
+│             │      ┌──────────────┐                            │
+│             │      │  Backorder   │                            │
+│             │      └──────┬───────┘                            │
+│             │             │                                    │
+│             └──────┬──────┘                                    │
+│                    │                                            │
+│                    ▼                                            │
+│             ┌──────────────┐                                   │
+│             │ Process Ship │                                   │
+│             └──────┬───────┘                                   │
+│                    │                                            │
+│                    ▼                                            │
+│             ┌──────────────┐                                   │
+│             │   Generate   │                                   │
+│             │  Confirmation│                                   │
+│             └──────┬───────┘                                   │
+│                    │                                            │
+│                    ▼                                            │
+│                  [End]                                          │
+└────────────────────────────────────────────────────────────────────┘
+```
+
+### Advanced Activity Diagrams
+
+**Sending and Receiving Signals:**
+- External events
+- Asynchronous communication
+
+**Time Constraints:**
+- Deadlines
+- Delays
+
+```java
+// Activity diagram implementation
+public class OrderWorkflow {
+    public enum OrderState {
+        RECEIVED, VALIDATED, PROCESSING, COMPLETED, CANCELLED
+    }
+    
+    public class OrderProcess {
+        public void processOrder(Order order) {
+            // Action: Validate payment
+            Payment payment = paymentService.validate(order.getPayment());
+            
+            // Decision: Check validation result
+            if (!payment.isValid()) {
+                // Action: Notify customer
+                notificationService.sendPaymentFailed(order.getCustomer());
+                return;
+            }
+            
+            // Action: Check inventory
+            InventoryResult inventory = inventoryService.checkAvailability(order);
+            
+            // Fork: Process items in parallel
+            Parallel.parallel(() -> {
+                // Action: Reserve items
+                inventoryService.reserveItems(order);
+            }, () -> {
+                // Action: Process payment
+                paymentService.process(order.getPayment());
+            });
+            
+            // Join: Wait for both to complete
+            Parallel.join();
+            
+            // Decision: Check inventory result
+            if (inventory.isComplete()) {
+                // Action: Process shipment
+                shipmentService.ship(order);
+            } else {
+                // Action: Backorder
+                inventoryService.createBackorder(order);
+            }
+            
+            // Action: Generate confirmation
+            confirmationService.send(order);
+        }
+    }
+}
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: ATM Withdrawal Activity Diagram</strong>
+
+Create an activity diagram for the ATM withdrawal process including:
+
+- Card insertion and verification
+- PIN entry and validation
+- Account selection
+- Amount entry
+- Balance checking
+- Cash dispensing
+- Receipt printing
+- Error handling (wrong PIN, insufficient funds, etc.)
+- Concurrent operations (e.g., updating database while printing receipt)
+
+**Tasks:**
+1. Create a detailed activity diagram
+2. Include all decision points and merge points
+3. Show concurrent activities using fork and join
+4. Indicate object nodes for data flow
+5. Include signal sending (e.g., to bank system)
+6. Add time constraints where appropriate
+7. Write the corresponding activity diagram in code
+
+</div>
+
+---
+
+## Semester Project Requirements
+
+<div class="exercise-box">
+
+<strong>📋 Semester Project Guidelines</strong>
+
+Your semester project must demonstrate the complete design of an information system using UML. You will be evaluated on the quality of your models and the clarity of your design rationale.
+
+**Project Components:**
+
+1. **Problem Description**
+   - Define the system to be designed
+   - Provide context and business justification
+   - Identify stakeholders
+
+2. **Requirements Specification**
+   - Functional and non-functional requirements
+   - Prioritized using MoSCoW
+   - Traceable to use cases
+
+3. **Use Case Model**
+   - Use case diagram
+   - Detailed use case specifications
+   - Include and extend relationships
+
+4. **Analysis Model**
+   - Class diagram with attributes, methods, and relationships
+   - Package organization
+   - Sequence diagrams for key use cases
+
+5. **Design Decisions**
+   - Justification of key design choices
+   - Trade-offs considered
+   - Alternatives explored
+
+6. **Validation**
+   - Traceability matrix
+   - Use case realizations
+   - Consistency checks
+
+</div>
+
+### Submission Checklist
+
+<div class="checklist">
+
+- [ ] System description and context
+- [ ] Requirements specification (functional and non-functional)
+- [ ] Use case diagram
+- [ ] Use case specifications (min. 5 detailed)
+- [ ] Class diagram
+- [ ] Sequence diagrams (min. 3)
+- [ ] Activity diagrams (min. 2)
+- [ ] Package diagram
+- [ ] Design rationale document
+- [ ] Traceability matrix
+- [ ] Presentation (10-15 min)
+
+</div>
+
+---
+
+## Code Review Guide
+
+### What to Look For
+
+When reviewing design documentation, focus on:
+
+1. **Completeness**
+   - Are all requirements addressed?
+   - Are all necessary diagrams present?
+   - Is the documentation consistent?
+
+2. **Clarity**
+   - Is the model easy to understand?
+   - Are names meaningful and consistent?
+   - Is there unnecessary complexity?
+
+3. **Correctness**
+   - Are UML notations correct?
+   - Are relationships appropriate?
+   - Are multiplicities accurate?
+
+4. **Quality**
+   - Are design principles followed?
+   - Is coupling appropriate?
+   - Is cohesion sufficient?
+
+5. **Traceability**
+   - Can we trace from requirements to design?
+   - Is every design element justified?
+   - Are dependencies managed?
+
+### Example Design Review
+
+<div class="review-note">
+
+<strong>🔍 Design Review Example</strong>
+
+**Original Design:**
+```yaml
+# Too many direct relationships
+Order:
+  - Customer
+  - Product
+  - Payment
+  - Shipping
+  - Invoice
+  - Inventory
+```
+
+**Revised Design:**
+```yaml
+# Better separation of concerns
+Order:
+  - Customer
+  - OrderItems[]
+  
+OrderItem:
+  - Product
+  - Quantity
+  - Price
+
+OrderProcessing:
+  - Order
+  - PaymentService
+  - ShippingService
+  - InvoiceService
+
+InventoryManagement:
+  - Product
+  - StockLevel
+  - Warehouse
+```
+
+**Improvements Made:**
+1. <span class="badge">Good</span> Reduced coupling between Order and other classes
+2. <span class="badge">Good</span> Introduced OrderItem as an intermediate class
+3. <span class="badge">Good</span> Separated business logic from core domain
+4. <span class="badge danger">Bad</span> Original had Order directly manipulating inventory
+
+</div>
+
+---
+
+## Exam Preparation
+
+### Exam Structure
+
+**Oral Examination (100%):**
+- 15-minute presentation of semester project
+- 20-30 minutes of Q&A
+- Discussion of 3 random topics from the course
+
+### Topics to Review
+
+**Software Engineering Fundamentals:**
+- Software crisis and its causes
+- Software engineering principles
+- Quality attributes
+
+**Methodologies:**
+- Unified Process phases and workflows
+- Agile manifesto and principles
+- Scrum roles, artifacts, and events
+- When to use each methodology
+
+**Requirements Engineering:**
+- Functional vs. non-functional requirements
+- Elicitation techniques
+- Quality requirements (CUCVRU)
+- MoSCoW prioritization
+
+**Use Case Modeling:**
+- Actors and use cases
+- Include, extend, generalization
+- Use case specifications
+- Extension points
+
+**Class Modeling:**
+- Classes, attributes, methods
+- Association, aggregation, composition
+- Inheritance and polymorphism
+- Packaging
+
+**Design Principles:**
+- GRASP principles
+- Separation of concerns
+- Layered architecture
+- Design patterns (introduction)
+
+**Model Validation:**
+- Use case realization
+- Sequence diagrams
+- Traceability
+
+**Activity Diagrams:**
+- Modeling workflows
+- Concurrent activities
+- Decision and merge
+
+### Practice Questions
+
+<div class="exercise-box">
+
+<strong>📝 Sample Exam Questions</strong>
+
+**Question 1:** (Theoretical)
+Explain the difference between aggregation and composition. Provide examples from a real system and justify your choices.
+
+**Question 2:** (Design)
+You are designing a library management system. What are the key classes? How would you organize them into packages? Draw the package diagram.
+
+**Question 3:** (Application)
+Given the following requirements: "A customer can search for products, add them to a shopping cart, and purchase them using a credit card or PayPal."
+
+- Create a use case diagram
+- Write detailed specifications for the "Purchase Products" use case
+- Identify extension points
+
+**Question 4:** (Analysis)
+Review the following class diagram and identify:
+
+```
+Customer ────▶ ShoppingCart ────▶ CartItem ────▶ Product
+               ▲                  ▲
+               │                  │
+               └──────────────────┘
+               (many-to-many relationship)
+```
+
+- Identify any design issues
+- Suggest improvements
+- Explain the multiplicities
+
+**Question 5:** (Validation)
+How would you validate that the design correctly implements the use cases? Describe the process and create a traceability example.
+
+</div>
+
+---
+
+## Quick Reference Cards
+
+### Common UML Notations
+
+**Class Diagram:**
+```
++ public   - private   # protected   ~ package
+
+┌─────────────────────────────┐
+│          ClassName          │
+├─────────────────────────────┤
+│ - attribute: Type           │
+├─────────────────────────────┤
+│ + method(): ReturnType      │
+└─────────────────────────────┘
+```
+
+**Relationships:**
+```
+Association:   ClassA ────▶ ClassB
+Aggregation:   ClassA ◇───▶ ClassB
+Composition:   ClassA ◆───▶ ClassB
+Inheritance:   ClassA ▲───▶ ClassB
+Dependency:    ClassA ─ ─ ▶ ClassB
+```
+
+### UML Diagram Types
+
+| Diagram Type | Purpose |
+|--------------|---------|
+| Use Case | Functional requirements |
+| Class | Structural design |
+| Sequence | Interaction over time |
+| Activity | Business workflow |
+| State Machine | Lifecycle modeling |
+| Component | System architecture |
+| Deployment | Hardware configuration |
+| Package | Model organization |
+
+### Design Pattern Overview
+
+| Pattern | Type | Use Case |
+|---------|------|----------|
+| Singleton | Creational | Single instance |
+| Factory Method | Creational | Object creation |
+| Observer | Behavioral | Event handling |
+| Strategy | Behavioral | Algorithm selection |
+| Adapter | Structural | Interface compatibility |
+| Composite | Structural | Tree structures |
+| Decorator | Structural | Dynamic behavior |
+| Template Method | Behavioral | Algorithm skeleton |
+
+### GRASP Principles Summary
+
+| Principle | Description |
+|-----------|-------------|
+| Information Expert | Assign responsibility to class with most info |
+| Creator | Class A should create Class B if A contains B |
+| Controller | Mediate between UI and domain logic |
+| Low Coupling | Minimize dependencies |
+| High Cohesion | Keep related functions together |
+| Polymorphism | Use polymorphism for behavior variation |
+| Pure Fabrication | Create artificial classes for high cohesion |
+| Indirection | Use intermediate for decoupling |
+| Protected Variations | Protect against variation/instability |
+
+### Requirements Quality Checklist
+
+```yaml
+requirements_checklist:
+  Correctness:
+    - "Is it accurate and truthful?"
+    - "Does it match stakeholder intent?"
+  
+  Unambiguous:
+    - "Is it clear and precise?"
+    - "Is there only one interpretation?"
+  
+  Complete:
+    - "Does it include all necessary information?"
+    - "Are all scenarios covered?"
+  
+  Consistent:
+    - "No contradictions with other requirements?"
+    - "No conflicts with business rules?"
+  
+  Verifiable:
+    - "Can it be tested?"
+    - "Are acceptance criteria defined?"
+  
+  Prioritized:
+    - "Is priority/importance indicated?"
+    - "MoSCoW categories defined?"
+  
+  Traceable:
+    - "Can we trace to source?"
+    - "Unique identifier assigned?"
+```
+
+### Agile Estimation Techniques
+
+| Technique | Description |
+|-----------|-------------|
+| Planning Poker | Consensus-based estimation |
+| T-Shirt Sizes | Relative sizing (S, M, L, XL) |
+| Fibonacci Sequence | 1, 2, 3, 5, 8, 13, 21 |
+| Ideal Days | Time-based estimation |
+| Affinity Estimation | Grouping similar items |
+
+---
+
+*End of Course Documentation*
+
+Good luck with your software design journey! 🏗️📐
