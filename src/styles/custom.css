@@ -1,0 +1,24 @@
+/* Shrink the text size of the Table of Contents globally */
+/*starlight-toc {
+  font-size: 0.85rem;
+}
+
+/* On Desktop: Make it auto-collapse to the right side of the screen */
+/*
+@media (min-width: 72rem) {
+  .right-sidebar-container {
+    width: 14rem !important; 
+    transform: translateX(75%);
+    opacity: 0.3;
+    transition: all 0.3s ease-in-out;
+    border-left: 4px solid var(--sl-color-accent);
+    background-color: var(--sl-color-bg-nav);
+  }
+
+  .right-sidebar-container:hover {
+    transform: translateX(0);
+    opacity: 1;
+    box-shadow: -5px 0 15px rgba(0,0,0,0.2);
+  }
+}
+*/

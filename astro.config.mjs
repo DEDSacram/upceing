@@ -8,18 +8,49 @@ export default defineConfig({
 		starlight({
 			title: 'My Docs',
 			social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/withastro/starlight' }],
+			customCss: [
+				'./src/styles/custom.css',
+			],
 			sidebar: [
 				{
-					label: 'Guides',
+					label: 'Year 1: Required',
 					items: [
-						// Each item here is one entry in the navigation menu.
-						{ label: 'Example Guide', slug: 'guides/example' },
-					],
+						{
+							label: 'Winter Semester (ZS)',
+							items: [{ autogenerate: { directory: 'year-1-required/winter' } }]
+						},
+						{
+							label: 'Summer Semester (LS)',
+							items: [{ autogenerate: { directory: 'year-1-required/summer' } }]
+						}
+					]
 				},
 				{
-					label: 'Reference',
-					items: [{ autogenerate: { directory: 'reference' } }],
+					label: 'Year 1: Optional Required',
+					items: [
+						{
+							label: 'Winter Semester (ZS)',
+							items: [{ autogenerate: { directory: 'year-1-optional/winter' } }]
+						},
+						{
+							label: 'Summer Semester (LS)',
+							items: [{ autogenerate: { directory: 'year-1-optional/summer' } }]
+						}
+					]
 				},
+				{
+					label: 'Optional Courses',
+					items: [
+						{
+							label: 'Winter Semester (ZS)',
+							items: [{ autogenerate: { directory: 'optional/winter' } }]
+						},
+						{
+							label: 'Summer Semester (LS)',
+							items: [{ autogenerate: { directory: 'optional/summer' } }]
+						}
+					]
+				}
 			],
 		}),
 	],

@@ -1,0 +1,806 @@
+---
+title: "Database Administration and Development on the Oracle Platform (KST/DBSO)"
+description: "Complete course materials for database design, development, and administration on the Oracle platform."
+template: doc
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+# Database Administration and Development on the Oracle Platform (KST/DBSO)
+
+Welcome to the course! This comprehensive documentation covers all aspects of administering and developing with the Oracle Database system. From architecture fundamentals to advanced optimization and backup strategies, you'll find everything you need to succeed.
+
+## 📑 Table of Contents
+
+### Course Overview
+- [Course Objectives](#course-objectives)
+- [Assessment & Credit Requirements](#assessment--credit-requirements)
+- [Examination Structure](#examination-structure)
+- [Schedule](#schedule)
+
+### Lecture Materials
+1. [Week 1: Oracle Architecture & Storage](#week-1-oracle-architecture--storage)
+2. [Week 2: Memory Structures & Data Storage](#week-2-memory-structures--data-storage)
+3. [Week 3: Database Processes & Management Tools](#week-3-database-processes--management-tools)
+4. [Week 4: Listener, Sessions & Database Modes](#week-4-listener-sessions--database-modes)
+5. [Week 5: User, Schema & Object Management](#week-5-user-schema--object-management)
+6. [Week 6: SQL Processing & Execution Plans](#week-6-sql-processing--execution-plans)
+7. [Week 7: Data Access Methods & The Cost-Based Optimizer](#week-7-data-access-methods--the-cost-based-optimizer)
+8. [Week 8: Transaction Management & Undo Tablespaces](#week-8-transaction-management--undo-tablespaces)
+9. [Week 9: Locks, Concurrency & Isolation Levels](#week-9-locks-concurrency--isolation-levels)
+10. [Week 10: SQL Optimization & Partitioning](#week-10-sql-optimization--partitioning)
+11. [Week 11: Indexing Strategies & Hints](#week-11-indexing-strategies--hints)
+12. [Week 12: Profiling & Performance Tuning](#week-12-profiling--performance-tuning)
+13. [Week 13: Backup, Recovery & Flashback](#week-13-backup-recovery--flashback)
+
+### Assignments & Exam
+- [Assignment Requirements](#assignment-requirements)
+- [Code Review Guide](#code-review-guide)
+- [Exam Preparation](#exam-preparation)
+
+---
+
+## Course Overview
+
+### Course Objectives
+
+The goal of this course is to expand students' knowledge of the design, development, and administration of databases on the Oracle platform. By the end of this course, you will have gained:
+
+- <span class="badge">Architecture</span> Orientation in the architecture of the Oracle database system, its processes, and recovery technologies.
+- <span class="badge">Security</span> The ability to apply selected security principles.
+- <span class="badge">Transactions</span> Mastery of transactional mechanisms.
+- <span class="badge">Optimization</span> Skills in working with execution plans for query optimization.
+
+### Assessment & Credit Requirements
+
+<div class="exercise-box">
+
+<strong>📋 To receive credit (zápočet), students must:</strong>
+
+- Maintain regular attendance at the practical sessions (cvičení).
+- Demonstrate consistent preparedness for each session.
+- Show the ability to independently solve assigned tasks.
+- Successfully process and complete practical tasks within a team environment.
+
+</div>
+
+### Examination Structure
+
+The final examination is **oral**. It consists of a discussion and analysis of the topics covered in the course, with a strong emphasis on the student's understanding of the fundamental principles of the subject matter.
+
+### Schedule
+
+| Week | Lecture Topic | Exercise Focus |
+|------|---------------|----------------|
+| 1 | Oracle Architecture & Storage | Navigating the Oracle environment and file system |
+| 2 | Memory Structures & Data Storage | Configuring SGA and creating tablespaces |
+| 3 | Database Processes & Management Tools | Using SQL*Plus and Enterprise Manager |
+| 4 | Listener, Sessions & Database Modes | Configuring the listener and managing sessions |
+| 5 | User, Schema & Object Management | Creating users, roles, and managing profiles |
+| 6 | SQL Processing & Execution Plans | Generating and reading execution plans |
+| 7 | Data Access Methods & CBO | Analyzing statistics and understanding access paths |
+| 8 | Transaction Management & Undo | Working with undo data and savepoints |
+| 9 | Locks, Concurrency & Isolation | Simulating deadlocks and managing isolation |
+| 10 | SQL Optimization & Partitioning | Implementing range and list partitioning |
+| 11 | Indexing Strategies & Hints | Creating and using various index types |
+| 12 | Profiling & Performance Tuning | Using SQL Trace and TKPROF for analysis |
+| 13 | Backup, Recovery & Flashback | Performing a basic backup and recovery scenario |
+
+---
+
+## Week 1: Oracle Architecture & Storage
+
+This week provides a foundational understanding of the Oracle architecture, its logical and physical storage structures, and the directory structure of an Oracle installation.
+
+### Oracle Database Architecture
+
+An Oracle database system consists of two main parts: the **Instance** and the **Database**. The instance is the software (memory and processes) that manages the data, while the database is the physical storage (files) that contain the data. A single instance can manage a single database.
+
+### Physical & Logical Storage
+
+Oracle uses a layered storage model:
+- **Logical Storage:** From the user's perspective, data resides in **tablespaces**, which contain **segments**, **extents**, and **blocks**.
+- **Physical Storage:** At the operating system level, data is stored in **datafiles**, **control files**, and **redo log files**.
+
+#### Automatic Storage Management (ASM)
+
+ASM is a volume manager and file system designed specifically for Oracle database files. It provides performance improvements through disk striping and mirroring, and simplifies storage management by allowing the DBA to manage a disk group rather than individual files.
+
+#### Directory Structure (Oracle Base & ORACLE_HOME)
+
+The `ORACLE_BASE` is the root directory for Oracle software and administrative files. The `ORACLE_HOME` is a subdirectory under `ORACLE_BASE` where the actual software executables, network files, and libraries are located. Understanding this structure is crucial for managing the environment.
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: Exploring the Oracle File System</strong>
+
+Using your Oracle installation, navigate to the `ORACLE_BASE` and `ORACLE_HOME` directories and identify the following:
+1. The location of the `init.ora` parameter file.
+2. The directory containing network configuration files (`tnsnames.ora`, `listener.ora`).
+3. The location of the default data files.
+
+<strong>💡 Hint:</strong> Use the `echo $ORACLE_HOME` and `echo $ORACLE_BASE` commands in the terminal, or check your environment variables.
+
+</div>
+
+---
+
+## Week 2: Memory Structures & Data Storage
+
+This week focuses on Oracle's memory architecture and the details of data storage at the segment and block level.
+
+### System Global Area (SGA)
+
+The SGA is a shared memory area that contains data and control information for one Oracle instance. Key components include:
+- **Database Buffer Cache:** Caches data blocks from the datafiles.
+- **Redo Log Buffer:** Stores redo entries for recovery.
+- **Shared Pool:** Caches SQL and PL/SQL code (Library Cache) and data dictionary information (Data Dictionary Cache).
+- **Large Pool:** Used for large memory allocations, such as RMAN operations.
+
+### Program Global Area (PGA)
+
+The PGA is a private memory area for a single server process. It contains session-specific information, such as:
+- **Sort Area:** Memory allocated for sorting operations.
+- **Hash Area:** Memory for hash joins.
+- **Session Memory:** Holds session variables and other runtime data.
+
+### Tablespaces, Segments, Extents & Blocks
+
+- **Tablespace:** A logical container that groups together physical data files. The `SYSTEM` and `SYSAUX` tablespaces are mandatory.
+- **Segment:** A database object (e.g., a table or index) that consumes storage.
+- **Extent:** A contiguous set of blocks allocated for a segment.
+- **Block:** The smallest unit of I/O in the database. A typical block size is 8KB.
+
+The following SQL shows how to create a new tablespace and an associated datafile:
+
+```sql
+-- Create a new tablespace
+CREATE TABLESPACE course_data
+DATAFILE '/u01/app/oracle/oradata/CDB1/course_data01.dbf'
+SIZE 100M
+AUTOEXTEND ON NEXT 10M MAXSIZE 500M;
+
+-- Create a table in the new tablespace
+CREATE TABLE students (
+    student_id NUMBER PRIMARY KEY,
+    name VARCHAR2(100)
+)
+TABLESPACE course_data;
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: Create Tablespace and Segment</strong>
+
+Write a series of SQL statements to:
+1. Create a new tablespace called ``TEST_TS`` with a datafile size of 50MB.
+2. Create a table called ``test_data`` with one column `id` NUMBER in the `TEST_TS` tablespace.
+3. Insert 1000 rows into the `test_data` table.
+4. Query `DBA_SEGMENTS` to find the size of the segment created for your `test_data` table.
+
+<strong>💡 Hint:</strong> Use a PL/SQL block or a simple loop to insert the 1000 rows to make it quick.
+
+</div>
+
+---
+
+## Week 3: Database Processes & Management Tools
+
+This week covers the core database background processes and the essential tools for managing an Oracle database.
+
+### Key Oracle Background Processes
+
+These are the processes that run in the background to manage the instance and perform various maintenance tasks.
+- **SMON (System Monitor):** Performs instance recovery after a failure and merges free extents.
+- **PMON (Process Monitor):** Cleans up after failed user processes and monitors the listener.
+- **DBWn (Database Writer):** Writes dirty buffers from the database buffer cache to the datafiles.
+- **LGWR (Log Writer):** Writes redo entries from the redo log buffer to the online redo log files.
+- **CKPT (Checkpoint):** Updates the control file and datafile headers to indicate that all modifications up to a certain System Change Number (SCN) have been written to disk.
+
+### Utilities and Tools
+
+Oracle provides several tools for database administration:
+- **SQL*Plus:** The command-line interface for executing SQL and PL/SQL, and for performing database administration.
+- **Oracle Enterprise Manager (OEM) Cloud Control:** A web-based management tool with a graphical interface for monitoring and administering databases and other Oracle products.
+- **Oracle Data Pump (`expdp`/`impdp`):** High-performance utilities for data export and import.
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: Observing Background Processes</strong>
+
+Use your operating system's process monitoring tool (e.g., `ps -ef | grep ora_` on Linux) to list the Oracle background processes running for your instance.
+
+1. Identify the processes for `SMON`, `PMON`, `DBW0`, `LGWR`, and `CKPT`.
+2. Show the output of the command or a screenshot.
+3. Explain the primary function of each of these processes in your own words.
+
+</div>
+
+---
+
+## Week 4: Listener, Sessions & Database Modes
+
+This week focuses on how clients connect to the Oracle database, the role of the listener, and the operational states of the database.
+
+### The Oracle Listener
+
+The listener is a separate process that runs on the database server. It listens for incoming client connection requests and routes them to the appropriate database instance. Configuration is stored in `listener.ora`.
+
+### Connecting to the Database (EZConnect)
+
+EZConnect is a simple, tnsnames-less connection method. It uses a URL-like syntax:
+```bash
+sqlplus username/password@//hostname:port/service_name
+```
+
+### Establishing a Session
+
+When a connection is established, the server process creates a **session**. The session persists for the duration of the connection and contains the state of the user's current environment.
+
+### Database Startup and Shutdown Modes
+
+An Oracle database can be in several modes:
+- **Shutdown (NORMAL/IMMEDIATE/ABORT):** Closes the database.
+- **Mount:** The instance is started but the database is not open. Control files are read.
+- **Nomount:** The instance is started without mounting the database (used for creating a new database).
+- **Open:** The database is fully open and available for users.
+
+```bash
+# Startup commands in SQL*Plus
+STARTUP NOMOUNT;  # Starts instance, reads parameter file
+STARTUP MOUNT;    # Starts instance, reads control files
+STARTUP OPEN;     # Starts instance, opens database
+SHUTDOWN IMMEDIATE; # Closes database, kills active sessions
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: Managing Database States</strong>
+
+Practice managing the database by executing the following operations in SQL*Plus:
+
+1. Shut down the database using `SHUTDOWN IMMEDIATE`.
+2. Start it up in `NOMOUNT` mode. What parameter file is read at this stage?
+3. Change the state to `MOUNT`.
+4. Finally, open the database with `ALTER DATABASE OPEN`.
+
+<strong>💡 Hint:</strong> Use the `STATUS` command in SQL*Plus to see the current state of the database instance.
+
+</div>
+
+---
+
+## Week 5: User, Schema & Object Management
+
+This week is dedicated to managing users, their schemas, profiles, and quotas within the Oracle database.
+
+### Users & Schemas
+
+A **user** is a named account that can connect to the database. A **schema** is a collection of database objects (tables, views, procedures) owned by a user. The user and schema are often used interchangeably.
+
+### Managing Users
+
+Creating and managing users involves setting credentials, default tablespaces, and privileges.
+```sql
+-- Create a new user
+CREATE USER course_user IDENTIFIED BY password
+DEFAULT TABLESPACE course_data
+QUOTA 10M ON course_data;
+
+-- Grant basic privileges
+GRANT CREATE SESSION, CREATE TABLE TO course_user;
+```
+
+### User Profiles
+
+Profiles are used to enforce password policies and resource limits (e.g., CPU time, idle time).
+```sql
+-- Create a profile with a password expiry
+CREATE PROFILE strict_profile LIMIT
+    PASSWORD_LIFE_TIME 180
+    PASSWORD_GRACE_TIME 10
+    FAILED_LOGIN_ATTEMPTS 3;
+
+ALTER USER course_user PROFILE strict_profile;
+```
+
+### Quotas
+
+Quotas control the amount of storage a user can consume in a tablespace. The `UNLIMITED` quota should be used with caution.
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: User and Schema Management</strong>
+
+1. Create a new user named `DEV_USER` with a temporary password.
+2. Assign this user a profile that limits them to 2 failed login attempts before the account is locked.
+3. Grant `DEV_USER` the `CREATE SESSION` and `CREATE TABLE` privileges.
+4. Assign a quota of 5MB on the `USERS` tablespace.
+5. Connect to the database as `DEV_USER` and create a simple table to verify the quota.
+
+</div>
+
+---
+
+## Week 6: SQL Processing & Execution Plans
+
+This week examines how the database processes an SQL statement, from the parse phase to the execution phase.
+
+### The SQL Execution Flow
+
+1. **Parse:** The SQL statement is checked for syntax, semantics, and permissions. If it's a hard parse, the database builds a new execution plan.
+2. **Execute:** The database engine executes the chosen plan, reading data from disk or cache.
+3. **Fetch:** The rows are sent back to the client.
+
+### Execution Plans
+
+An execution plan is a step-by-step description of how the database will access and manipulate data to satisfy a query. It is generated by the optimizer.
+
+You can obtain an execution plan using `EXPLAIN PLAN` or by querying `V$SQL_PLAN` after a query has been run.
+
+```sql
+-- Generate an execution plan
+EXPLAIN PLAN FOR
+SELECT * FROM employees WHERE department_id = 10;
+
+-- Display the plan
+SELECT * FROM TABLE(DBMS_XPLAN.DISPLAY);
+```
+
+A simple execution plan might look like:
+```
+-------------------------------------------------------
+| Id  | Operation         | Name      | Rows  | Cost |
+-------------------------------------------------------
+|   0 | SELECT STATEMENT  |           |       |      |
+|   1 |  TABLE ACCESS FULL| EMPLOYEES |   100 |    5 |
+-------------------------------------------------------
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: Analyzing an Execution Plan</strong>
+
+1. Write a query that joins the `employees` and `departments` tables.
+2. Use `EXPLAIN PLAN` to generate the execution plan.
+3. Identify the type of join used (e.g., Nested Loops, Hash Join).
+4. Determine which table is accessed first in the plan.
+
+</div>
+
+---
+
+## Week 7: Data Access Methods & The Cost-Based Optimizer
+
+This week explores how the optimizer chooses the most efficient way to access data.
+
+### Data Access Methods
+
+The most common access methods are:
+- **Full Table Scan:** Reads every block of a table. Good for accessing a large percentage of rows.
+- **Index Scan:** Accesses data by traversing an index structure. Good for fetching a small number of rows.
+
+### Cost-Based Optimizer (CBO)
+
+The CBO is the heart of the query execution planner. It uses **statistics** about tables, indexes, and columns to estimate the cost of different access paths and join orders, and then selects the plan with the lowest estimated cost.
+- **Statistics:** Data about tables (row count, block count), columns (distribution, number of distinct values), and indexes. They must be current for the CBO to work effectively.
+
+```sql
+-- Gather statistics for a table
+EXEC DBMS_STATS.GATHER_TABLE_STATS('HR', 'EMPLOYEES');
+```
+
+### Access Path Comparison
+
+| Access Method | Best For | Cost |
+| :--- | :--- | :--- |
+| Full Table Scan | Large percentage of rows (&gt;10-20%) | Low |
+| Unique Index Scan | Single row lookup | Very Low |
+| Non-Unique Index Scan | Small percentage of rows (&lt;10%) | Medium |
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: Comparing Access Paths</strong>
+
+Consider a table `orders` with 1,000,000 rows and an index on the `order_date` column.
+
+1. Write a query to select all orders from January 2023 (approx. 1% of the data). What access path would you expect the CBO to choose? Why?
+2. Write a query to select all orders from 2022 (approx. 50% of the data). What access path would you expect now? Why?
+
+</div>
+
+---
+
+## Week 8: Transaction Management & Undo Tablespaces
+
+This week covers the principles of transaction management in Oracle, including the use of undo data.
+
+### Transactions
+
+A transaction is a logical unit of work that is either committed or rolled back. Oracle follows the ACID properties.
+
+### Undo Tablespaces
+
+Undo tablespaces store "before images" of data that is being modified. This data is used for:
+- **Rollback:** To undo changes if a transaction is rolled back.
+- **Read Consistency:** To provide a consistent view of the data for readers while changes are being made.
+- **Flashback:** To query or restore data from a past point in time.
+
+### Savepoints
+
+Savepoints are markers within a transaction that allow you to roll back part of the work.
+
+```sql
+-- Example of using savepoints
+INSERT INTO accounts (id, balance) VALUES (1, 100);
+SAVEPOINT before_update;
+UPDATE accounts SET balance = 50 WHERE id = 1;
+-- Oops, wrong calculation
+ROLLBACK TO before_update;
+COMMIT;
+-- Now the balance is still 100
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: Working with Undo and Savepoints</strong>
+
+Write a PL/SQL block or a series of SQL statements that demonstrates the use of a savepoint.
+
+1. Begin a transaction.
+2. Perform an update on a table.
+3. Set a savepoint.
+4. Perform another update.
+5. Rollback to the savepoint.
+6. Commit.
+7. Query the table to verify the final state.
+
+</div>
+
+---
+
+## Week 9: Locks, Concurrency & Isolation Levels
+
+This week delves into the mechanisms Oracle uses to manage concurrent access to data.
+
+### Transaction Locks
+
+Oracle uses locks to prevent multiple users from modifying the same data simultaneously.
+- **Shared Locks:** Used for reads (e.g., `SELECT ... FOR UPDATE`).
+- **Exclusive Locks:** Used for writes (e.g., `UPDATE`, `DELETE`, `INSERT`).
+
+### Deadlocks
+
+A deadlock occurs when two or more sessions are waiting for locks held by each other. Oracle automatically detects deadlocks and resolves them by rolling back one of the transactions.
+
+### Isolation Levels
+
+Oracle supports the following isolation levels (set by `SET TRANSACTION`):
+- **Read Committed:** The default. A query will only see data that was committed before the query started.
+- **Serializable:** A query sees a snapshot of the database as it existed at the start of the transaction.
+- **Read Only:** A transaction that can only read data.
+
+### Read Consistency
+
+Oracle provides **read consistency** by using undo data. A reader never blocks a writer, and a writer never blocks a reader. The reader sees the data as it was at the start of the query (or transaction), regardless of any uncommitted changes.
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: Simulating a Deadlock</strong>
+
+In two separate SQL*Plus sessions, perform the following steps to simulate a deadlock:
+
+1. **Session A:** Update a row in Table 1. (Do not commit).
+2. **Session B:** Update a row in Table 2. (Do not commit).
+3. **Session A:** Update the same row in Table 2 that Session B is holding.
+4. **Session B:** Update the same row in Table 1 that Session A is holding.
+5. Observe which session gets the deadlock error.
+
+<strong>💡 Hint:</strong> Be prepared for one of the sessions to be killed. This exercise demonstrates why you should avoid this pattern.
+
+</div>
+
+---
+
+## Week 10: SQL Optimization & Partitioning
+
+This week focuses on optimizing SQL queries, primarily through the use of partitioning.
+
+### SQL Optimization Principles
+
+- **Reduce Data Sets:** Only select the columns and rows you need.
+- **Use WHERE Clauses:** Always filter as early as possible.
+- **Join Order Matters:** The CBO determines this, but you can influence it with hints.
+- **Avoid Functions in WHERE:** Indexes may not be used if you wrap a column in a function.
+
+### Partitioning
+
+Partitioning divides large tables and indexes into smaller, more manageable pieces called partitions. Benefits include:
+- **Improved Performance:** Query only relevant partitions (partition pruning).
+- **Improved Manageability:** Easier to perform maintenance (e.g., dropping a partition).
+- **Increased Availability:** Partitions can be moved to different tablespaces.
+
+Common partition methods:
+- **Range Partitioning:** By a date or numeric range.
+- **List Partitioning:** By a discrete list of values.
+- **Hash Partitioning:** By a hash function, good for distributing data evenly.
+
+```sql
+-- Range Partitioning by date
+CREATE TABLE sales (
+    sale_id NUMBER,
+    sale_date DATE,
+    amount NUMBER
+)
+PARTITION BY RANGE (sale_date) (
+    PARTITION sales_q1 VALUES LESS THAN (TO_DATE('01-APR-2024', 'DD-MON-YYYY')),
+    PARTITION sales_q2 VALUES LESS THAN (TO_DATE('01-JUL-2024', 'DD-MON-YYYY')),
+    PARTITION sales_q3 VALUES LESS THAN (TO_DATE('01-OCT-2024', 'DD-MON-YYYY')),
+    PARTITION sales_q4 VALUES LESS THAN (TO_DATE('01-JAN-2025', 'DD-MON-YYYY'))
+);
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: Implementing Partition Pruning</strong>
+
+1. Create a range-partitioned table based on a date column (e.g., `order_date`).
+2. Insert sample data spanning multiple months.
+3. Write a query that selects all data for a single month.
+4. Use `EXPLAIN PLAN` to demonstrate that partition pruning is happening (you should see `PARTITION RANGE SINGLE` in the plan).
+
+</div>
+
+---
+
+## Week 11: Indexing Strategies & Hints
+
+This week covers the different types of indexes in Oracle, how to use them effectively, and how to influence the CBO with hints.
+
+### Index Types
+
+- **B-Tree (Balanced Tree):** The default index type. Good for high-cardinality columns.
+- **Bitmap Index:** Uses a bitmap for each distinct value. Good for low-cardinality columns (e.g., gender, status).
+- **Function-Based Index:** An index on a function expression (e.g., `UPPER(last_name)`).
+
+### Using Indexes Effectively
+
+- **Selectivity:** An index is most useful when it selects a small percentage of rows.
+- **Leading Column:** For composite indexes (e.g., on `(col1, col2)`), the leading column (`col1`) must be present in the query's `WHERE` clause for the index to be used effectively.
+
+### Hints
+
+Hints are instructions you can embed in a SQL statement to force the optimizer to take a specific action. They should be used as a last resort, after testing.
+
+```sql
+-- Hint to use a specific index
+SELECT /*+ INDEX(employees emp_name_idx) */ *
+FROM employees
+WHERE last_name = 'Smith';
+
+-- Hint to use a full table scan
+SELECT /*+ FULL(employees) */ *
+FROM employees;
+```
+
+### Hard Parse vs. Soft Parse
+- **Hard Parse:** The SQL is parsed, checked, and a new execution plan is generated. This is CPU-intensive.
+- **Soft Parse:** The database finds an existing execution plan in the Library Cache, reusing it. This is efficient.
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: Using Index Hints</strong>
+
+1. Create a B-tree index on the `last_name` column of a large `employees` table.
+2. Write a query to fetch employees with a common last name (e.g., 'Smith').
+3. Use an `INDEX` hint to force the optimizer to use your index.
+4. Check the execution plan to confirm the index was used.
+5. Compare the cost of the query with and without the hint.
+
+</div>
+
+---
+
+## Week 12: Profiling & Performance Tuning
+
+This week is about finding bottlenecks in your database applications using Oracle's diagnostic tools.
+
+### Oracle Wait Interface (OWI)
+
+OWI is a set of views (`V$EVENT_HISTOGRAM`, `V$SESSION_EVENT`) that allow you to see what events sessions are waiting for. Common wait events include:
+- `db file sequential read`: Waiting on a single block read (e.g., from an index).
+- `db file scattered read`: Waiting on a multi-block read (e.g., a full table scan).
+- `log file sync`: Waiting for a commit to finish.
+
+### SQL Trace & TKPROF
+
+- **SQL Trace (`ALTER SESSION SET SQL_TRACE = TRUE;`):** Generates a trace file that contains detailed information about the SQL executed by a session.
+- **TKPROF:** A command-line utility that formats the trace file into a readable report, showing parse, execute, and fetch statistics, and the execution plan.
+
+```bash
+# Format a trace file
+tkprof ora_12345.trc trace_report.out
+```
+
+### Profiling Sessions
+
+You can identify high-load SQL by querying `V$SQL` (or `V$SQLSTATS`) to find statements with high CPU time, high elapsed time, or high disk reads.
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: Tracing a Slow Query</strong>
+
+1. Enable SQL Trace for your session (`ALTER SESSION SET SQL_TRACE = TRUE;`).
+2. Execute a relatively complex query (e.g., a join of 3+ tables).
+3. Disable the trace (`ALTER SESSION SET SQL_TRACE = FALSE;`).
+4. Locate the trace file in the `USER_DUMP_DEST` directory.
+5. Use `TKPROF` to format the trace file.
+6. Identify the query's execution plan and the number of disk reads in the report.
+
+</div>
+
+---
+
+## Week 13: Backup, Recovery & Flashback
+
+The final week covers the essential strategies for protecting data through backup and recovery.
+
+### Archivelog Mode
+
+The database must be in `ARCHIVELOG` mode to enable online backups and point-in-time recovery. In this mode, Oracle archives filled online redo log files to a separate location.
+
+### RMAN (Recovery Manager)
+
+RMAN is Oracle's integrated tool for performing backup and recovery tasks. It manages the backup process and can restore and recover the database.
+
+```bash
+# Connect to the target database using RMAN
+rman target /
+
+# Perform a full database backup
+BACKUP DATABASE PLUS ARCHIVELOG;
+
+# A simple restore and recovery scenario
+STARTUP MOUNT;
+RESTORE DATABASE;
+RECOVER DATABASE;
+ALTER DATABASE OPEN;
+```
+
+### Flashback Queries
+
+Flashback technologies allow you to view data as it existed at a previous time, without needing to restore from a backup.
+
+```sql
+-- Flashback Query to see data from 15 minutes ago
+SELECT * FROM employees AS OF TIMESTAMP (SYSTIMESTAMP - INTERVAL '15' MINUTE);
+
+-- Flashback Table to revert a table to a previous state
+FLASHBACK TABLE employees TO TIMESTAMP (SYSTIMESTAMP - INTERVAL '30' MINUTE);
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: Flashback vs. RMAN</strong>
+
+1. **Flashback:** Simulate a "mistake" by deleting all rows from a small table. Use the `FLASHBACK TABLE` command to restore it to its state before the deletion. (The table must have `ROW MOVEMENT` enabled).
+2. **RMAN:** Suppose you lost the entire `USERS` tablespace datafile. Write the RMAN commands to restore and recover it. Explain the difference in the nature of the recovery (point-in-time vs. logical undo).
+
+</div>
+
+---
+
+## Assignment Requirements
+
+For this course, there will be a practical assignment (a "patch") that you must complete and present.
+
+<div class="exercise-box">
+
+<strong>📋 Patch Description:</strong>
+
+Your task is to design and implement a partial database for a real-world application (e.g., a library management system, a simple e-commerce platform). This is a practical task that will be worked on in teams and forms the basis for the oral exam discussion.
+
+</div>
+
+### Submission Checklist
+
+<div class="checklist">
+
+- [ ] **Database Schema:** A complete ER diagram and SQL script (`create_schema.sql`) that creates all tables, constraints, and indexes.
+- [ ] **Data Population:** A script (`populate_data.sql`) that inserts a reasonable amount of sample data (at least 100 rows per main table).
+- [ ] **Analytical Queries:** A script (`analytical_queries.sql`) containing 5-10 complex analytical queries that demonstrate the use of joins, subqueries, aggregations, and window functions.
+- [ ] **Performance Analysis:** A report (`performance_report.md` or `.pdf`) containing the execution plans for your analytical queries, along with a brief explanation of the chosen access paths and any optimization steps taken (e.g., creating indexes, using hints).
+- [ ] **Backup Strategy:** A brief description of the backup and recovery strategy you would implement for this application.
+
+</div>
+
+## Code Review Guide
+
+When conducting code reviews for database projects, focus on the following areas:
+
+### SQL Quality
+
+- **Readability:** Is the SQL formatted and commented clearly?
+- **Performance:** Are there any `SELECT *` or `NVL` functions in `WHERE` clauses? Are all joins using proper keys?
+- **Portability:** Are any Oracle-specific features (e.g., `CONNECT BY`) used appropriately?
+
+### Example Review Note
+
+<div class="review-note">
+
+<strong>🔍 Code Review Example:</strong>
+
+Consider the following query intended to find the top 5 employees by salary in each department:
+
+```sql
+SELECT * FROM
+ (SELECT e.*, ROW_NUMBER() OVER (PARTITION BY department_id ORDER BY salary DESC) rn
+  FROM employees e)
+WHERE rn <= 5;
+```
+
+<span class="badge">Good</span> Use of window function for an efficient, standard solution.
+
+<span class="badge danger">Bad</span> Using `SELECT e.*` returns all columns and might impact performance. Consider listing only the necessary columns.
+
+</div>
+
+## Exam Preparation
+
+### Oral Exam Structure
+
+The exam will be an oral discussion lasting approximately 15-20 minutes. It will cover the main topics from the syllabus. You are expected to:
+- Explain key concepts clearly.
+- Provide examples from your practical work (the patch).
+- Answer conceptual questions.
+
+### Topics to Review
+
+- Architecture (Instance vs. Database, Memory structures).
+- Storage (Tablespaces, segments, data blocks).
+- Transaction Management (ACID, undo, redo, locks).
+- Optimization (Execution plans, indexes, hints, CBO).
+- Backup & Recovery (Archivelog mode, RMAN, Flashback).
+
+### Practice Question
+
+<div class="exercise-box">
+
+<strong>❓ Sample Exam Question:</strong>
+
+"Explain the difference between a HARD PARSE and a SOFT PARSE in Oracle. Why does a hard parse consume more resources, and how can you reduce the number of hard parses in your application?"
+
+<strong>💡 Hint:</strong> Think about the Library Cache and the use of bind variables.
+
+</div>
+
+---
+
+*End of Course Documentation*
+```

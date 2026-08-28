@@ -1,0 +1,225 @@
+Year 1: Required Courses
+
+Winter Semester (ZS)
+
+English for Electro/IT Careers - B2 (JC/IPAIV)
+
+13-Week Subtopics: [Weeks 1–13 detailed weekly topics]
+
+Summary: [Core takeaways & key concepts]
+
+Questionnaire: [Final exam instructions, evaluation criteria, sample questions / test examples]
+
+Mathematical Statistics (KAM/NMAST)
+
+13-Week Subtopics: [Weeks 1–13 detailed weekly topics]
+
+Summary: [Core takeaways & key concepts]
+
+Questionnaire: [Final exam instructions, evaluation criteria, sample questions / test examples]
+
+Architecture and Techn. of Dat. Systems (KIT/NNADS)
+
+13-Week Subtopics: [Weeks 1–13 detailed weekly topics]
+
+Summary: [Core takeaways & key concepts]
+
+Questionnaire: [Final exam instructions, evaluation criteria, sample questions / test examples]
+
+Designing of Software Systems (KST/NNPSW)
+
+13-Week Subtopics: [Weeks 1–13 detailed weekly topics]
+
+Summary: [Core takeaways & key concepts]
+
+Questionnaire: [Final exam instructions, evaluation criteria, sample questions / test examples]
+
+Advanced Programming Techniques (KST/NNPTP)
+
+13-Week Subtopics: [Weeks 1–13 detailed weekly topics]
+
+Summary: [Core takeaways & key concepts]
+
+Questionnaire: [Final exam instructions, evaluation criteria, sample questions / test examples]
+
+Summer Semester (LS)
+
+Theoretical Informatics (KAM/NNTEI)
+
+13-Week Subtopics: [Weeks 1–13 detailed weekly topics]
+
+Summary: [Core takeaways & key concepts]
+
+Questionnaire: [Final exam instructions, evaluation criteria, sample questions / test examples]
+
+Architecture and Design of Inf. Systems (KST/NAPIS)
+
+13-Week Subtopics: [Weeks 1–13 detailed weekly topics]
+
+Summary: [Core takeaways & key concepts]
+
+Questionnaire: [Final exam instructions, evaluation criteria, sample questions / test examples]
+
+Data Structures and Algorithms (KST/NNDSA)
+
+13-Week Subtopics: [Weeks 1–13 detailed weekly topics]
+
+Summary: [Core takeaways & key concepts]
+
+Questionnaire: [Final exam instructions, evaluation criteria, sample questions / test examples]
+
+Programming of Internet Applications (KST/NNPIA)
+
+13-Week Subtopics: [Weeks 1–13 detailed weekly topics]
+
+Summary: [Core takeaways & key concepts]
+
+Questionnaire: [Final exam instructions, evaluation criteria, sample questions / test examples]
+
+Year 1: Optional Required Courses
+
+Winter Semester (ZS)
+
+Introduction to Artific. Intelligence 1 (KAM/NNUI1)
+
+13-Week Subtopics: [Weeks 1–13 detailed weekly topics]
+
+Summary: [Core takeaways & key concepts]
+
+Questionnaire: [Final exam instructions, evaluation criteria, sample questions / test examples]
+
+Data Protection and Security (KST/NOBD)
+
+13-Week Subtopics: [Weeks 1–13 detailed weekly topics]
+
+Summary: [Core takeaways & key concepts]
+
+Questionnaire: [Final exam instructions, evaluation criteria, sample questions / test examples]
+
+Network Security (KIT/NBPS)
+
+13-Week Subtopics: [Weeks 1–13 detailed weekly topics]
+
+Summary: [Core takeaways & key concepts]
+
+Questionnaire: [Final exam instructions, evaluation criteria, sample questions / test examples]
+
+Scripting in 3D Graphics Software (KIT/NS3DS)
+
+13-Week Subtopics: [Weeks 1–13 detailed weekly topics]
+
+Summary: [Core takeaways & key concepts]
+
+Questionnaire: [Final exam instructions, evaluation criteria, sample questions / test examples]
+
+Summer Semester (LS)
+
+Introduction to Artific. Intelligence 2 (KAM/NNUI2)
+
+13-Week Subtopics: [Weeks 1–13 detailed weekly topics]
+
+Summary: [Core takeaways & key concepts]
+
+Questionnaire: [Final exam instructions, evaluation criteria, sample questions / test examples]
+
+Security and Data Protection in Mob. ICT (KIT/NNBOD)
+
+13-Week Subtopics: [Weeks 1–13 detailed weekly topics]
+
+Summary: [Core takeaways & key concepts]
+
+Questionnaire: [Final exam instructions, evaluation criteria, sample questions / test examples]
+
+Parallel Programming (KST/NNPAR)
+
+13-Week Subtopics: [Weeks 1–13 detailed weekly topics]
+
+Summary: [Core takeaways & key concepts]
+
+Questionnaire: [Final exam instructions, evaluation criteria, sample questions / test examples]
+
+Business Informatics (KIT/NNPI)
+
+13-Week Subtopics: [Weeks 1–13 detailed weekly topics]
+
+Summary: [Core takeaways & key concepts]
+
+Questionnaire: [Final exam instructions, evaluation criteria, sample questions / test examples]
+
+Computer Graphics 2D (KST/NNPG2)
+
+13-Week Subtopics: [Weeks 1–13 detailed weekly topics]
+
+Summary: [Core takeaways & key concepts]
+
+Questionnaire: [Final exam instructions, evaluation criteria, sample questions / test examples]
+
+Optional Courses (Year Unspecified)
+
+Winter Semester (ZS)
+
+English Conversation (FEI/NNAKO)
+
+13-Week Subtopics: [Weeks 1–13 detailed weekly topics]
+
+Summary: [Core takeaways & key concepts]
+
+Questionnaire: [Final exam instructions, evaluation criteria, sample questions / test examples]
+
+Electronic Document Preparation (KIT/NNEPD)
+
+13-Week Subtopics: [Weeks 1–13 detailed weekly topics]
+
+Summary: [Core takeaways & key concepts]
+
+Questionnaire: [Final exam instructions, evaluation criteria, sample questions / test examples]
+
+Introduction to Artific. Intelligence (KIT/ZNUI1)
+
+13-Week Subtopics: [Weeks 1–13 detailed weekly topics]
+
+Summary: [Core takeaways & key concepts]
+
+Questionnaire: [Final exam instructions, evaluation criteria, sample questions / test examples]
+
+Geographic Information Systems III (USII/FGIS3)
+
+13-Week Subtopics: [Weeks 1–13 detailed weekly topics]
+
+Summary: [Core takeaways & key concepts]
+
+Questionnaire: [Final exam instructions, evaluation criteria, sample questions / test examples]
+
+Summer Semester (LS)
+
+English conversation for follow-ups (FEI/INAK2)
+
+13-Week Subtopics: [Weeks 1–13 detailed weekly topics]
+
+Summary: [Core takeaways & key concepts]
+
+Questionnaire: [Final exam instructions, evaluation criteria, sample questions / test examples]
+
+Digital Photography (KAM/IDIFO)
+
+13-Week Subtopics: [Weeks 1–13 detailed weekly topics]
+
+Summary: [Core takeaways & key concepts]
+
+Questionnaire: [Final exam instructions, evaluation criteria, sample questions / test examples]
+
+Digital Photography (KAM/ZDIFO)
+
+13-Week Subtopics: [Weeks 1–13 detailed weekly topics]
+
+Summary: [Core takeaways & key concepts]
+
+Questionnaire: [Final exam instructions, evaluation criteria, sample questions / test examples]
+
+Basics of Business (KIT/BZPO)
+
+13-Week Subtopics: [Weeks 1–13 detailed weekly topics]
+
+Summary: [Core takeaways & key concepts]
+
+Questionnaire: [Final exam instructions, evaluation criteria, sample questions / test examples]
