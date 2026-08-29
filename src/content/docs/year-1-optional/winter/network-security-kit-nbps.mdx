@@ -1,3 +1,758 @@
 ---
-title: Network Security (KIT/NBPS)
+title: "Network Security (KIT/NBPS)"
+description: "Complete course materials covering network device security, firewalls, VPNs, endpoint protection, and security policies."
+template: doc
 ---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+# Network Security (KIT/NBPS)
+
+Welcome to the course! This documentation covers the design and implementation of security measures for network devices, with a strong emphasis on endpoint protection. The curriculum builds on knowledge from CCNA and Linux OS courses, and includes practical hands-on development of a security auditing tool for Windows 11 Pro.
+
+## 📑 Table of Contents
+
+### Course Overview
+- [Course Objectives](#course-objectives)
+- [Assessment & Credit Requirements](#assessment--credit-requirements)
+- [Examination Structure](#examination-structure)
+- [Schedule](#schedule)
+
+### Lecture Materials
+1. [Week 1: Introduction to Security Threats](#week-1-introduction-to-security-threats)
+2. [Week 2: Network Security Fundamentals](#week-2-network-security-fundamentals)
+3. [Week 3: Attacks on Network Foundations](#week-3-attacks-on-network-foundations)
+4. [Week 4: Response to Attacks](#week-4-response-to-attacks)
+5. [Week 5: Wireless Network Security](#week-5-wireless-network-security)
+6. [Week 6: Network Infrastructure Security](#week-6-network-infrastructure-security)
+7. [Week 7: Windows OS Security](#week-7-windows-os-security)
+8. [Week 8: Linux OS Security](#week-8-linux-os-security)
+9. [Week 9: Endpoint Security Concepts](#week-9-endpoint-security-concepts)
+10. [Week 10: Cybersecurity Policies, Procedures, and Processes](#week-10-cybersecurity-policies-procedures-and-processes)
+11. [Week 11: Firewalls and VPN Technologies](#week-11-firewalls-and-vpn-technologies)
+12. [Week 12: Secure Access and Authentication](#week-12-secure-access-and-authentication)
+13. [Week 13: Integration and Advanced Topics](#week-13-integration-and-advanced-topics)
+
+### Assignments & Exam
+- [Assignment Requirements](#assignment-requirements)
+- [Code Review Guide](#code-review-guide)
+- [Exam Preparation](#exam-preparation)
+
+---
+
+## Course Overview
+
+### Course Objectives
+
+The goal of this course is to familiarize students with the design and implementation of network device security measures, with an emphasis on endpoint protection. The content covers:
+
+- <span class="badge">Network Security</span> Firewalls, VPN technologies, secure access, and protection against network threats.
+- <span class="badge">Endpoint Protection</span> Hardening Windows and Linux systems, antivirus, encryption, and patch management.
+- <span class="badge">Security Policies</span> Development and implementation of cybersecurity policies, procedures, and processes.
+- <span class="badge">Practical Skills</span> Building a GUI‑based security auditing tool for Windows 11 Pro.
+
+The course builds on the content of Computer Networks (CCNAv7) and Linux OS.
+
+### Assessment & Credit Requirements
+
+<div class="exercise-box">
+
+<strong>📋 To receive credit (zápočet), students must:</strong>
+
+- Complete an **e‑learning course** with a required test success rate of at least **70%**.
+- Independently develop a **GUI application** that verifies and displays the security settings of Windows 11 Pro. The application must present results in an output table with columns: `Check`, `Status`, `Comment`.
+
+</div>
+
+### Examination Structure
+
+The final grade is based on:
+- **E‑learning test** (pass/fail, 70% required).
+- **Project submission** (GUI application and report).
+- **Oral discussion** (to confirm understanding and explain design choices).
+
+### Schedule
+
+| Week | Lecture Topic | Exercise Focus |
+|------|---------------|----------------|
+| 1 | Security threats and attack surfaces | Identifying vulnerabilities in a sample network |
+| 2 | Network security fundamentals (CIA, AAA, defence in depth) | Configuring basic ACLs on a router |
+| 3 | Attacks on network foundations (spoofing, sniffing, DoS) | Simulating ARP spoofing and mitigation |
+| 4 | Response to attacks (incident response, forensics) | Creating an incident response plan |
+| 5 | Wireless network security (WPA3, rogue APs) | Auditing a Wi‑Fi network with airodump‑ng |
+| 6 | Network infrastructure security (routers, switches, NGFW) | Securing SNMP and SSH on Cisco devices |
+| 7 | Windows OS security | Writing PowerShell scripts for security checks |
+| 8 | Linux OS security | Hardening SSH, firewall (iptables/nftables), and auditing with Lynis |
+| 9 | Endpoint security concepts (AV, EDR, DLP) | Deploying and testing an open‑source EDR |
+| 10 | Cybersecurity policies, procedures, processes | Writing a security policy document |
+| 11 | Firewalls and VPN technologies | Configuring IPsec VPN between two sites |
+| 12 | Secure access and authentication (802.1X, MFA) | Setting up RADIUS authentication |
+| 13 | Integration and advanced topics | Final project presentations and review |
+
+---
+
+## Week 1: Introduction to Security Threats
+
+This week introduces the landscape of security threats, threat actors, attack surfaces, and the fundamental goals of security (CIA triad).
+
+### Key Concepts
+
+- **Security Threats** – Malware, phishing, DDoS, insider threats, APTs (Advanced Persistent Threats).
+- **Attack Surface** – The sum of all points where an attacker can try to enter or extract data.
+- **CIA Triad** – Confidentiality, Integrity, Availability.
+- **Risk Management** – Identification, assessment, and mitigation of risks.
+
+### Threat Modeling Example (STRIDE)
+
+- **S**poofing – pretending to be someone else.
+- **T**ampering – modifying data.
+- **R**epudiation – denying an action.
+- **I**nformation disclosure – leaking data.
+- **D**enial of service – making a service unavailable.
+- **E**levation of privilege – gaining higher access.
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: Threat Model a Small Network</strong>
+
+Consider a small office network with:
+- A firewall/router, a switch, three workstations (Windows 11 Pro), a file server (Linux), and a Wi‑Fi AP.
+1. Identify at least 5 potential threats (use STRIDE).
+2. Rank them by likelihood and impact.
+3. Suggest at least one mitigation for each.
+
+</div>
+
+---
+
+## Week 2: Network Security Fundamentals
+
+This week covers the core concepts of network security: authentication, authorization, accounting (AAA), defence in depth, and secure design principles.
+
+### Key Concepts
+
+- **Defence in Depth** – Layered security: physical, network, host, application, data.
+- **AAA** – Authentication (who you are), Authorization (what you can do), Accounting (what you did).
+- **Security Zones** – Inside, DMZ, outside; trust levels.
+- **Network Segmentation** – VLANs, subnets, firewalls to contain breaches.
+
+### Example: Access Control List (ACL) on Cisco
+
+```
+! Deny telnet from outside, allow SSH only from management subnet
+access-list 101 deny tcp any any eq 23
+access-list 101 permit tcp 192.168.10.0 0.0.0.255 any eq 22
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: Design a Secure Network Zone Architecture</strong>
+
+Design a network for a small e‑commerce company with three tiers: web server, application server, database server. Place them in appropriate security zones. Specify firewall rules (allow/deny) between zones and to the internet.
+
+</div>
+
+---
+
+## Week 3: Attacks on Network Foundations
+
+This week examines common network‑layer attacks and their countermeasures.
+
+### Key Concepts
+
+- **ARP Spoofing** – Attacker sends fake ARP replies to associate their MAC with a legitimate IP.
+- **IP Spoofing** – Forging source IP addresses.
+- **Sniffing** – Capturing network traffic (e.g., using Wireshark) to steal credentials or data.
+- **DoS/DDoS** – Overwhelming a target with traffic to disrupt services.
+- **Mitigation** – Dynamic ARP inspection, IPsec, encryption (TLS), rate limiting, and intrusion detection.
+
+### Python Example: ARP Spoof Detection
+
+```python
+import scapy.all as scapy
+
+def detect_arp_spoof(packet):
+    if packet.haslayer(scapy.ARP) and packet[scapy.ARP].op == 2:  # ARP reply
+        # check if IP-MAC pair changes unexpectedly
+        # store known mapping and alert if conflict
+        pass
+
+scapy.sniff(prn=detect_arp_spoof, filter="arp", store=0)
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: Simulate and Detect ARP Spoofing</strong>
+
+Using a virtual lab (e.g., GNS3 or mininet):
+1. Launch an ARP spoofing attack from a rogue host.
+2. Write a simple script in Python (using Scapy) that detects the attack by monitoring MAC‑IP changes.
+3. Suggest a permanent mitigation for the network (e.g., Dynamic ARP Inspection).
+
+</div>
+
+---
+
+## Week 4: Response to Attacks
+
+Preparation, detection, containment, eradication, and recovery – the incident response lifecycle.
+
+### Key Concepts
+
+- **Incident Response Plan** – Documented steps to follow when a security incident occurs.
+- **Phases** – Preparation, Identification, Containment, Eradication, Recovery, Lessons Learned.
+- **Forensics** – Collecting and analyzing evidence (disk, memory, network logs) while maintaining chain of custody.
+- **SIEM** – Security Information and Event Management (e.g., Splunk, ELK) for centralized logging and alerting.
+
+### Creating an Incident Response Checklist
+
+```python
+def incident_response_checklist():
+    return {
+        'Preparation': 'Train team, update tools, define roles',
+        'Identification': 'Monitor alerts, confirm incident',
+        'Containment': 'Isolate affected systems, block malicious IPs',
+        'Eradication': 'Remove malware, patch vulnerabilities',
+        'Recovery': 'Restore from clean backups, verify integrity',
+        'Lessons Learned': 'Conduct post‑mortem, update policies'
+    }
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: Draft an Incident Response Plan</strong>
+
+For the small company network from Week 2, draft a one‑page incident response plan covering:
+1. Contact list (who to call).
+2. Steps for a ransomware infection on a workstation.
+3. Steps for a DDoS attack on the web server.
+4. Communication strategy (internal and external).
+
+</div>
+
+---
+
+## Week 5: Wireless Network Security
+
+Wireless networks are inherently less secure. This week covers Wi‑Fi security protocols, common attacks, and best practices.
+
+### Key Concepts
+
+- **Wi‑Fi Security Protocols** – WEP (broken), WPA, WPA2, WPA3.
+- **Attacks** – Rogue AP, Evil Twin, KRACK, deauthentication attacks.
+- **WPA3 Improvements** – SAE (Simultaneous Authentication of Equals), stronger encryption.
+- **802.1X** – Port‑based authentication for enterprise Wi‑Fi (RADIUS).
+
+### Auditing a Wi‑Fi Network (Using `airodump-ng`)
+
+```bash
+# Enable monitor mode
+airmon-ng start wlan0
+# Scan for networks
+airodump-ng wlan0mon
+# Capture handshake (for WPA)
+airodump-ng -c 6 --bssid AA:BB:CC:DD:EE:FF -w capture wlan0mon
+# Deauth attack to force reauthentication
+aireplay-ng -0 2 -a AA:BB:CC:DD:EE:FF -c client_mac wlan0mon
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: Secure a Wi‑Fi Network</strong>
+
+You are setting up a small office Wi‑Fi.
+1. Choose the best security protocol (WPA3 if available) and explain why.
+2. Configure a strong passphrase and suggest periodic rotation.
+3. Enable MAC filtering (optional) and disable SSID broadcast (optional) – discuss if these are effective.
+4. Set up a guest network isolated from the internal network.
+
+</div>
+
+---
+
+## Week 6: Network Infrastructure Security
+
+Securing routers, switches, and other infrastructure devices is critical to prevent attacks on the network backbone.
+
+### Key Concepts
+
+- **Router Security** – Disable unused services, use SSH instead of Telnet, enable logging, configure ACLs.
+- **Switch Security** – Port security (MAC limiting), VLAN trunking hardening, STP protection (BPDU guard).
+- **Management Plane** – Secure SNMP (v3), out‑of‑band management, role‑based access.
+- **NGFW** – Next‑Generation Firewalls with application awareness, IPS, and SSL inspection.
+
+### Example: Basic Router Hardening (Cisco IOS)
+
+```
+! Secure SSH
+ip domain-name example.com
+crypto key generate rsa modulus 2048
+username admin secret StrongPass123
+line vty 0 4
+ transport input ssh
+ login local
+ exit
+! Disable unused ports
+interface gi0/0
+ shutdown
+! Logging
+logging 192.168.1.100
+service timestamps log datetime msec
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: Implement Switch Port Security</strong>
+
+On a Cisco switch, configure port security on an access port to:
+- Allow only one MAC address.
+- Shutdown the port if a violation occurs.
+- Set the maximum MAC count to 2 (so you can add a printer).
+Write the configuration commands and explain what happens when a third device is connected.
+
+</div>
+
+---
+
+## Week 7: Windows OS Security
+
+This week focuses on securing Windows 11 Pro and forms the technical basis for the semester project – building a security auditing application.
+
+### Key Concepts
+
+- **Windows Security Components** – Windows Defender Antivirus, Windows Update, User Account Control (UAC), BitLocker, TPM.
+- **Security Configuration** – Local Group Policy, Security Compliance Toolkit.
+- **PowerShell for Auditing** – Using cmdlets to query security settings.
+
+### PowerShell Script for Security Checks
+
+```powershell
+# Check Windows Defender status
+Get-MpComputerStatus | Select-Object AntivirusEnabled, RealTimeProtectionEnabled, AntivirusSignatureVersion
+
+# Check Windows Update status
+Get-WUHistory | Select-Object -Last 5
+
+# Check UAC settings
+Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" | Select-Object EnableLUA, ConsentPromptBehaviorAdmin
+
+# List administrators
+Get-LocalGroupMember -Group "Administrators"
+
+# Check BitLocker status
+Get-BitLockerVolume | Select-Object MountPoint, ProtectionStatus
+
+# Check open ports (listening)
+netstat -an | findstr LISTENING
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: Write a PowerShell Function for a Specific Check</strong>
+
+Write a PowerShell function `Test-SMBv1` that checks if SMBv1 is enabled (which is insecure). The function should return `$true` if enabled, `$false` otherwise, and include a comment explaining the security risk.
+
+</div>
+
+---
+
+## Week 8: Linux OS Security
+
+Linux is widely used in servers and IoT; securing it is vital. This week covers hardening, auditing, and monitoring.
+
+### Key Concepts
+
+- **System Hardening** – Disable unused services, configure firewall (nftables/iptables), enforce strong passwords, enable SELinux/AppArmor.
+- **Secure SSH** – Disable root login, use key‑based authentication, change default port (optional).
+- **Auditing Tools** – `lynis`, `chkrootkit`, `rkhunter`.
+- **File Integrity** – `tripwire`, `aide` to detect changes.
+
+### Hardening SSH
+
+```bash
+# /etc/ssh/sshd_config
+PermitRootLogin no
+PubkeyAuthentication yes
+PasswordAuthentication no
+AllowUsers user1 user2
+Port 2222  # optional
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: Run a Security Audit with Lynis</strong>
+
+Install Lynis on a Linux VM, run an audit, review the warnings, and remediate at least three issues. Provide a report with the before/after findings.
+
+</div>
+
+---
+
+## Week 9: Endpoint Security Concepts
+
+Endpoint security goes beyond antivirus. This week covers EDR, DLP, and device control.
+
+### Key Concepts
+
+- **Antivirus vs. EDR** – Traditional AV uses signatures; EDR provides behavioral monitoring, threat hunting, and response.
+- **Endpoint Detection and Response (EDR)** – Collects endpoint telemetry and enables investigation.
+- **Data Loss Prevention (DLP)** – Prevents sensitive data from leaving the organization.
+- **Application Control** – Whitelisting/blacklisting applications (e.g., Windows AppLocker, Linux seccomp).
+
+### Example: Open‑Source EDR – Wazuh Integration
+
+```bash
+# Install Wazuh agent on endpoint
+wget https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_4.7.0-1_amd64.deb
+dpkg -i wazuh-agent_4.7.0-1_amd64.deb
+# Configure manager address
+echo "MANAGER_IP=10.0.0.10" >> /var/ossec/etc/ossec.conf
+systemctl start wazuh-agent
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: Test EDR Capabilities</strong>
+
+Set up a Wazuh server and deploy an agent on a Windows VM. Simulate a malicious activity (e.g., downloading a known malware sample, disabled). Observe the alerts generated. Write a brief analysis.
+
+</div>
+
+---
+
+## Week 10: Cybersecurity Policies, Procedures, and Processes
+
+Security is not just technical; it is also about people and processes. This week covers policy development and compliance.
+
+### Key Concepts
+
+- **Security Policy** – High‑level document defining security objectives and responsibilities.
+- **Standards** – Specific technical requirements (e.g., password length).
+- **Procedures** – Step‑by‑step instructions for tasks (e.g., user onboarding).
+- **Compliance Frameworks** – NIST, ISO 27001, CIS Controls.
+
+### Policy Template
+
+```markdown
+# Acceptable Use Policy (AUP)
+## Purpose
+Define acceptable use of company IT resources.
+## Scope
+All employees and contractors.
+## Policy
+- Personal use is allowed limited to non‑excessive usage.
+- Accessing illegal content is prohibited.
+- Passwords must follow the password standard.
+## Enforcement
+Violations may lead to disciplinary action.
+## Review
+Annually.
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: Draft a Password Policy</strong>
+
+Create a password policy document for the company that includes:
+- Minimum length and complexity.
+- Expiration period.
+- History requirements (cannot reuse last 5 passwords).
+- Guidance on multi‑factor authentication (MFA).
+
+</div>
+
+---
+
+## Week 11: Firewalls and VPN Technologies
+
+Firewalls and VPNs are essential for network security. This week covers types, configurations, and best practices.
+
+### Key Concepts
+
+- **Firewall Types** – Packet‑filtering, stateful, proxy, NGFW (with IPS/IDS).
+- **VPN** – Site‑to‑site and remote access; IPsec and SSL/TLS VPNs.
+- **IPsec** – AH and ESP, IKE, tunnel vs. transport mode.
+- **VPN Deployment** – Gateway configuration, split‑tunneling, and security considerations.
+
+### Configuring IPsec (strongSwan)
+
+```
+# ipsec.conf
+conn site-to-site
+    left=192.168.1.1
+    leftsubnet=192.168.1.0/24
+    leftid=@siteA
+    right=203.0.113.2
+    rightsubnet=10.0.0.0/24
+    rightid=@siteB
+    ike=aes256-sha256-modp2048
+    esp=aes256-sha256
+    keyingtries=%forever
+    auto=start
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: Set Up a Site‑to‑Site VPN</strong>
+
+Using a lab environment (e.g., two routers with strongSwan, or virtual instances), create a site‑to‑site VPN between two subnets. Test connectivity and capture the ESP packets to verify encryption.
+
+</div>
+
+---
+
+## Week 12: Secure Access and Authentication
+
+Authentication is the gateway to resources. This week covers 802.1X, RADIUS, MFA, and PKI.
+
+### Key Concepts
+
+- **802.1X** – Port‑based network access control, uses EAP.
+- **RADIUS** – Centralized authentication, authorization, and accounting.
+- **MFA** – Something you know, have, are – e.g., OTP, biometrics.
+- **PKI** – Public Key Infrastructure for certificates (e.g., for 802.1X and HTTPS).
+
+### Example: FreeRADIUS Configuration Snippet
+
+```
+# clients.conf
+client my_switch {
+    ipaddr = 192.168.1.10
+    secret = shared_secret
+    shortname = switch
+}
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: Implement 802.1X with RADIUS</strong>
+
+Configure a RADIUS server (FreeRADIUS) and a switch to authenticate a workstation using EAP‑TLS (certificate‑based). Document the setup steps and test successful and failed authentication.
+
+</div>
+
+---
+
+## Week 13: Integration and Advanced Topics
+
+The final week ties everything together, reviews advanced threats, and showcases student projects.
+
+### Key Concepts
+
+- **Zero Trust Architecture** – Never trust, always verify; micro‑segmentation.
+- **Cloud Security** – Shared responsibility model, CASB, cloud firewall.
+- **Threat Intelligence** – Feeds, sharing, and using to proactive defense.
+- **Automation** – SOAR (Security Orchestration, Automation, Response).
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: Final Project Presentation</strong>
+
+Each student presents their Windows 11 Pro security auditing application. Demonstrate:
+- The GUI (table with checks, status, comments).
+- Explanation of how each check is performed (PowerShell, WMI, registry).
+- Discussion of findings and recommendations for securing a test machine.
+- Q&A on design and security principles.
+
+</div>
+
+---
+
+## Assignment Requirements
+
+<div class="exercise-box">
+
+<strong>📋 Semester Project: Windows 11 Pro Security Auditor</strong>
+
+Develop a GUI application that verifies and displays the security settings of Windows 11 Pro. The application must present results in a table with columns: `Check`, `Status`, `Comment`. The following checks must be included:
+
+</div>
+
+**1. Antivirus Software:**
+- Verify the status of Windows Defender or another antivirus program.
+- Check whether the antivirus is active, updated, and has real‑time protection enabled.
+
+**2. Windows Update:**
+- Check the status of system updates.
+- List any missing security patches or the last update.
+
+**3. User Accounts and UAC:**
+- Verify User Account Control (UAC) settings.
+- Check who has administrator rights.
+- Detect outdated or temporary accounts.
+
+**4. Services and Protocols:**
+- Check for outdated or risky protocols (e.g., SMBv1).
+- Verify the status of potentially dangerous services (e.g., Telnet, RDP).
+
+**5. Encryption and BitLocker:**
+- Check whether BitLocker is enabled on system drives.
+- Verify TPM settings for encryption.
+
+**6. Network Security:**
+- Check for open ports.
+- Verify VPN, proxy, or Wi‑Fi encryption settings.
+
+### Submission Checklist
+
+<div class="checklist">
+
+- [ ] **Source Code** – Complete Python (or C#) application with GUI (e.g., Tkinter, PyQt, Windows Forms).
+- [ ] **Executable** – Pre‑built executable (or instructions to run).
+- [ ] **Documentation** – User manual explaining how to use the tool and what each check does.
+- [ ] **Report** – A brief report (2–3 pages) describing the design, implementation, and testing results on a sample Windows 11 Pro machine.
+- [ ] **Demo** – A short video (5 min) or live demo during the final session.
+
+</div>
+
+## Code Review Guide
+
+When reviewing project code, focus on:
+
+### Functionality
+- Does the tool correctly detect the status of each security setting?
+- Are the outputs accurate and up‑to‑date?
+
+### Code Quality
+- Is the code well‑structured (functions, modules)?
+- Are error conditions handled gracefully (e.g., permissions, missing registry keys)?
+
+### Security of the Tool Itself
+- Does the tool run with the least privileges necessary?
+- Is the GUI safe from injection (e.g., no executing user input)?
+
+### Example Review Note
+
+<div class="review-note">
+
+<strong>🔍 Code Review Example:</strong>
+
+```python
+def check_defender():
+    try:
+        status = subprocess.check_output(["powershell", "Get-MpComputerStatus"]).decode()
+        if "True" in status:
+            return "Enabled"
+        else:
+            return "Disabled"
+    except:
+        return "Error"
+```
+
+<span class="badge">Good</span> Uses PowerShell to retrieve real system data.
+
+<span class="badge danger">Bad</span> The check for "True" is too simplistic; it may match other fields. Use proper parsing (e.g., `Get-MpComputerStatus | ConvertTo-Json` and JSON parsing).
+
+</div>
+
+## Exam Preparation
+
+### Exam Structure
+
+The exam consists of:
+1. **Written test** (70% passing threshold) covering theoretical concepts from lectures.
+2. **Project demonstration** (presentation of the GUI tool and its features).
+3. **Oral follow‑up** with questions on the project and general topics.
+
+### Topics to Review
+
+- Network threats and attacks (ARP spoofing, DoS, wireless attacks).
+- Firewall and VPN technologies (IPsec, SSL/TLS).
+- Operating system security (Windows and Linux hardening).
+- Endpoint security (EDR, DLP, antivirus).
+- Security policies and compliance.
+- 802.1X, RADIUS, MFA.
+
+### Practice Questions
+
+<div class="exercise-box">
+
+<strong>❓ Sample Exam Question 1:</strong>
+
+"Explain the difference between a stateful firewall and an NGFW. Why would you deploy an NGFW in a modern network?"
+
+<strong>💡 Hint:</strong> NGFW adds application awareness, SSL inspection, and integrated IPS.
+
+</div>
+
+<div class="exercise-box">
+
+<strong>❓ Sample Exam Question 2:</strong>
+
+"Describe how you would securely configure a Windows 11 Pro workstation for a high‑security environment. Include UAC, BitLocker, Windows Update, and antivirus settings."
+
+</div>
+
+<div class="exercise-box">
+
+<strong>❓ Sample Exam Question 3:</strong>
+
+"Your company is implementing remote access VPN. What security considerations must you address (authentication, encryption, split‑tunneling, and end‑point security)?"
+
+</div>
+
+---
+
+## Quick Reference Cards
+
+### Common Network Attacks and Mitigations
+
+| Attack | Mitigation |
+| :--- | :--- |
+| ARP Spoofing | Dynamic ARP Inspection, static ARP entries |
+| IP Spoofing | Ingress/Egress filtering, RPF (Reverse Path Forwarding) |
+| DoS/DDoS | Rate limiting, blackholing, WAF, CDN |
+| Wi‑Fi Deauth | Management frame protection (802.11w) |
+| Man‑in‑the‑Middle | TLS, IPsec, SSH, strong authentication |
+| Password Cracking | Strong passwords, MFA, account lockout policies |
+
+### Windows Security Checks – Useful PowerShell Cmdlets
+
+| Check | Cmdlet / Method |
+| :--- | :--- |
+| Antivirus status | `Get-MpComputerStatus` |
+| Windows Update history | `Get-WUHistory` |
+| UAC settings | Registry: `HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System` |
+| Administrators | `Get-LocalGroupMember -Group "Administrators"` |
+| BitLocker | `Get-BitLockerVolume` |
+| Open ports (listening) | `Get-NetTCPConnection -State Listen` |
+| SMBv1 enabled | `Get-WindowsOptionalFeature -Online -FeatureName SMB1Protocol` |
+
+### Linux Hardening Quick Tips
+
+- **Firewall** – `sudo ufw enable` or `nftables`.
+- **SSH** – Disable root login, use keys.
+- **SELinux** – Enable and set to enforcing.
+- **Audit** – Run `lynis audit system`.
+- **Updates** – `apt update && apt upgrade` or `dnf update`.
+
+---
+
+*End of Course Documentation*
+```

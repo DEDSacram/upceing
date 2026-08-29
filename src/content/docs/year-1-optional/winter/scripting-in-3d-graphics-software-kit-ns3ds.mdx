@@ -1,3 +1,1047 @@
 ---
-title: Scripting in 3D Graphics Software (KIT/NS3DS)
+title: "Scripting in 3D Graphics Software (KIT/NS3DS)"
+description: "Complete course materials for MEL scripting in Autodesk Maya, covering fundamentals to advanced particle control."
+template: doc
 ---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+# Scripting in 3D Graphics Software (KIT/NS3DS)
+
+Welcome to the course! This documentation covers the principles of working with modern 3D programs, with a primary focus on Autodesk Maya and its embedded scripting language MEL (Maya Embedded Language). You will gain practical skills that can be applied to data preparation for multimedia applications, from automating repetitive tasks to creating complex procedural animations.
+
+## 📑 Table of Contents
+
+### Course Overview
+- [Course Objectives](#course-objectives)
+- [Assessment & Credit Requirements](#assessment--credit-requirements)
+- [Examination Structure](#examination-structure)
+- [Schedule](#schedule)
+
+### Lecture Materials
+1. [Week 1: The Basics of MEL Commands](#week-1-the-basics-of-mel-commands)
+2. [Week 2: Problem Solving with MEL Scripting](#week-2-problem-solving-with-mel-scripting)
+3. [Week 3: Variables and Data Types](#week-3-variables-and-data-types)
+4. [Week 4: Using MEL Commands](#week-4-using-mel-commands)
+5. [Week 5: Manipulating Nodes in MEL](#week-5-manipulating-nodes-in-mel)
+6. [Week 6: Controlling the Flow of Execution](#week-6-controlling-the-flow-of-execution)
+7. [Week 7: Procedures and Functions](#week-7-procedures-and-functions)
+8. [Week 8: Designing MEL User Interfaces](#week-8-designing-mel-user-interfaces)
+9. [Week 9: Simple MEL User Interfaces](#week-9-simple-mel-user-interfaces)
+10. [Week 10: Custom Dialog Boxes](#week-10-custom-dialog-boxes)
+11. [Week 11: Making Advanced Dialog Boxes](#week-11-making-advanced-dialog-boxes)
+12. [Week 12: Using Expressions](#week-12-using-expressions)
+13. [Week 13: Controlling Particles with Expressions](#week-13-controlling-particles-with-expressions)
+
+### Assignments & Exam
+- [Assignment Requirements](#assignment-requirements)
+- [Code Review Guide](#code-review-guide)
+- [Exam Preparation](#exam-preparation)
+
+---
+
+## Course Overview
+
+### Course Objectives
+
+The course provides students with practical knowledge of working with modern 3D programs, currently Autodesk Maya. By the end of this course, you will have gained:
+
+- <span class="badge">MEL Fundamentals</span> Understanding of MEL syntax, commands, and scripting principles.
+- <span class="badge">Automation</span> The ability to automate repetitive tasks and create custom tools.
+- <span class="badge">UI Development</span> Skills in designing custom user interfaces and dialog boxes.
+- <span class="badge">Animation Control</span> Proficiency in using expressions to control particles and animations.
+
+### Assessment & Credit Requirements
+
+<div class="exercise-box">
+
+<strong>📋 To receive credit (zápočet), students must:</strong>
+
+- Actively participate in tutorials (cvičení).
+- Maintain **75% attendance** (this is mandatory).
+- Complete all seminar tasks by the specified deadlines.
+- Create a 3D computer animation in Autodesk Maya according to the teacher's specification.
+
+</div>
+
+### Examination Structure
+
+The final assessment consists of:
+- **Practical Project** – A complete 3D animation with MEL scripting components.
+- **Oral Discussion** – The student explains their code and design choices.
+
+### Schedule
+
+| Week | Lecture Topic | Exercise Focus |
+|------|---------------|----------------|
+| 1 | The Basics of MEL Commands | First MEL script: creating a sphere |
+| 2 | Problem Solving with MEL | Writing a script to solve a specific task |
+| 3 | Variables and Data Types | Working with strings, ints, floats, arrays |
+| 4 | Using MEL Commands | Common Maya commands and their syntax |
+| 5 | Manipulating Nodes in MEL | Selecting, creating, and transforming nodes |
+| 6 | Controlling the Flow of Execution | Conditionals and loops in MEL |
+| 7 | Procedures and Functions | Creating reusable code with `proc` |
+| 8 | Designing MEL User Interfaces | Introduction to `window`, `columnLayout`, `button` |
+| 9 | Simple MEL User Interfaces | Building a basic tool UI |
+| 10 | Custom Dialog Boxes | `promptDialog`, `fileDialog`, custom message boxes |
+| 11 | Making Advanced Dialog Boxes | Tabbed layouts, option menus, checkboxes |
+| 12 | Using Expressions | Animation expressions in Maya |
+| 13 | Controlling Particles with Expressions | Procedural particle effects |
+
+---
+
+## Week 1: The Basics of MEL Commands
+
+MEL (Maya Embedded Language) is the scripting language built into Autodesk Maya. This week introduces the basics: how to run MEL commands, create objects, and understand the Script Editor.
+
+### Key Concepts
+
+- **Script Editor** – The primary tool for writing and testing MEL scripts. Can be opened via `Window > General Editors > Script Editor`.
+- **Command Line** – Execute single commands directly in the Script Editor or the command line.
+- **Basic Commands** – `polySphere`, `polyCube`, `move`, `rotate`, `scale`.
+- **MEL vs. Python** – Maya supports both MEL and Python; this course focuses on MEL.
+
+### Your First MEL Script
+
+```mel
+// Create a sphere
+polySphere -r 2 -sx 20 -sy 20 -name "mySphere";
+// Move it up
+move 3 5 0 "mySphere";
+// Print a message to the Script Editor
+print "Sphere created and moved!\n";
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: Create a Scene with MEL</strong>
+
+Write a MEL script that:
+1. Creates a cube at position (0, 0, 0).
+2. Creates a sphere at position (5, 0, 0).
+3. Rotates the cube 45 degrees on the Y-axis.
+4. Prints the name of each object to the Script Editor.
+
+<strong>💡 Hint:</strong> Use `polyCube`, `polySphere`, `move`, `rotate`, and `print`.
+
+</div>
+
+---
+
+## Week 2: Problem Solving with MEL Scripting
+
+This week focuses on using MEL to solve practical problems, such as creating a row of objects or performing batch operations.
+
+### Key Concepts
+
+- **Scripting Workflow** – Identify the problem, break it down, write and test the script.
+- **Comments** – Use `//` for single‑line comments and `/* ... */` for multi‑line comments.
+- **Echoing Commands** – Enable "Echo All Commands" in the Script Editor to see what MEL commands Maya generates when you use the UI.
+
+### Example: Creating a Row of Cubes
+
+```mel
+// Create a row of 5 cubes spaced 3 units apart
+for ($i = 0; $i < 5; $i++) {
+    string $cubeName = "cube_" + $i;
+    polyCube -name $cubeName;
+    move ($i * 3) 0 0 $cubeName;
+}
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: Create a Circular Array</strong>
+
+Write a MEL script that creates 8 spheres arranged in a circle of radius 5. Each sphere should be at an angle of 45 degrees from the next.
+
+<strong>💡 Hint:</strong> Use trigonometry: `x = radius * cos(angle)`, `z = radius * sin(angle)`.
+
+</div>
+
+---
+
+## Week 3: Variables and Data Types
+
+MEL supports several data types for storing and manipulating data. This week covers variables, data types, and type conversion.
+
+### Key Concepts
+
+- **Variable Declaration** – Use the `$` prefix for variables.
+- **Data Types** – `int`, `float`, `string`, `vector` (Maya-specific).
+- **Type Conversion** – `int()`, `float()`, `string()`.
+- **Arrays** – `$myArray[0]`, `$myArray[1]`, etc. (MEL arrays are dynamic).
+
+### Working with Variables
+
+```mel
+// Integer and float
+int $count = 10;
+float $radius = 5.5;
+
+// String
+string $objectName = "myObject";
+
+// Vector (Maya's vector type)
+vector $position = <<3.0, 5.0, 2.0>>;
+float $x = $position.x;
+float $y = $position.y;
+float $z = $position.z;
+
+// Array
+string $objects[];
+$objects[0] = "cube1";
+$objects[1] = "sphere1";
+$objects[2] = "cylinder1";
+
+// Loop through array
+for ($i = 0; $i < size($objects); $i++) {
+    print($objects[$i] + "\n");
+}
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: User Input and Calculations</strong>
+
+Write a MEL script that:
+1. Asks the user for a radius value.
+2. Creates a sphere with that radius.
+3. Displays the volume of the sphere (4/3 × π × r³) in the Script Editor.
+
+<strong>💡 Hint:</strong> Use the `promptDialog` command to get user input.
+
+</div>
+
+---
+
+## Week 4: Using MEL Commands
+
+MEL has hundreds of commands. This week covers the most frequently used commands for object creation, transformation, and selection.
+
+### Key Concepts
+
+- **Object Creation** – `polySphere`, `polyCube`, `polyCylinder`, `polyCone`.
+- **Transformation** – `move`, `rotate`, `scale`, `setAttr`.
+- **Selection** – `select`, `ls` (list selected objects), `pick`.
+- **Naming Convention** – Commands often have flags (e.g., `-r` for radius).
+- **Return Values** – Many commands return the name of the created object.
+
+### Common Commands and Flags
+
+```mel
+// Create a sphere with specific attributes
+polySphere -r 3 -sx 30 -sy 30 -name "bigSphere";
+// Returns: bigSphere
+
+// Move with absolute and relative values
+move 2 4 1 "bigSphere";  // Absolute
+move -r 1 0 0 "bigSphere"; // Relative
+
+// Get and set attributes
+float $currentScaleX = getAttr("bigSphere.scaleX");
+setAttr "bigSphere.scaleX" 2.0;
+
+// Select an object and get the selection list
+select "bigSphere";
+string $selected[] = `ls -sl`;  // Backticks execute command
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: Create a Parametric Staircase</strong>
+
+Write a MEL script that creates a staircase:
+1. Create 10 boxes, each with height 0.5, width 2, depth 1.
+2. Each step is offset by +0.5 in Y and +1 in Z from the previous.
+3. The script should work for any number of steps (use a variable).
+
+</div>
+
+---
+
+## Week 5: Manipulating Nodes in MEL
+
+Maya organizes scenes as a hierarchy of nodes. This week covers how to select, group, parent, and manipulate nodes.
+
+### Key Concepts
+
+- **Nodes** – Every object in Maya is a node (transform node, shape node, etc.).
+- **Parenting** – `parent` command; `listRelatives` to list parent/children.
+- **Grouping** – `group` command; creates a new transform parent.
+- **Node Selection** – Use `ls -type` to list nodes by type.
+- **Naming** – Nodes can be renamed with `rename`.
+
+### Node Manipulation Commands
+
+```mel
+// Create and rename a sphere
+string $sphere = `polySphere -r 2`;
+rename $sphere "myBeautifulSphere";
+
+// Group objects
+select "cube1" "sphere1" "cylinder1";
+string $group = `group`;
+
+// Parent a sphere under a cube
+parent "sphere1" "cube1";
+
+// List children of a node
+string $children[] = `listRelatives -children "cube1"`;
+
+// Find all transform nodes
+string $allTransforms[] = `ls -type "transform"`;
+
+// Delete a node
+delete "sphere1";
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: Build a Hierarchical Structure</strong>
+
+Write a MEL script that creates:
+1. A "root" group (empty group).
+2. Under it, three groups: "leftArm", "rightArm", "body".
+3. Under each arm group, a sphere (shoulder) and a cylinder (upper arm).
+4. Make the script flexible using loops and arrays.
+
+</div>
+
+---
+
+## Week 6: Controlling the Flow of Execution
+
+MEL supports standard control structures for decision making and repetition.
+
+### Key Concepts
+
+- **Conditionals** – `if`, `else if`, `else`.
+- **Loops** – `for`, `while`, `do-while`.
+- **Break and Continue** – `break`, `continue`.
+- **Switch Statement** – `switch` (less common but useful for UI handling).
+
+### Flow Control Examples
+
+```mel
+// If statement
+int $count = 5;
+if ($count > 10) {
+    print "Count is greater than 10\n";
+} else if ($count == 5) {
+    print "Count is exactly 5\n";
+} else {
+    print "Count is less than 5\n";
+}
+
+// For loop
+for ($i = 0; $i < 10; $i++) {
+    if ($i == 5) {
+        continue;  // Skip iteration
+    }
+    print("i = " + $i + "\n");
+}
+
+// While loop
+int $j = 0;
+while ($j < 5) {
+    print("j = " + $j + "\n");
+    $j++;
+}
+
+// Switch
+string $choice = "sphere";
+switch ($choice) {
+    case "sphere":
+        polySphere;
+        break;
+    case "cube":
+        polyCube;
+        break;
+    default:
+        print "Unknown object type\n";
+}
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: Generate a Random Pattern</strong>
+
+Write a MEL script that:
+1. Creates 20 objects randomly positioned in a 10x10 grid area.
+2. Each object is either a cube or a sphere (randomly chosen).
+3. Cube size is randomly between 0.5 and 2. Sphere radius is randomly between 0.5 and 2.
+4. Print a summary (how many cubes, how many spheres) at the end.
+
+<strong>💡 Hint:</strong> Use `rand()` for random numbers.
+
+</div>
+
+---
+
+## Week 7: Procedures and Functions
+
+Procedures (functions) allow you to encapsulate reusable code. This week covers creating and using `proc` in MEL.
+
+### Key Concepts
+
+- **Procedure Definition** – `proc returnType functionName(parameters) { ... }`.
+- **Return Values** – Use `return` to return a value.
+- **Scope** – Variables inside a procedure are local by default.
+- **Global vs. Local** – Use `global` to make variables accessible outside the procedure.
+- **Default Parameters** – MEL doesn't support default parameters directly; use overloading or conditional checks.
+
+### Creating and Using Procedures
+
+```mel
+// Simple procedure with no parameters
+proc createScene() {
+    polySphere -r 1;
+    polyCube -w 2 -h 2 -d 2;
+    print "Scene created!\n";
+}
+
+// Procedure with parameters
+proc string createObject(string $type, float $size) {
+    string $result;
+    switch ($type) {
+        case "sphere":
+            $result = `polySphere -r $size`;
+            break;
+        case "cube":
+            $result = `polyCube -w $size -h $size -d $size`;
+            break;
+        default:
+            print "Unknown type\n";
+            return "";
+    }
+    return $result;
+}
+
+// Procedure with return value
+proc float calculateVolume(float $radius) {
+    return (4.0 / 3.0) * 3.14159 * pow($radius, 3);
+}
+
+// Call the procedures
+createScene;
+```java
+string $obj = createObject("sphere", 2.0);
+```
+float $vol = calculateVolume(2.0);
+print("Volume: " + $vol + "\n");
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: Create a Shape Library</strong>
+
+Write a MEL script with procedures for:
+1. `createCube(float $width, float $height, float $depth, string $name)`.
+2. `createSphere(float $radius, string $name)`.
+3. `createCylinder(float $radius, float $height, string $name)`.
+4. `createTorus(float $radius, float $tubeRadius, string $name)`.
+
+Each procedure should return the name of the created object. Test your procedures by creating one of each.
+
+</div>
+
+---
+
+## Week 8: Designing MEL User Interfaces
+
+MEL provides commands for creating custom user interfaces. This week covers the basics of UI layout and controls.
+
+### Key Concepts
+
+- **UI Hierarchy** – `window` → layouts (`columnLayout`, `rowLayout`) → controls (`button`, `text`, `textField`).
+- **Window Creation** – Use `window` command to create a window.
+- **Layouts** – Organize UI elements.
+- **Controls** – Buttons, text fields, sliders, option menus, etc.
+- **UI Commands** – Commands like `button` have a `-command` flag to specify what happens when clicked.
+
+### A Basic UI Window
+
+```mel
+proc createUI() {
+    window -title "My First UI" -widthHeight 300 200;
+    columnLayout -adj true;
+    
+    text -label "Welcome to my tool!" -font "boldLabelFont";
+    separator -height 10;
+    
+    button -label "Create Sphere" -command "polySphere -r 2";
+    button -label "Create Cube" -command "polyCube -w 3 -h 3 -d 3";
+    button -label "Close" -command "deleteUI -window $myWindow";
+    
+    showWindow;
+}
+
+// Call the UI creation procedure
+createUI;
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: Build a Simple Tool Window</strong>
+
+Create a MEL UI that includes:
+1. A text field for the object name.
+2. A drop‑down menu (optionMenu) to choose object type: Sphere, Cube, Cylinder.
+3. A text field for size (float).
+4. A "Create" button that creates the object with the specified name and size.
+5. A "Close" button that closes the window.
+
+</div>
+
+---
+
+## Week 9: Simple MEL User Interfaces
+
+This week dives deeper into building practical UIs, including how to handle user input and update the scene dynamically.
+
+### Key Concepts
+
+- **Getting User Input** – Use `textFieldGrp`, `floatSliderGrp`, `intSliderGrp`.
+- **Command Strings** – Build command strings dynamically using `+` concatenation.
+- **Global Variables** – Use `global` to share data between UI elements.
+- **Refresh UI** – Use `uiResize` or `refresh` when updating the UI.
+
+### UI with Input Controls
+
+```mel
+global string $gObjectName = "myObject";
+global float $gRadius = 1.0;
+
+proc createToolUI() {
+    window -title "Object Creator" -widthHeight 350 250;
+    columnLayout -adj true;
+    
+    text -label "Object Creation Tool" -font "boldLabelFont";
+    separator -height 10;
+    
+    text -label "Object Name:";
+    textFieldGrp -text $gObjectName -changeCommand "gObjectName = `textFieldGrp -query -text`";
+    
+    text -label "Sphere Radius:";
+    floatSliderGrp -field true -min 0.1 -max 10 -value $gRadius 
+                   -changeCommand "gRadius = `floatSliderGrp -query -value`";
+    
+    separator -height 10;
+    
+    button -label "Create Sphere" -command createSphereUI;
+    button -label "Close" -command "deleteUI -window $myWindow";
+    
+    showWindow;
+}
+
+proc createSphereUI() {
+    string $cmd = "polySphere -r " + $gRadius + " -name " + $gObjectName;
+    eval($cmd);
+    print("Created: " + $gObjectName + "\n");
+}
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: Object Manager UI</strong>
+
+Create a UI that allows the user to:
+1. Enter an object name.
+2. Choose between Cube, Sphere, and Cylinder.
+3. Set size via a slider.
+4. Choose color from a list (red, green, blue).
+5. Click "Create" to create the object and color it.
+6. Click "Delete Selected" to remove the selected object.
+
+</div>
+
+---
+
+## Week 10: Custom Dialog Boxes
+
+Dialog boxes are used to get input from the user or display information. This week covers `promptDialog`, `fileDialog`, and `confirmDialog`.
+
+### Key Concepts
+
+- **promptDialog** – Get text input from the user.
+- **fileDialog** – Browse for files or directories.
+- **confirmDialog** – Show a yes/no or ok/cancel dialog.
+- **Dialog Results** – Check the result and retrieve input.
+
+### Working with Dialogs
+
+```mel
+// Prompt dialog
+proc promptForNumber() {
+    string $result = `promptDialog
+        -title "Input"
+        -message "Enter a number:"
+        -text "5"
+        -button "OK" -button "Cancel"`;
+    
+    if ($result == "OK") {
+        string $value = `promptDialog -query -text`;
+        float $num = float($value);
+        print("You entered: " + $num + "\n");
+    }
+}
+
+// File dialog - select a file
+proc browseFile() {
+    string $file = `fileDialog
+        -fileMode 1  // 1 = open file, 0 = save file
+        -title "Select a file"`;
+    if ($file != "") {
+        print("Selected: " + $file + "\n");
+    }
+}
+
+// Confirm dialog
+proc confirmDelete() {
+    string $result = `confirmDialog
+        -title "Confirm Delete"
+        -message "Delete selected objects?"
+        -button "Yes" -button "No"
+        -defaultButton "No"`;
+    
+    if ($result == "Yes") {
+        string $selected[] = `ls -sl`;
+        delete $selected;
+        print("Deleted " + size($selected) + " objects\n");
+    }
+}
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: Batch Rename Tool with Dialog</strong>
+
+Create a MEL script that:
+1. Uses `promptDialog` to ask for a base name (e.g., "object").
+2. Uses `promptDialog` to ask for a starting number.
+3. Renames all selected objects sequentially (e.g., "object_1", "object_2", ...).
+4. If nothing is selected, show a warning with `confirmDialog` or `warning`.
+
+</div>
+
+---
+
+## Week 11: Making Advanced Dialog Boxes
+
+This week covers more complex UI elements such as tabbed layouts, checkboxes, and radio buttons for creating professional‑grade tools.
+
+### Key Concepts
+
+- **Tabbed Layouts** – `tabLayout` for creating tabs.
+- **Checkboxes** – `checkBox` for boolean options.
+- **Radio Buttons** – `radioButton` and `radioCollection` for mutually exclusive options.
+- **Scrollable Windows** – `scrollLayout` for large UIs.
+- **Menu Bars** – Adding menus to UI windows.
+
+### Advanced UI Example
+
+```mel
+global string $gTabWindows;
+
+proc createAdvancedUI() {
+    window -title "Advanced Tool" -widthHeight 400 300;
+    columnLayout -adj true;
+    
+    // Create menu bar
+    menuBarLayout;
+    menu -label "File";
+        menuItem -label "New Scene" -command "file -f -new";
+        menuItem -label "Open..." -command browseFile;
+        menuItem -divider;
+        menuItem -label "Exit" -command "deleteUI -window $gTabWindows";
+    setParent ..;
+    
+    // Tabbed layout
+    tabLayout -tabs "Create" -tabs "Modify" -tabs "Info" $gTabWindows;
+    
+    // Tab 1: Create
+    columnLayout;
+        text -label "Object Creation";
+        radioCollection -name "objType";
+        radioButton -label "Sphere" -select true;
+        radioButton -label "Cube";
+        radioButton -label "Cylinder";
+        floatSliderGrp -label "Size" -min 0.1 -max 10 -value 1;
+        checkBox -label "Double‑sided?" -value true;
+        button -label "Create" -command createAdvancedObject;
+    setParent ..;
+    
+    // Tab 2: Modify
+    columnLayout;
+        text -label "Modify Selected";
+        floatSliderGrp -label "Scale X" -min 0.1 -max 5 -value 1;
+        floatSliderGrp -label "Scale Y" -min 0.1 -max 5 -value 1;
+        floatSliderGrp -label "Scale Z" -min 0.1 -max 5 -value 1;
+        button -label "Apply Scale" -command applyScale;
+    setParent ..;
+    
+    // Tab 3: Info
+    columnLayout;
+        text -label "Scene Information";
+        button -label "Count Objects" -command countObjects;
+        button -label "List Selected" -command listSelected;
+    setParent ..;
+    
+    showWindow;
+}
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: Particle System Creator UI</strong>
+
+Create a UI that allows users to design a particle system:
+1. Tab 1: "Emitter" – settings for particle emission (rate, speed, position).
+2. Tab 2: "Behavior" – settings for particle behavior (gravity, turbulence, lifespan).
+3. Tab 3: "Render" – settings for particle rendering (type, size, color).
+4. Each tab should have a "Apply" button that sets the parameters.
+5. A "Create" button that creates the particle system with all settings.
+
+</div>
+
+---
+
+## Week 12: Using Expressions
+
+Maya expressions allow you to control animation attributes mathematically. This week covers the basics of expression syntax and application.
+
+### Key Concepts
+
+- **Expression** – A MEL statement that runs every frame to set an attribute.
+- **Creation** – Use `expression` command or the Expression Editor (`Window > Animation Editors > Expression Editor`).
+- **Variables** – `frame` is a special variable that gives the current frame number.
+- **Time** – `time` variable gives the current time in seconds.
+- **Syntax** – Expressions are similar to MEL but with restrictions.
+
+### Animation Expressions
+
+```mel
+// Simple oscillation expression (bouncing ball)
+// On the translateY attribute of a sphere
+sphere.translateY = 5 * sin(time * 2);
+
+// Advanced: bounce with damping
+float $bounce = 5;
+float $damping = 0.98;
+float $velocity = -10;
+// This is simplified; full physics requires more complex setup
+
+// Expression using frame
+// Scale oscillates with frame
+polySphere.scaleX = 1 + 0.5 * sin(frame * 0.1);
+polySphere.scaleY = 1 + 0.5 * sin(frame * 0.1 + 2);
+polySphere.scaleZ = 1 + 0.5 * sin(frame * 0.1 + 4);
+
+// Conditional expression (flashing light)
+if (frame % 10 < 5) {
+    spotlight.intensity = 1;
+} else {
+    spotlight.intensity = 0;
+}
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: Create a Pendulum Animation</strong>
+
+Write a MEL expression that creates a pendulum effect:
+1. Create a sphere at position (0, 5, 0).
+2. Apply an expression to its rotateZ attribute that makes it swing like a pendulum.
+3. The equation should be: `angle = amplitude * sin(frequency * time)`.
+4. Add damping so the swing gradually decreases.
+
+<strong>💡 Hint:</strong> Use `angle = amplitude * exp(-damping * time) * sin(frequency * time)`.
+
+</div>
+
+---
+
+## Week 13: Controlling Particles with Expressions
+
+Particle systems are a core feature of Maya for creating effects like fire, smoke, and explosions. This week covers using expressions to control particle behavior.
+
+### Key Concepts
+
+- **Particle Systems** – Create particles with `particle` command or the Dynamics menu.
+- **Particle Attributes** – `position`, `velocity`, `lifespan`, `color`, `size`, etc.
+- **Per‑Particle Expressions** – Expressions that run per particle, using `particleShape.attribute` syntax.
+- **Creation Expressions** – Run once when a particle is created.
+- **Runtime Expressions** – Run every frame for each particle.
+
+### Particle Control with Expressions
+
+```mel
+// Create a basic particle system
+particle -position 0 0 0 -count 100 -name "fireParticles";
+
+// Creation expression - set initial random velocity
+// In the particle's creation expression:
+particleShape1.velocity = rand(-2, 2);
+particleShape1.velocityY = rand(1, 5);
+
+// Runtime expression - add gravity and turbulence
+// In the particle's runtime expression:
+particleShape1.velocityY += -0.5 * time;
+particleShape1.velocity += rand(-0.1, 0.1);
+particleShape1.position += particleShape1.velocity;
+
+// Fade particles based on age
+float $age = particleShape1.age / particleShape1.lifespan;
+particleShape1.opacity = 1 - $age;
+
+// Change color over lifetime
+if ($age < 0.3) {
+    particleShape1.color = <<1, 0.5, 0>>;  // Orange
+} else if ($age < 0.7) {
+    particleShape1.color = <<1, 0.8, 0>>;  // Yellow
+} else {
+    particleShape1.color = <<0.5, 0, 0>>;  // Dark red
+}
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: Create a Firework Effect</strong>
+
+Write a complete MEL script that creates a fireworks particle system:
+1. Create a particle emitter at a random position.
+2. Particles should burst outward from the center with random velocities.
+3. Each particle should change color over its lifetime (bright to fading).
+4. Particles should fade out as they age.
+5. After all particles die, the firework is complete.
+
+<strong>💡 Hint:</strong> Use a `sphere` emitter with high speed and `rand()` for randomness. Use per‑particle expressions for color and opacity.
+
+</div>
+
+---
+
+## Assignment Requirements
+
+<div class="exercise-box">
+
+<strong>📋 Final Animation Project</strong>
+
+You are required to create a 3D computer animation in Autodesk Maya according to the teacher's specification. The project must include:
+
+1. **A complete 3D scene** – At least 5 objects, with proper materials and lighting.
+2. **MEL scripting** – At least three of the following elements:
+   - A custom UI tool (window with controls).
+   - Procedural object generation (scripted creation of objects).
+   - Animation expressions (controlled motion).
+   - Particle system with custom expressions.
+3. **Animation** – At least 5 seconds of animation with keyframes or expressions.
+4. **Documentation** – A brief report explaining your script(s) and their functionality.
+
+</div>
+
+### Submission Checklist
+
+<div class="checklist">
+
+- [ ] **MEL Scripts** – All `.mel` files, properly commented and organized.
+- [ ] **Maya Scene** – The `.ma` or `.mb` file containing the final animation.
+- [ ] **Documentation** – PDF report explaining the scripts and animation.
+- [ ] **Video Export** – An exported video of the animation (optional but recommended).
+- [ ] **UI Tool** – A custom UI window that demonstrates your scripting skills.
+
+</div>
+
+## Code Review Guide
+
+When reviewing MEL scripts, focus on:
+
+### Code Quality
+- **Readability** – Are variables and procedures named clearly? Are there comments?
+- **Efficiency** – Are there unnecessary loops or commands?
+- **Error Handling** – Does the script handle edge cases (e.g., no selection)?
+- **Naming Conventions** – Are names clear (e.g., `$radius` not `$r`)?
+
+### Maya‑Specific Practices
+- **UI Design** – Is the UI intuitive and well‑organized?
+- **Performance** – Are expressions efficient (avoid heavy computations per frame)?
+- **Node Management** – Are nodes properly named to avoid conflicts?
+
+### Example Review Note
+
+<div class="review-note">
+
+<strong>🔍 Code Review Example:</strong>
+
+```mel
+proc createStuff() {
+    string $sel[] = `ls -sl`;
+    for ($i=0;$i<size($sel);$i++) {
+        move 0 $i*2 0 $sel[$i];
+    }
+}
+```
+
+<span class="badge">Good</span> Clear purpose (moves selected objects upward in a step pattern).
+
+<span class="badge danger">Bad</span> No error handling if nothing is selected. Add a check:
+```mel
+if (size(`ls -sl`) == 0) {
+    warning "No objects selected!";
+    return;
+}
+```
+
+</div>
+
+## Exam Preparation
+
+### Exam Structure
+
+The final assessment consists of:
+1. **Practical Project** – A 3D animation with MEL scripting.
+2. **Oral Discussion** – Explaining your code and design choices.
+
+### Topics to Review
+
+- MEL fundamentals (commands, variables, data types)
+- Flow control (conditionals, loops)
+- Procedures (defining and calling)
+- UI development (windows, layouts, controls)
+- Dialog boxes (prompt, file, confirm)
+- Expressions for animation
+- Particle systems and per‑particle expressions
+
+### Practice Questions
+
+<div class="exercise-box">
+
+<strong>❓ Sample Exam Question 1:</strong>
+
+"Write a MEL procedure that creates a row of spheres. The procedure should take three parameters: `$count` (number of spheres), `$spacing` (distance between them), and `$radius` (radius of each sphere)."
+
+</div>
+
+<div class="exercise-box">
+
+<strong>❓ Sample Exam Question 2:</strong>
+
+"Describe the steps to create a UI window with a text field, a button, and a label. Explain the process of getting user input from the text field and using it to create an object."
+
+</div>
+
+<div class="exercise-box">
+
+<strong>❓ Sample Exam Question 3:</strong>
+
+"Explain the difference between a runtime expression and a creation expression for particles. Provide an example of when you would use each."
+
+</div>
+
+---
+
+## Quick Reference Cards
+
+### Common MEL Commands
+
+| Command | Purpose | Example |
+| :--- | :--- | :--- |
+| `polySphere` | Create a sphere | `polySphere -r 2 -name "sphere1"` |
+| `polyCube` | Create a cube | `polyCube -w 2 -h 3 -d 1` |
+| `move` | Move an object | `move 5 0 0 "obj"` |
+| `rotate` | Rotate an object | `rotate -r 45 0 0 "obj"` |
+| `scale` | Scale an object | `scale 2 2 2 "obj"` |
+| `select` | Select an object | `select "sphere1"` |
+| `ls` | List objects | `ls -sl` (list selected) |
+| `delete` | Delete an object | `delete "sphere1"` |
+| `group` | Group objects | `group` (groups selected) |
+| `parent` | Parent objects | `parent "child" "parent"` |
+| `getAttr` | Get attribute value | `getAttr "sphere1.translateX"` |
+| `setAttr` | Set attribute value | `setAttr "sphere1.scaleX" 2` |
+
+### MEL Data Types and Variables
+
+| Type | Example |
+| :--- | :--- |
+| `int` | `$i = 5` |
+| `float` | `$f = 3.14` |
+| `string` | `$s = "Hello"` |
+| `vector` | `$v = <<1,2,3>>` |
+| `array` | `$a[0] = "first"` |
+
+### UI Control Commands
+
+| Control | Purpose |
+| :--- | :--- |
+| `window` | Create a window |
+| `columnLayout` | Vertical layout |
+| `rowLayout` | Horizontal layout |
+| `text` | Display text |
+| `button` | Clickable button |
+| `textFieldGrp` | Text input field |
+| `floatSliderGrp` | Float slider with field |
+| `intSliderGrp` | Integer slider |
+| `optionMenu` | Drop‑down menu |
+| `checkBox` | Checkbox option |
+| `radioButton` | Radio button |
+| `tabLayout` | Tabbed panels |
+
+### Common MEL Patterns
+
+**For loop:**
+```mel
+for ($i = 0; $i < $count; $i++) {
+    // Code here
+}
+```
+
+**If statement:**
+```mel
+if ($condition) {
+    // Code
+} else if ($other) {
+    // Code
+} else {
+    // Code
+}
+```
+
+**Procedure definition:**
+```mel
+proc returnType functionName(parameterType $param) {
+    // Code
+    return $value;
+}
+```
+
+---
+
+*End of Course Documentation*
+```

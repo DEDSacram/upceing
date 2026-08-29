@@ -1,3 +1,802 @@
 ---
 title: Introduction to Artificial Intelligence 1 (KAM/NNUI1)
+description: "Complete course materials covering search algorithms, game theory, fuzzy logic, and evolutionary optimization."
+template: doc
 ---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+#  Introduction to Artificial Intelligence 1 (KAM/NNUI1)
+
+Welcome to the course! This documentation covers the fundamental concepts and practical implementations of artificial intelligence, from classical search and game playing to fuzzy systems and evolutionary algorithms. Each week includes theoretical foundations, code examples in Python, and hands‑on exercises.
+
+## 📑 Table of Contents
+
+### Course Overview
+- [Course Objectives](#course-objectives)
+- [Assessment & Credit Requirements](#assessment--credit-requirements)
+- [Examination Structure](#examination-structure)
+- [Schedule](#schedule)
+
+### Lecture Materials
+1. [Week 1: Introduction to AI](#week-1-introduction-to-ai)
+2. [Week 2: Graphs, Transition Systems & Planning](#week-2-graphs-transition-systems--planning)
+3. [Week 3: Uninformed Search – BFS & DFS](#week-3-uninformed-search--bfs--dfs)
+4. [Week 4: Advanced Uninformed Search](#week-4-advanced-uninformed-search)
+5. [Week 5: Informed Search & Heuristics](#week-5-informed-search--heuristics)
+6. [Week 6: Game Theory – Minimax & Alpha‑Beta](#week-6-game-theory--minimax--alpha-beta)
+7. [Week 7: Introduction to Fuzzy Sets](#week-7-introduction-to-fuzzy-sets)
+8. [Week 8: Fuzzy Relations & Numbers](#week-8-fuzzy-relations--numbers)
+9. [Week 9: Linguistic Variables & Approximate Reasoning](#week-9-linguistic-variables--approximate-reasoning)
+10. [Week 10: Fuzzy Logic Systems](#week-10-fuzzy-logic-systems)
+11. [Week 11: Stochastic Optimization Methods](#week-11-stochastic-optimization-methods)
+12. [Week 12: Genetic Algorithms & Differential Evolution](#week-12-genetic-algorithms--differential-evolution)
+13. [Week 13: Hybrid Evolutionary Algorithms](#week-13-hybrid-evolutionary-algorithms)
+
+### Assignments & Exam
+- [Assignment Requirements](#assignment-requirements)
+- [Code Review Guide](#code-review-guide)
+- [Exam Preparation](#exam-preparation)
+
+---
+
+## Course Overview
+
+### Course Objectives
+
+The aim of this course is to introduce students to the broad field of artificial intelligence and provide them with practical knowledge in:
+
+- <span class="badge">Problem Solving</span> Formulating and solving problems using state‑space search.
+- <span class="badge">Game Playing</span> Implementing adversarial search algorithms (Minimax, Alpha‑Beta).
+- <span class="badge">Fuzzy Logic</span> Understanding fuzzy sets, relations, and approximate reasoning.
+- <span class="badge">Knowledge Systems</span> Building rule‑based systems and fuzzy controllers.
+- <span class="badge">Evolutionary Computation</span> Applying genetic algorithms and other stochastic optimization techniques.
+
+### Assessment & Credit Requirements
+
+<div class="exercise-box">
+
+<strong>📋 To receive credit (zápočet), students must:</strong>
+
+- Complete a final project that solves a set of problems from the covered topics (individual or team work).
+- Demonstrate the ability to implement and explain algorithms from at least three different areas (e.g., search, fuzzy logic, genetic algorithms).
+- Present the project results and be prepared to answer questions about the implementation and theoretical background.
+
+</div>
+
+### Examination Structure
+
+The final examination is **oral**. It consists of a discussion with the examiner covering the main topics of the course. Emphasis is placed on understanding the fundamental principles, the ability to compare different approaches, and the application of the learned methods to new problems.
+
+### Schedule
+
+| Week | Lecture Topic | Exercise Focus |
+|------|---------------|----------------|
+| 1 | Introduction to AI, history | Python basics for AI |
+| 2 | Graphs, transition systems, planning | Graph representation in Python |
+| 3 | Uninformed search – BFS, DFS | Implementing BFS and DFS |
+| 4 | Advanced uninformed search (IDS, bidirectional, UCS) | Implementing iterative deepening and uniform‑cost search |
+| 5 | Informed search, heuristic functions | Implementing A* and designing heuristics |
+| 6 | Game theory – Minimax and Alpha‑Beta | Implementing a simple game (e.g., Tic‑Tac‑Toe) |
+| 7 | Fuzzy sets – basics and operations | Implementing fuzzy set operations in Python |
+| 8 | Fuzzy relations, numbers, extension principle | Computing fuzzy relation compositions |
+| 9 | Linguistic variables, fuzzy logic, approximate reasoning | Building a simple fuzzy inference system |
+| 10 | Fuzzy logic systems and applications | Designing a fuzzy controller (e.g., temperature control) |
+| 11 | Stochastic optimization (Monte Carlo, hill climbing, tabu, SA, ant colony) | Implementing simulated annealing for TSP |
+| 12 | Genetic algorithms, differential evolution | Implementing a basic genetic algorithm |
+| 13 | Hybrid evolutionary algorithms | Combining genetic algorithm with local search |
+
+---
+
+## Week 1: Introduction to AI
+
+This week provides an overview of artificial intelligence as a scientific discipline, its history, and its main subfields. We also cover fundamental concepts such as agents, environments, and the distinction between weak (narrow) and strong (general) AI.
+
+### Key Concepts
+
+- **What is AI?** – The study of agents that perceive their environment and take actions to achieve goals.
+- **History of AI** – From the Dartmouth workshop (1956) through the AI winters and the current deep learning revolution.
+- **Subfields of AI** – Search, reasoning, knowledge representation, planning, learning, natural language processing, robotics, etc.
+- **Intelligent Agents** – Sensors, actuators, performance measure, environment types (fully/partially observable, deterministic/stochastic, etc.).
+
+### Python Basics for AI
+
+We will use Python throughout the course. A quick recap of essential constructs:
+
+```python
+# Lists, list comprehensions, and dictionaries
+states = ["S", "A", "B", "G"]
+graph = {
+    "S": ["A", "B"],
+    "A": ["S", "G"],
+    "B": ["S", "G"],
+    "G": []
+}
+
+# Functions and generators
+def dfs(graph, start, goal, path=None):
+    if path is None:
+        path = []
+    path = path + [start]
+    if start == goal:
+        return path
+    for neighbor in graph.get(start, []):
+        if neighbor not in path:
+            new_path = dfs(graph, neighbor, goal, path)
+            if new_path:
+                return new_path
+    return None
+
+print(dfs(graph, "S", "G"))  # Output: ['S', 'A', 'G']
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: Implement a Simple Agent</strong>
+
+Write a Python function `simple_reflex_agent(percept)` that returns an action based on a rule‑based system. The environment is a vacuum‑cleaner world with two rooms (A and B). The percept is a tuple `(location, status)` where `status` is `'clean'` or `'dirty'`. The agent can perform actions: `'suck'`, `'move_left'`, `'move_right'`.
+
+<strong>💡 Hint:</strong> Use a dictionary to map percepts to actions. For example, if the location is A and dirty, suck; if clean, move to B.
+
+</div>
+
+---
+
+## Week 2: Graphs, Transition Systems & Planning
+
+Graph theory forms the foundation for state‑space search. This week we formalize problems as transition systems and introduce planning as searching for a path from an initial state to a goal state.
+
+### Key Concepts
+
+- **Graph** – A set of nodes (states) and edges (transitions) that may be directed or undirected, weighted or unweighted.
+- **Transition System** – A formal model of a problem: `(S, A, T, I, G)` where:
+  - `S` – set of states
+  - `A` – set of actions
+  - `T` – transition function `S × A → S`
+  - `I` – initial state
+  - `G` – set of goal states
+- **Planning** – Finding a sequence of actions that transforms the initial state into a goal state.
+
+### Representing Graphs in Python
+
+```python
+# Example: a weighted directed graph using adjacency list with costs
+graph = {
+    'S': {'A': 1, 'B': 4},
+    'A': {'S': 1, 'G': 3},
+    'B': {'S': 4, 'G': 2},
+    'G': {}
+}
+
+# Helper to get neighbors with costs
+def get_neighbors(node):
+    return graph.get(node, {}).items()
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: Build a Transition System</strong>
+
+Define a transition system for the "Missionaries and Cannibals" problem. Represent states as tuples `(m_left, c_left, boat)` where `m_left` and `c_left` are numbers on the left bank, and `boat` is `1` if the boat is on the left, `0` otherwise. The goal is `(0, 0, 0)`. Write a function `successors(state)` that returns a list of possible next states (valid moves).
+
+<strong>💡 Hint:</strong> Valid moves carry 1 or 2 people, with the constraint that missionaries are never outnumbered by cannibals on either bank.
+
+</div>
+
+---
+
+## Week 3: Uninformed Search – BFS & DFS
+
+Uninformed (blind) search algorithms explore the state space without using domain‑specific knowledge. We cover breadth‑first search (BFS) and depth‑first search (DFS).
+
+### Key Concepts
+
+- **BFS** – Explores all nodes at the current depth before moving to the next depth. Guarantees the shortest path in terms of number of steps (unweighted). Uses a queue (FIFO).
+- **DFS** – Explores as far as possible along a branch before backtracking. Uses a stack (LIFO). Not guaranteed to find the shortest path; may get stuck in infinite loops if cycles are not handled.
+- **Complexity** – BFS: O(b^d) time, O(b^d) space; DFS: O(b^m) time, O(b*m) space (where b = branching factor, d = depth of shallowest goal, m = maximum depth).
+
+### Implementation
+
+```python
+from collections import deque
+
+def bfs(graph, start, goal):
+    visited = set()
+    queue = deque([(start, [start])])
+    while queue:
+        node, path = queue.popleft()
+        if node == goal:
+            return path
+        if node not in visited:
+            visited.add(node)
+            for neighbor in graph.get(node, []):
+                if neighbor not in visited:
+                    queue.append((neighbor, path + [neighbor]))
+    return None
+
+def dfs_iterative(graph, start, goal):
+    visited = set()
+    stack = [(start, [start])]
+    while stack:
+        node, path = stack.pop()
+        if node == goal:
+            return path
+        if node not in visited:
+            visited.add(node)
+            for neighbor in graph.get(node, []):
+                if neighbor not in visited:
+                    stack.append((neighbor, path + [neighbor]))
+    return None
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: Compare BFS and DFS</strong>
+
+Given the following graph (adjacency list): `A: [B, C], B: [D, E], C: [F, G], D: [], E: [], F: [], G: []`. Find the path from A to G using both BFS and DFS. Explain the difference in the order of exploration and the resulting paths.
+
+</div>
+
+---
+
+## Week 4: Advanced Uninformed Search
+
+We extend the basic search algorithms to handle depth limits, iterative deepening, bidirectional search, and uniform‑cost search for weighted graphs.
+
+### Key Concepts
+
+- **Depth‑Limited DFS** – DFS with a maximum depth cutoff to avoid infinite loops.
+- **Iterative Deepening DFS (IDDFS)** – Repeatedly runs depth‑limited DFS with increasing limits. Combines the space efficiency of DFS with the completeness of BFS (for finite branching factor).
+- **Bidirectional Search** – Run two simultaneous searches (forward from start, backward from goal) and stop when they meet. Significantly reduces time complexity to O(b^(d/2)).
+- **Uniform‑Cost Search (UCS)** – Generalization of BFS for weighted graphs. Uses a priority queue (min‑heap) ordered by path cost. Equivalent to Dijkstra's algorithm.
+
+### Implementation of UCS
+
+```python
+import heapq
+
+def ucs(graph, start, goal):
+    # graph: dict node -> {neighbor: cost}
+    frontier = [(0, start, [start])]  # (cost, node, path)
+    visited = set()
+    while frontier:
+        cost, node, path = heapq.heappop(frontier)
+        if node == goal:
+            return path, cost
+        if node not in visited:
+            visited.add(node)
+            for neighbor, edge_cost in graph.get(node, {}).items():
+                if neighbor not in visited:
+                    heapq.heappush(frontier, (cost + edge_cost, neighbor, path + [neighbor]))
+    return None, float('inf')
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: Implement IDDFS</strong>
+
+Write a function `iddfs(graph, start, goal, max_depth)` that performs iterative deepening depth‑first search. For each depth limit from 0 to max_depth, call a depth‑limited DFS. Return the path when found. Test it on a graph where the goal is at depth 5.
+
+</div>
+
+---
+
+## Week 5: Informed Search & Heuristics
+
+Informed (heuristic) search uses domain‑specific knowledge to guide the search, improving efficiency. The most prominent algorithm is A*.
+
+### Key Concepts
+
+- **Heuristic Function** `h(n)` – Estimates the cost from node n to the goal. Must be admissible (never overestimates) and consistent (monotonic) for A* to be optimal.
+- **A* Algorithm** – Combines uniform‑cost search (g(n) = cost from start) with heuristic (h(n)): f(n) = g(n) + h(n). Uses a priority queue ordered by f(n).
+- **Greedy Best‑First Search** – Uses only h(n); not optimal but often faster.
+- **Designing Heuristics** – Common methods: relax the problem (e.g., Manhattan distance for 8‑puzzle), subproblem, pattern databases.
+
+### A* Implementation
+
+```python
+def a_star(graph, start, goal, heuristic):
+    frontier = [(heuristic(start), 0, start, [start])]  # (f, g, node, path)
+    visited = {}
+    while frontier:
+        f, g, node, path = heapq.heappop(frontier)
+        if node == goal:
+            return path, g
+        if node not in visited or g < visited[node]:
+            visited[node] = g
+            for neighbor, step_cost in graph.get(node, {}).items():
+                new_g = g + step_cost
+                new_f = new_g + heuristic(neighbor)
+                heapq.heappush(frontier, (new_f, new_g, neighbor, path + [neighbor]))
+    return None, float('inf')
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: A* on a Grid</strong>
+
+Implement a simple grid environment where each cell has coordinates. The goal is to go from (0,0) to (4,4) with obstacles. Use Manhattan distance as heuristic. Write functions to generate the graph on‑the‑fly and run A*. Compare the number of expanded nodes with UCS.
+
+</div>
+
+---
+
+## Week 6: Game Theory – Minimax & Alpha‑Beta
+
+This week introduces adversarial search for two‑player games. We implement the Minimax algorithm and its optimization, Alpha‑Beta pruning.
+
+### Key Concepts
+
+- **Game Tree** – Nodes represent game states; edges are moves. The root is the initial state.
+- **Minimax** – For a zero‑sum game, the player (MAX) tries to maximize the score, while the opponent (MIN) minimizes it. The algorithm recursively computes the value of each state: MAX nodes take the maximum over children, MIN nodes take the minimum.
+- **Alpha‑Beta Pruning** – Prunes branches that cannot influence the final decision. Maintains two bounds: α (best value for MAX) and β (best value for MIN). If α ≥ β, prune.
+
+### Implementation (Tic‑Tac‑Toe)
+
+```python
+def minimax(board, depth, is_maximizing):
+    # Returns (best_score, best_move)
+    if game_over(board) or depth == 0:
+        return evaluate(board), None
+    if is_maximizing:
+        best_score = -float('inf')
+        best_move = None
+        for move in get_legal_moves(board):
+            new_board = make_move(board, move, 'X')
+            score, _ = minimax(new_board, depth-1, False)
+            if score > best_score:
+                best_score = score
+                best_move = move
+        return best_score, best_move
+    else:
+        best_score = float('inf')
+        best_move = None
+        for move in get_legal_moves(board):
+            new_board = make_move(board, move, 'O')
+            score, _ = minimax(new_board, depth-1, True)
+            if score < best_score:
+                best_score = score
+                best_move = move
+        return best_score, best_move
+```
+
+### Alpha‑Beta Pruning
+
+Add alpha and beta parameters and prune when `score >= beta` for MAX or `score <= alpha` for MIN.
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: Implement Alpha‑Beta for Connect Four</strong>
+
+Implement a simplified version of Connect Four on a 4×4 board. Write the evaluation function (e.g., count potential winning lines) and implement the alpha‑beta search with a depth limit of 4. Test it by playing against a random move opponent.
+
+</div>
+
+---
+
+## Week 7: Introduction to Fuzzy Sets
+
+Fuzzy sets extend classical (crisp) sets by allowing partial membership, represented by a membership degree between 0 and 1. This enables handling of imprecise concepts.
+
+### Key Concepts
+
+- **Membership Function** – Assigns a membership degree μ_A(x) to each element x in the universe of discourse.
+- **Basic Operations** – Union (max), Intersection (min), Complement (1 - μ).
+- **Support, Core, Height, Normality** – Support: elements with μ > 0; Core: μ = 1; Height: max μ; Normal: height = 1.
+
+### Python Implementation
+
+```python
+# Represent fuzzy set as a dict: element -> membership degree
+fuzzy_A = {'a': 0.2, 'b': 0.8, 'c': 1.0}
+fuzzy_B = {'b': 0.5, 'c': 0.3, 'd': 0.9}
+
+def fuzzy_union(A, B):
+    union = {}
+    for key in set(A.keys()) | set(B.keys()):
+        union[key] = max(A.get(key, 0), B.get(key, 0))
+    return union
+
+def fuzzy_intersection(A, B):
+    inter = {}
+    for key in set(A.keys()) & set(B.keys()):
+        inter[key] = min(A.get(key, 0), B.get(key, 0))
+    return inter
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: Membership Functions</strong>
+
+Define a fuzzy set "tall" for heights in centimeters using a trapezoidal membership function: μ_tall(x) = 0 for x ≤ 160, (x-160)/20 for 160 < x ≤ 180, 1 for 180 < x ≤ 200, (220-x)/20 for 200 < x ≤ 220, 0 for x > 220. Write a function `tall_membership(height)` and compute membership for heights 150, 170, 190, 210, 230.
+
+</div>
+
+---
+
+## Week 8: Fuzzy Relations & Numbers
+
+We extend fuzzy set concepts to relations and numbers, and introduce the extension principle for mapping crisp functions to fuzzy domains.
+
+### Key Concepts
+
+- **Fuzzy Relation** – A fuzzy set on the Cartesian product of two universes; membership degree indicates the strength of association.
+- **Composition** – Max‑min composition: R ∘ S (x,z) = max_y min(R(x,y), S(y,z)).
+- **Fuzzy Numbers** – A fuzzy set on the real line that is normal, convex, and has a bounded support (e.g., triangular, trapezoidal).
+- **Extension Principle** – Allows extending a crisp function f: X → Y to fuzzy sets: `f(A)(y) = sup_{x: f(x)=y} μ_A(x)`.
+
+### Python Example: Triangular Fuzzy Number
+
+```python
+def triangular_membership(x, a, b, c):
+    # a < b < c, peak at b
+    if x <= a or x >= c:
+        return 0.0
+    elif a < x <= b:
+        return (x - a) / (b - a)
+    else:  # b < x < c
+        return (c - x) / (c - b)
+
+# Example: fuzzy number "around 5" with (3,5,7)
+print(triangular_membership(4, 3, 5, 7))  # 0.5
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: Max‑Min Composition</strong>
+
+Given fuzzy relations R (size 2x3) and S (size 3x2) as matrices, compute the composition R ∘ S using max‑min. Write a function in Python that accepts two matrices and returns the composed matrix.
+
+</div>
+
+---
+
+## Week 9: Linguistic Variables & Approximate Reasoning
+
+Linguistic variables allow the use of natural language terms (e.g., "temperature is high") in fuzzy systems. Approximate reasoning uses fuzzy rules to infer conclusions from imprecise premises.
+
+### Key Concepts
+
+- **Linguistic Variable** – A variable whose values are linguistic terms (fuzzy sets). For example, "temperature" can be &lcub;cold, warm, hot&rcub;.
+- **Fuzzy Rules** – If‑then rules with fuzzy antecedents and consequents (e.g., "If temperature is hot and humidity is high, then fan_speed is fast").
+- **Fuzzy Inference** – Steps: fuzzification (mapping crisp inputs to membership degrees), rule evaluation (combining antecedents with AND/OR using min/max), aggregation (combining rule outputs), defuzzification (e.g., centroid method).
+
+### Mamdani Inference Example
+
+```python
+# Simple rule: If x is A and y is B then z is C
+# Use min for AND, max for aggregation
+def evaluate_rule(x_val, y_val, A, B, C):
+    mu_A = A(x_val)
+    mu_B = B(y_val)
+    firing_strength = min(mu_A, mu_B)
+    # Implication: truncate C
+    def implied_C(z):
+        return min(firing_strength, C(z))
+    return implied_C
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: Build a Simple Fuzzy Inference System</strong>
+
+Design a fuzzy controller for a washing machine. Inputs: dirtiness (0–100) and type of fabric (crisp, but map to fuzzy terms). Output: wash time (0–60 min). Define membership functions, write at least three rules, and compute output for a given input.
+
+</div>
+
+---
+
+## Week 10: Fuzzy Logic Systems and Their Applications
+
+We explore the architecture of fuzzy logic systems (FLS) and their real‑world applications, from control systems to decision support.
+
+### Key Concepts
+
+- **Components of FLS** – Fuzzification, Rule Base, Inference Engine, Defuzzification.
+- **Defuzzification Methods** – Centroid (center of gravity), bisector, mean of maxima.
+- **Types of FLS** – Mamdani (often used for control) and Takagi‑Sugeno (consequents are functions, used for modeling).
+- **Applications** – Industrial control (cement kiln, subway trains), consumer electronics (auto‑focus cameras), financial forecasting.
+
+### Example: Centroid Defuzzification
+
+```python
+def centroid(output_set, universe):
+    numerator = sum(x * output_set(x) for x in universe)
+    denominator = sum(output_set(x) for x in universe)
+    return numerator / denominator if denominator != 0 else 0
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: Implement a Takagi‑Sugeno Fuzzy System</strong>
+
+Create a Sugeno FLS for a simple function approximation. Inputs: x in [0,10]. Rules: If x is small then y = 0.2x; if x is medium then y = 0.5x + 1; if x is large then y = x. Define membership functions for small, medium, large and compute output for x = 4.
+
+</div>
+
+---
+
+## Week 11: Stochastic Optimization Methods
+
+This week covers randomized search techniques that are useful for complex optimization problems where deterministic methods fail.
+
+### Key Concepts
+
+- **Monte Carlo** – Random sampling to estimate properties (e.g., approximate pi, compute integrals).
+- **Hill Climbing** – Iterative improvement by moving to a better neighbor. Susceptible to local optima.
+- **Tabu Search** – Uses a memory (tabu list) to avoid revisiting recent solutions, encouraging exploration.
+- **Simulated Annealing** – Accepts worse solutions with a probability that decreases over time (annealing schedule) to escape local optima.
+- **Ant Colony Optimization** – Inspired by ant foraging, uses pheromone trails to build solutions for path‑finding problems (e.g., TSP).
+
+### Simulated Annealing for TSP (pseudo‑code)
+
+```python
+def simulated_annealing(initial_solution, cost_func, neighbor_func, schedule):
+    current = initial_solution
+    current_cost = cost_func(current)
+    for t in range(max_iter):
+        T = schedule(t)
+        if T == 0: break
+        candidate = neighbor_func(current)
+        candidate_cost = cost_func(candidate)
+        delta = candidate_cost - current_cost
+        if delta < 0 or random.random() < math.exp(-delta / T):
+            current = candidate
+            current_cost = candidate_cost
+    return current, current_cost
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: Implement Hill Climbing with Random Restarts</strong>
+
+Write a hill‑climbing algorithm for the 8‑queens problem (minimize number of attacking pairs). Use random restarts (e.g., 10 times) and report the best solution found. Compare the success rate with simple hill climbing.
+
+</div>
+
+---
+
+## Week 12: Genetic Algorithms & Differential Evolution
+
+Evolutionary algorithms mimic natural selection. Genetic algorithms (GA) and differential evolution (DE) are among the most popular.
+
+### Key Concepts
+
+- **Genetic Algorithm** – Population of chromosomes; selection (roulette, tournament), crossover (one‑point, uniform), mutation (bit‑flip, Gaussian).
+- **Fitness Function** – Evaluates the quality of a solution.
+- **Elitism** – Preserve the best individuals each generation.
+- **Differential Evolution** – For continuous optimization; creates new candidate by adding weighted difference of two population members to a third.
+
+### GA Implementation (binary string for knapsack)
+
+```python
+import random
+
+def ga(pop_size, fitness, crossover, mutate, generations):
+    pop = [random.choices([0,1], k=chromosome_length) for _ in range(pop_size)]
+    for _ in range(generations):
+        # fitness
+        fitnesses = [fitness(ind) for ind in pop]
+        new_pop = []
+        # elitism: keep top 2
+        sorted_pop = [x for _, x in sorted(zip(fitnesses, pop), reverse=True)]
+        new_pop.extend(sorted_pop[:2])
+        # fill rest
+        while len(new_pop) < pop_size:
+            p1 = tournament_selection(pop, fitnesses)
+            p2 = tournament_selection(pop, fitnesses)
+            child = crossover(p1, p2)
+            child = mutate(child)
+            new_pop.append(child)
+        pop = new_pop
+    return max(pop, key=fitness)
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: Differential Evolution for Function Minimization</strong>
+
+Implement differential evolution (DE) to minimize the Rastrigin function in 2D. Use population size 50, CR=0.5, F=0.8, for 100 generations. Plot the convergence curve.
+
+</div>
+
+---
+
+## Week 13: Hybrid Evolutionary Algorithms
+
+Hybrid algorithms combine evolutionary methods with local search (memetic algorithms) or other techniques to exploit their strengths and mitigate weaknesses.
+
+### Key Concepts
+
+- **Memetic Algorithms** – GA + local search (e.g., hill climbing) applied to each individual after crossover/mutation.
+- **Lamarckian vs. Baldwinian** – Lamarckian: update chromosome with improved solution; Baldwinian: keep chromosome but update fitness.
+- **Co‑evolutionary Algorithms** – Multiple populations that co‑evolve (e.g., predator‑prey).
+- **Grammar‑guided Genetic Programming** – Uses context‑free grammars to constrain solutions.
+
+### Hybrid Example
+
+```python
+def memetic_algorithm(pop, fitness, local_search, ...):
+    for generation:
+        # crossover and mutation
+        # local search on each child (or with probability)
+        child = local_search(child)  # improve
+        # evaluate and replace
+    return best
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: Design a Hybrid for the TSP</strong>
+
+Enhance a genetic algorithm for TSP with a 2‑opt local search as a mutation operator (or after crossover). Compare the performance (solution quality and convergence speed) with a standard GA on a 100‑city instance.
+
+</div>
+
+---
+
+## Assignment Requirements
+
+<div class="exercise-box">
+
+<strong>📋 Final Project Description</strong>
+
+You are required to complete a final project that solves a set of problems from the covered topics. The project must include:
+
+- Implementation of at least **three different AI techniques** from different areas (e.g., search, fuzzy logic, genetic algorithm).
+- A written report (5–10 pages) describing the problem, chosen methods, implementation details, experimental results, and conclusions.
+- A working Python script (or Jupyter notebook) that reproduces all results.
+
+Possible project themes:
+- Solving a puzzle (e.g., 8‑puzzle) using multiple search algorithms and comparing performance.
+- Implementing a fuzzy logic controller for a simple system (e.g., room temperature regulation).
+- Applying a genetic algorithm to optimize a benchmark function or a real‑world problem (e.g., feature selection).
+
+</div>
+
+### Submission Checklist
+
+<div class="checklist">
+
+- [ ] **Code** – All Python files, properly documented, with a `README.md` explaining how to run.
+- [ ] **Report** – PDF document with introduction, methodology, results, and discussion.
+- [ ] **Presentation** – A short (5‑minute) video or live demo during the final session.
+- [ ] **Self‑Assessment** – A brief reflection on what was learned and what challenges were encountered.
+
+</div>
+
+## Code Review Guide
+
+When reviewing code for AI projects, focus on these aspects:
+
+### Algorithm Correctness
+- Does the search algorithm correctly handle cycles and visited states?
+- Are heuristics admissible and consistent (if applicable)?
+- For fuzzy systems: are membership functions properly defined and rule bases complete?
+
+### Efficiency
+- Are data structures appropriate (e.g., priority queue for A*)?
+- Are there any redundant computations?
+- For evolutionary algorithms: is the population size and number of generations reasonable?
+
+### Readability & Documentation
+- Are functions and variables named clearly?
+- Are the main steps of the algorithm commented?
+
+### Example Review Note
+
+<div class="review-note">
+
+<strong>🔍 Code Review Example:</strong>
+
+Consider this A* implementation fragment:
+
+```python
+def a_star(start, goal, neighbors, heuristic):
+    open_set = {start}
+    came_from = {}
+    g_score = {start: 0}
+    f_score = {start: heuristic(start)}
+    while open_set:
+        current = min(open_set, key=lambda x: f_score[x])
+        ...
+```
+
+<span class="badge">Good</span> Using a set for open set and min to extract is simple but inefficient. Consider using `heapq` for better performance.
+
+<span class="badge danger">Bad</span> No check for goal when expanding, leading to unnecessary expansions.
+
+</div>
+
+## Exam Preparation
+
+### Oral Exam Structure
+
+The exam will be an oral discussion (approx. 20 minutes) covering the main topics. You will be asked to:
+
+- Explain key concepts (e.g., difference between BFS and DFS, how fuzzy inference works).
+- Compare different methods (e.g., genetic algorithm vs. simulated annealing).
+- Interpret results from your project and justify your design choices.
+
+### Topics to Review
+
+- Search (uninformed, informed, adversarial)
+- Fuzzy logic (sets, relations, inference)
+- Evolutionary and stochastic optimization (GA, SA, DE)
+- Hybrid and memetic algorithms
+
+### Practice Question
+
+<div class="exercise-box">
+
+<strong>❓ Sample Exam Question:</strong>
+
+"Compare the strengths and weaknesses of A* and genetic algorithms for solving a complex optimization problem. In which situation would you prefer one over the other? Justify your answer with examples."
+
+<strong>💡 Hint:</strong> Think about problem characteristics: continuity, size of search space, availability of heuristics, time constraints, and need for exact optimality.
+
+</div>
+
+---
+
+## Quick Reference Cards
+
+### Search Algorithms Summary
+
+| Algorithm | Strategy | Complete? | Optimal? | Time | Space |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| BFS | Queue (FIFO) | Yes (finite) | Yes (unweighted) | O(b^d) | O(b^d) |
+| DFS | Stack (LIFO) | No (infinite) | No | O(b^m) | O(b*m) |
+| IDDFS | DFS with increasing depth | Yes | Yes (unweighted) | O(b^d) | O(b*d) |
+| UCS | Priority queue (g) | Yes | Yes (weighted) | O(b^(1+floor(C*/ε))) | O(b^(1+floor(C*/ε))) |
+| A* | Priority queue (g+h) | Yes (finite) | Yes (admissible h) | Exponential | Exponential |
+| Minimax | Recursive minimax | Yes (finite game) | Yes (perfect play) | O(b^d) | O(b*d) |
+
+### Fuzzy Logic Operations
+
+| Operation | Formula |
+| :--- | :--- |
+| Union (OR) | μ_A∪B(x) = max(μ_A(x), μ_B(x)) |
+| Intersection (AND) | μ_A∩B(x) = min(μ_A(x), μ_B(x)) |
+| Complement (NOT) | μ_¬A(x) = 1 - μ_A(x) |
+| Implication (Mamdani) | μ_R(x,y) = min(μ_A(x), μ_B(y)) |
+| Composition (max‑min) | μ_R∘S(x,z) = max_y min(μ_R(x,y), μ_S(y,z)) |
+
+### Evolutionary Algorithm Parameters
+
+- **Population size** – typically 50–200.
+- **Selection** – tournament (k=2–7) or roulette wheel.
+- **Crossover rate** – 0.6–0.9.
+- **Mutation rate** – 0.001–0.1 (for binary), 0.1–0.5 for real‑valued.
+- **Elitism** – keep 1–2 best individuals.
+
+---
+
+*End of Course Documentation*
+```

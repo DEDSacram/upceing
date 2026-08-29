@@ -1,3 +1,832 @@
 ---
-title: Data Protection and Security (KST/NOBD)
+title: "Data Protection and Security (KST/NOBD)"
+description: "Complete course materials covering cryptography, algebraic foundations, security architectures, and legal compliance."
+template: doc
 ---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+# Data Protection and Security (KST/NOBD)
+
+Welcome to the course! This documentation covers advanced methods of information system design with a focus on data security, in compliance with relevant standards and current legal frameworks. From cryptographic foundations to modern security architectures and GDPR compliance, you'll gain comprehensive knowledge for securing data in today's complex environments.
+
+## 📑 Table of Contents
+
+### Course Overview
+- [Course Objectives](#course-objectives)
+- [Assessment & Credit Requirements](#assessment--credit-requirements)
+- [Examination Structure](#examination-structure)
+- [Schedule](#schedule)
+
+### Lecture Materials
+1. [Week 1: Sensitive Data & Information Systems](#week-1-sensitive-data--information-systems)
+2. [Week 2: Encoding, Encryption & History of Cryptography](#week-2-encoding-encryption--history-of-cryptography)
+3. [Week 3: Relations & Mappings](#week-3-relations--mappings)
+4. [Week 4: Groups](#week-4-groups)
+5. [Week 5: Fields](#week-5-fields)
+6. [Week 6: Linear & Cyclic Codes](#week-6-linear--cyclic-codes)
+7. [Week 7: Lattices & Boolean Algebras](#week-7-lattices--boolean-algebras)
+8. [Week 8: Prime Factorization & Primality Testing](#week-8-prime-factorization--primality-testing)
+9. [Week 9: Asymmetric Ciphers](#week-9-asymmetric-ciphers)
+10. [Week 10: Key Management & Cryptocurrencies](#week-10-key-management--cryptocurrencies)
+11. [Week 11: Security Issues in Resource Sharing & Virtualization](#week-11-security-issues-in-resource-sharing--virtualization)
+12. [Week 12: Data Center Solutions](#week-12-data-center-solutions)
+13. [Week 13: Legislation, Personal Data Protection & GDPR](#week-13-legislation-personal-data-protection--gdpr)
+
+### Assignments & Exam
+- [Assignment Requirements](#assignment-requirements)
+- [Code Review Guide](#code-review-guide)
+- [Exam Preparation](#exam-preparation)
+
+---
+
+## Course Overview
+
+### Course Objectives
+
+The aim of this course is to introduce students to advanced methods of information system design with respect to data security, in compliance with relevant standards and current legal frameworks. By the end of this course, you will have gained:
+
+- <span class="badge">Cryptography</span> Understanding of symmetric and asymmetric cryptographic systems, their mathematical foundations, and practical applications.
+- <span class="badge">Algebraic Foundations</span> Knowledge of groups, fields, rings, and lattices as they apply to cryptography and coding theory.
+- <span class="badge">Security Architecture</span> Insights into virtualization security, data center solutions, and resource sharing challenges.
+- <span class="badge">Legal Compliance</span> Awareness of GDPR, personal data protection regulations, and their impact on system design.
+
+### Assessment & Credit Requirements
+
+<div class="exercise-box">
+
+<strong>📋 To receive credit (zápočet), students must:</strong>
+
+- Attend the practical sessions (cvičení).
+- A maximum of **2 absences** are permitted.
+- Active participation and demonstrated understanding of the practical exercises.
+
+</div>
+
+### Examination Structure
+
+The examination consists of two parts:
+1. **Written Exam** – Students must achieve at least **50% (1/2)** of the total points.
+2. **Oral Follow‑up** – After the written part, students answer supplementary questions to clarify and deepen their understanding of the topics.
+
+### Schedule
+
+| Week | Lecture Topic | Exercise Focus |
+|------|---------------|----------------|
+| 1 | Sensitive data, open vs. closed information systems | Identifying sensitive data in case studies |
+| 2 | Encoding, encryption, history, simple ciphers | Implementing Caesar and Vigenère ciphers |
+| 3 | Relations and mappings | Working with modular arithmetic and functions |
+| 4 | Groups | Group operations, subgroups, and cyclic groups |
+| 5 | Fields | Finite fields, GF(2^n), polynomial arithmetic |
+| 6 | Linear and cyclic codes | Generating and decoding Hamming and cyclic codes |
+| 7 | Lattices and Boolean algebras | Lattice operations, Boolean expressions |
+| 8 | Prime factorization, primality testing, prime generation | Implementing Miller–Rabin, generating primes |
+| 9 | Asymmetric ciphers | Implementing RSA and Diffie–Hellman key exchange |
+| 10 | Key administration, cryptocurrencies | Simulating PKI, exploring blockchain basics |
+| 11 | Security issues in resource sharing, virtualization | Analyzing VM escape and side‑channel attacks |
+| 12 | Data center solutions | Designing a secure data center architecture |
+| 13 | Legislation, personal data protection, GDPR | Creating a GDPR compliance checklist |
+
+---
+
+## Week 1: Sensitive Data & Information Systems
+
+This week introduces the concept of sensitive data, its legal protections, and the distinction between open and closed information systems.
+
+### Key Concepts
+
+- **Sensitive Data** – Personal data, health records, financial information, trade secrets, and any data whose disclosure could cause harm.
+- **Open vs. Closed Information Systems** – Open systems allow public access (e.g., public websites); closed systems restrict access to authorized users (e.g., internal corporate networks).
+- **Legal Frameworks** – The GDPR, national laws, and industry standards (e.g., PCI DSS) mandate protection for sensitive data.
+
+### Identifying Sensitive Data
+
+The classification of data sensitivity depends on:
+- **Confidentiality** – Should the data be secret?
+- **Integrity** – Is accuracy critical?
+- **Availability** – Is uptime essential?
+
+```python
+# Example: Data classification helper
+def classify_data(data_type, context):
+    sensitivity_levels = {
+        'personal': 'HIGH',
+        'financial': 'HIGH',
+        'health': 'VERY HIGH',
+        'public': 'LOW',
+        'internal': 'MEDIUM'
+    }
+    return sensitivity_levels.get(data_type, 'UNKNOWN')
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: Classify Sample Data</strong>
+
+Consider the following data items: (a) a customer's name and address, (b) credit card number, (c) a company's annual report, (d) employee salaries, (e) a public blog post.
+1. Classify each item as open/closed and determine a sensitivity level (LOW, MEDIUM, HIGH, VERY HIGH).
+2. Suggest basic security measures for each.
+
+</div>
+
+---
+
+## Week 2: Encoding, Encryption & History of Cryptography
+
+This week covers the fundamentals: encoding vs. encryption, the history of cryptographic techniques, and implementation of simple classical ciphers.
+
+### Key Concepts
+
+- **Encoding** – Converting data from one form to another (e.g., Base64, ASCII). No security is provided.
+- **Encryption** – Converting plaintext to ciphertext using a key. Provides confidentiality.
+- **History** – From the Caesar cipher (ancient Rome) through the Enigma machine (WWII) to modern public‑key cryptography.
+
+### Simple Ciphers
+
+**Caesar Cipher** – Each letter is shifted by a fixed number of positions.
+
+```python
+def caesar(text, shift, decrypt=False):
+    result = []
+    shift = -shift if decrypt else shift
+    for char in text:
+        if char.isalpha():
+            base = ord('A') if char.isupper() else ord('a')
+            result.append(chr((ord(char) - base + shift) % 26 + base))
+        else:
+            result.append(char)
+    return ''.join(result)
+
+# Example: Caesar cipher with shift 3
+print(caesar("HELLO", 3))  # KHOOR
+```
+
+**Vigenère Cipher** – Uses a keyword to create multiple Caesar shifts.
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: Implement and Break Vigenère</strong>
+
+1. Implement the Vigenère cipher encryption/decryption in Python.
+2. Write a function to crack the cipher using frequency analysis (assume you know the key length or use Kasiski examination).
+3. Test your implementation on a sample ciphertext.
+
+</div>
+
+---
+
+## Week 3: Relations & Mappings
+
+Mathematical relations and mappings form the foundation of cryptographic functions. This week covers equivalence relations, functions, and modular arithmetic.
+
+### Key Concepts
+
+- **Relation** – A set of ordered pairs. Examples: "less than", "congruent modulo n".
+- **Equivalence Relation** – Reflexive, symmetric, transitive. Creates equivalence classes.
+- **Mapping (Function)** – A relation where each input has exactly one output.
+- **Modular Arithmetic** – Arithmetic on residue classes modulo n. The basis for many cryptographic algorithms.
+
+### Modular Arithmetic in Python
+
+```python
+# Modular arithmetic operations
+def mod_add(a, b, n): return (a + b) % n
+def mod_mul(a, b, n): return (a * b) % n
+def mod_pow(base, exp, n): return pow(base, exp, n)  # Built‑in efficient exponentiation
+
+# Example: Extended Euclidean algorithm for modular inverse
+def mod_inverse(a, n):
+    # Returns x such that a*x ≡ 1 (mod n), or None if not invertible
+    t, new_t = 0, 1
+    r, new_r = n, a
+    while new_r != 0:
+        q = r // new_r
+        t, new_t = new_t, t - q * new_t
+        r, new_r = new_r, r - q * new_r
+    if r > 1: return None  # Not invertible
+    if t < 0: t += n
+    return t
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: Modular Arithmetic Practice</strong>
+
+1. Compute: (17 + 25) mod 12, (37 * 42) mod 11, 5^7 mod 13.
+2. Find the modular inverse of 7 modulo 26 (important for the affine cipher).
+3. Determine if 15 and 28 are coprime.
+
+</div>
+
+---
+
+## Week 4: Groups
+
+Groups are fundamental algebraic structures used in cryptography. This week covers group definitions, properties, and examples such as cyclic groups and the multiplicative group of integers modulo n.
+
+### Key Concepts
+
+- **Group (G, *)** – A set G with operation * satisfying: closure, associativity, identity element, and inverse element.
+- **Abelian Group** – Commutative group (a * b = b * a).
+- **Cyclic Group** – Generated by a single element g; every element is g^k for some integer k.
+- **Order** – The number of elements in the group (for finite groups).
+- **Subgroup** – A subset that is itself a group.
+
+### Example: Multiplicative Group Modulo n
+
+```python
+# Find all elements of the multiplicative group modulo n
+def multiplicative_group(n):
+    elements = [a for a in range(1, n) if math.gcd(a, n) == 1]
+    return elements
+
+# Check if a number is a generator (primitive root)
+def is_generator(g, n):
+    elements = multiplicative_group(n)
+    powers = set()
+    for i in range(1, len(elements) + 1):
+        powers.add(pow(g, i, n))
+    return len(powers) == len(elements)
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: Explore Cyclic Groups</strong>
+
+1. Find the multiplicative group modulo 7. Is it cyclic? If yes, find a generator.
+2. Determine all subgroups of Z_12 (the additive group of integers modulo 12).
+3. Explain why the multiplicative group modulo a prime p is always cyclic.
+
+</div>
+
+---
+
+## Week 5: Fields
+
+Fields are algebraic structures where addition, subtraction, multiplication, and division (except by zero) are defined. Finite fields (Galois fields) are crucial for coding theory and cryptography.
+
+### Key Concepts
+
+- **Field (F, +, *)** – A set with two operations: addition (forming an abelian group) and multiplication (forming an abelian group except for zero). Distributivity holds.
+- **Finite Field GF(p)** – The field of integers modulo a prime p.
+- **Finite Field GF(2^n)** – Field of polynomials over GF(2) modulo an irreducible polynomial. Used in AES and other ciphers.
+
+### Example: GF(2^3) with irreducible polynomial x^3 + x + 1
+
+```python
+# Represent elements as integers (bits), addition is XOR
+# Multiplication modulo the irreducible polynomial
+def gf_mul(a, b, mod=0b1011):  # mod = x^3 + x + 1
+    result = 0
+    while b:
+        if b & 1:
+            result ^= a
+        b >>= 1
+        a <<= 1
+        if a & 0b1000:  # degree >= 3
+            a ^= mod
+    return result & 0b111
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: Arithmetic in GF(2^3)</strong>
+
+Using the irreducible polynomial x^3 + x + 1:
+1. Compute the addition table for all elements (0–7).
+2. Compute the multiplication table.
+3. Find the multiplicative inverse of each non‑zero element.
+
+</div>
+
+---
+
+## Week 6: Linear & Cyclic Codes
+
+Error‑detecting and error‑correcting codes are essential for reliable data transmission. This week covers linear codes, Hamming codes, and cyclic codes.
+
+### Key Concepts
+
+- **Linear Code** – A subspace of GF(q)^n with dimension k. Represented by a generator matrix G (k×n) and parity‑check matrix H ((n−k)×n).
+- **Hamming Code** – A perfect 1‑error‑correcting code with parameters (2^m−1, 2^m−1−m).
+- **Cyclic Code** – A linear code where every cyclic shift of a codeword is also a codeword. Represented by a generator polynomial.
+- **Minimum Distance** – The minimum Hamming distance between any two codewords. Determines error‑correcting capability.
+
+### Example: Hamming Code (7,4) Encoding
+
+```python
+# Generator matrix for (7,4) Hamming code
+G = [
+    [1, 0, 0, 0, 1, 1, 1],
+    [0, 1, 0, 0, 1, 1, 0],
+    [0, 0, 1, 0, 1, 0, 1],
+    [0, 0, 0, 1, 0, 1, 1]
+]
+
+def hamming_encode(data):
+    # data: list of 4 bits
+    return [sum(G[i][j] * data[i] for i in range(4)) % 2 for j in range(7)]
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: Implement Hamming (7,4) Decoding</strong>
+
+Write a function that takes a 7‑bit received word (possibly with one error) and decodes it to the original 4‑bit data. Use the parity‑check matrix to detect and correct the error.
+
+</div>
+
+---
+
+## Week 7: Lattices & Boolean Algebras
+
+Lattices and Boolean algebras provide the mathematical foundation for access control models and logic circuits. This week covers these structures and their security applications.
+
+### Key Concepts
+
+- **Partially Ordered Set (Poset)** – A set with a reflexive, antisymmetric, transitive order relation.
+- **Lattice** – A poset where every pair of elements has a unique least upper bound (join) and greatest lower bound (meet).
+- **Boolean Algebra** – A complemented distributive lattice. Used in access control (Bell–LaPadula model).
+- **Security Lattices** – Used to model security levels (e.g., TOP SECRET > SECRET > CONFIDENTIAL > UNCLASSIFIED).
+
+### Example: Bell–LaPadula Security Model
+
+```python
+class SecurityLevel:
+    def __init__(self, classification, categories=None):
+        self.classification = classification  # e.g., 'TS', 'S', 'C', 'U'
+        self.categories = categories or set()  # e.g., {'NUCLEAR', 'FINANCE'}
+    
+    def dominates(self, other):
+        # Simple dominance: classification >= other and categories superset
+        order = {'TS': 4, 'S': 3, 'C': 2, 'U': 1}
+        return (order[self.classification] >= order[other.classification] and
+                self.categories.issuperset(other.categories))
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: Implement a Security Lattice</strong>
+
+Design a security lattice for an organization with:
+- Classifications: TOP SECRET, SECRET, CONFIDENTIAL, UNCLASSIFIED.
+- Categories: &lcub;HR, FINANCE, R&D, LEGAL&rcub;.
+
+1. Define the partial order.
+2. Implement join and meet operations.
+3. Determine if a user with classification SECRET and categories  &lcub;HR, R&D&rcub; can access a document classified CONFIDENTIAL with categories &lcub;HR&rcub;? Justify.
+
+</div>
+
+---
+
+## Week 8: Prime Factorization & Primality Testing
+
+Prime numbers are the cornerstone of modern cryptography. This week covers factorization, primality testing, and prime generation.
+
+### Key Concepts
+
+- **Fundamental Theorem of Arithmetic** – Every integer > 1 can be uniquely factored into primes.
+- **Trial Division** – Simple but inefficient for large numbers.
+- **Miller–Rabin Primality Test** – A probabilistic test that is fast and widely used.
+- **Sieve of Eratosthenes** – Generates all primes up to a limit.
+- **Prime Generation** – Generating large primes for RSA involves selecting random numbers and testing them.
+
+### Miller–Rabin Implementation
+
+```python
+import random
+
+def miller_rabin(n, k=5):
+    if n < 2: return False
+    if n in (2, 3): return True
+    if n % 2 == 0: return False
+    
+    # Write n-1 = 2^r * d
+    r, d = 0, n - 1
+    while d % 2 == 0:
+        r += 1
+        d //= 2
+    
+    # Witness loop
+    for _ in range(k):
+        a = random.randint(2, n - 2)
+        x = pow(a, d, n)
+        if x == 1 or x == n - 1:
+            continue
+        for _ in range(r - 1):
+            x = pow(x, 2, n)
+            if x == n - 1:
+                break
+        else:
+            return False
+    return True
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: Generate a 512‑bit Prime</strong>
+
+1. Write a function `generate_prime(bits)` that uses the Miller–Rabin test to generate a random prime of the given bit length.
+2. Test it by generating a 512‑bit prime.
+3. What is the probability that the generated number is composite (using 5 rounds)?
+
+</div>
+
+---
+
+## Week 9: Asymmetric Ciphers
+
+Asymmetric (public‑key) cryptography revolutionized security. This week covers the RSA algorithm and the Diffie–Hellman key exchange.
+
+### Key Concepts
+
+- **RSA** – Based on the difficulty of factoring large numbers. Key generation: choose two large primes p and q, compute n = p*q, φ(n) = (p−1)(q−1), choose e coprime to φ(n), compute d = e^(−1) mod φ(n).
+- **Diffie–Hellman** – Allows two parties to agree on a shared secret over an insecure channel using discrete logarithms.
+- **Security** – Based on the discrete logarithm problem (DLP) and integer factorization problem (IFP).
+
+### RSA Implementation
+
+```python
+def rsa_keygen(bits):
+    p = generate_prime(bits // 2)
+    q = generate_prime(bits // 2)
+    n = p * q
+    phi = (p - 1) * (q - 1)
+    e = 65537  # Common public exponent
+    d = mod_inverse(e, phi)
+    return (e, n), (d, n)  # public, private
+
+def rsa_encrypt(m, public_key):
+    e, n = public_key
+    return pow(m, e, n)
+
+def rsa_decrypt(c, private_key):
+    d, n = private_key
+    return pow(c, d, n)
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: Implement RSA with OAEP Padding</strong>
+
+1. Extend the RSA implementation to handle arbitrary‑length messages using OAEP padding.
+2. Encrypt and decrypt a message longer than the modulus size (use hybrid encryption: AES for data, RSA for key).
+3. Demonstrate the importance of proper padding by showing an example where unpadded RSA is vulnerable.
+
+</div>
+
+---
+
+## Week 10: Key Management & Cryptocurrencies
+
+Key management is one of the hardest parts of cryptography. This week covers PKI, certificate management, and the cryptographic principles behind cryptocurrencies.
+
+### Key Concepts
+
+- **Key Management** – Generation, distribution, storage, renewal, and revocation of keys.
+- **PKI (Public Key Infrastructure)** – System of CAs (Certificate Authorities), certificates (X.509), and CRLs (Certificate Revocation Lists).
+- **Blockchain** – A tamper‑evident ledger built on cryptographic hashing and signatures.
+- **Cryptocurrencies** – Bitcoin uses ECDSA for signatures, SHA‑256 for hashing, and a proof‑of‑work consensus.
+
+### Simulating Blockchain Basics
+
+```python
+import hashlib
+import json
+import time
+
+class Block:
+    def __init__(self, index, transactions, previous_hash):
+        self.index = index
+        self.timestamp = time.time()
+        self.transactions = transactions
+        self.previous_hash = previous_hash
+        self.nonce = 0
+        self.hash = self.compute_hash()
+    
+    def compute_hash(self):
+        block_string = json.dumps({
+            'index': self.index,
+            'timestamp': self.timestamp,
+            'transactions': self.transactions,
+            'previous_hash': self.previous_hash,
+            'nonce': self.nonce
+        }, sort_keys=True)
+        return hashlib.sha256(block_string.encode()).hexdigest()
+    
+    def mine_block(self, difficulty):
+        target = '0' * difficulty
+        while self.hash[:difficulty] != target:
+            self.nonce += 1
+            self.hash = self.compute_hash()
+        print(f'Block mined: {self.hash}')
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: Build a Simple Certificate Authority</strong>
+
+1. Implement a basic CA that can generate a self‑signed root certificate.
+2. Issue a certificate for a server (create a CSR, sign it with the CA's private key).
+3. Write a function to verify a certificate against the CA's root certificate.
+
+</div>
+
+---
+
+## Week 11: Security Issues in Resource Sharing & Virtualization
+
+Virtualization introduces unique security challenges. This week covers threats like VM escape, side‑channel attacks, and resource isolation failures.
+
+### Key Concepts
+
+- **Virtualization Security** – Attack surface increases with hypervisors, VMMs, and shared resources.
+- **VM Escape** – An attacker breaks out of a VM and gains access to the host or other VMs.
+- **Side‑Channel Attacks** – Exploiting resource contention (cache, memory bus, network) to leak information.
+- **Container Security** – Containers share the host kernel, so isolation is weaker than VMs.
+- **Resource Sharing** – CPU caches, memory, and I/O devices can be exploited.
+
+### Example: Cache‑Based Timing Attack
+
+```python
+import time
+
+def time_memory_access(data, index):
+    start = time.perf_counter_ns()
+    _ = data[index]
+    return time.perf_counter_ns() - start
+
+# Monitor access times to detect which cache line was accessed
+# An attacker could use this to infer sensitive information
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: Analyze a Side‑Channel Vulnerability</strong>
+
+1. Design a simple program where a secret value determines which array element is accessed.
+2. Write a "spy" function that measures cache access times to infer the secret value.
+3. Suggest mitigations against such attacks.
+
+</div>
+
+---
+
+## Week 12: Data Center Solutions
+
+This week covers physical and logical security in data centers, including redundancy, disaster recovery, and access control.
+
+### Key Concepts
+
+- **Data Center Security** – Physical security (fences, biometrics, cameras) and logical security (firewalls, SIEM, access logs).
+- **Redundancy** – N+1, 2N, and geographic redundancy to ensure high availability.
+- **Disaster Recovery** – RTO (Recovery Time Objective) and RPO (Recovery Point Objective).
+- **Security Zones** – DMZ, internal network, and management network separation.
+
+### Designing a Secure Data Center
+
+```python
+class DataCenter:
+    def __init__(self, name, location):
+        self.name = name
+        self.location = location
+        self.security_zones = {
+            'DMZ': {'level': 'LOW', 'services': ['web', 'email']},
+            'INTERNAL': {'level': 'MEDIUM', 'services': ['app', 'db']},
+            'MANAGEMENT': {'level': 'HIGH', 'services': ['admin', 'monitoring']}
+        }
+        self.access_control = {}
+    
+    def grant_access(self, user, zone, time_window):
+        self.access_control[user] = {'zone': zone, 'time': time_window}
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: Design a Security Architecture</strong>
+
+For a financial institution:
+1. Propose a data center architecture with three security zones.
+2. Specify physical and logical controls for each zone.
+3. Define a disaster recovery plan with RTO of 4 hours and RPO of 1 hour.
+
+</div>
+
+---
+
+## Week 13: Legislation, Personal Data Protection & GDPR
+
+The final week covers the legal framework for data protection, with a focus on GDPR and its implications for system design.
+
+### Key Concepts
+
+- **GDPR** – Regulation (EU) 2016/679: rights of data subjects, obligations of controllers/processors, fines for non‑compliance.
+- **Key GDPR Principles** – Lawfulness, fairness and transparency; purpose limitation; data minimization; accuracy; storage limitation; integrity and confidentiality (security); accountability.
+- **Data Subject Rights** – Access, rectification, erasure (right to be forgotten), restriction of processing, data portability, objection.
+- **Data Protection Impact Assessment (DPIA)** – Required for high‑risk processing.
+- **Security Measures** – Pseudonymization, encryption, and ensuring ongoing confidentiality, integrity, availability, and resilience.
+
+### GDPR Compliance Checklist
+
+```python
+def gdpr_checklist():
+    return {
+        'Lawful basis': 'Identify and document legal basis for processing',
+        'Privacy notice': 'Provide clear information to data subjects',
+        'Data minimization': 'Collect only necessary data',
+        'Security measures': 'Implement appropriate technical/organisational measures',
+        'Data subject rights': 'Establish processes to handle requests',
+        'DPIA': 'Conduct assessment for high‑risk activities',
+        'Breach notification': 'Report to supervisory authority within 72 hours',
+        'Records of processing': 'Maintain processing records',
+        'Data Protection Officer': 'Appoint DPO if required',
+        'International transfers': 'Ensure adequate safeguards'
+    }
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task: Conduct a GDPR Audit</strong>
+
+Consider a system that processes customer data for an e‑commerce platform:
+1. Create a comprehensive GDPR compliance checklist for this system.
+2. For each requirement, describe specific technical and organizational measures.
+3. Identify potential risks and propose mitigations.
+
+</div>
+
+---
+
+## Assignment Requirements
+
+<div class="exercise-box">
+
+<strong>📋 Assignment Description</strong>
+
+You are required to complete a practical project that demonstrates your understanding of data protection and security. The project should include:
+
+1. A **threat model** for a given system (e.g., an online banking application).
+2. Implementation of at least **two security mechanisms** (e.g., encryption for data at rest, secure authentication, access control).
+3. A **security audit** identifying vulnerabilities and recommending mitigations.
+4. A **GDPR compliance assessment** for the system.
+
+</div>
+
+### Submission Checklist
+
+<div class="checklist">
+
+- [ ] **Threat Model** – Identify assets, threats, vulnerabilities, and countermeasures.
+- [ ] **Security Implementation** – Code and documentation for at least two security features.
+- [ ] **Security Audit** – Report with findings and recommendations.
+- [ ] **GDPR Assessment** – Checklist and compliance evaluation.
+- [ ] **Presentation** – A 10‑minute presentation of the project.
+
+</div>
+
+## Code Review Guide
+
+When reviewing security code, focus on:
+
+### Cryptographic Practices
+- **Key Management** – Are keys stored securely? Is proper key derivation used?
+- **Randomness** – Is a cryptographically secure PRNG used (e.g., `secrets` or `os.urandom`)?
+- **Padding** – Are proper padding schemes used (e.g., OAEP for RSA, PKCS#7 for AES)?
+- **Protocols** – Are secure versions of protocols used (TLS 1.3, not SSLv3)?
+
+### Access Control
+- Is least privilege principle applied?
+- Are roles and permissions properly defined?
+- Is there proper input validation to prevent injection attacks?
+
+### Example Review Note
+
+<div class="review-note">
+
+<strong>🔍 Code Review Example:</strong>
+
+```python
+import hashlib
+
+# Storing passwords
+def store_password(password):
+    return hashlib.md5(password.encode()).hexdigest()
+```
+
+<span class="badge danger">Bad</span> MD5 is cryptographically broken. Use a proper key derivation function like bcrypt, Argon2, or PBKDF2.
+
+<span class="badge">Good</span> A strong password hashing function with salt and a work factor.
+
+</div>
+
+## Exam Preparation
+
+### Exam Structure
+
+The exam consists of:
+1. **Written Part** – Multiple‑choice and short‑answer questions covering all topics. 50% is the minimum passing threshold.
+2. **Oral Follow‑up** – The examiner asks questions to probe deeper understanding.
+
+### Topics to Review
+
+- Algebraic foundations (groups, fields, lattices)
+- Classical and modern cryptography (symmetric, asymmetric)
+- Coding theory (linear and cyclic codes)
+- Key management and PKI
+- Security architectures (virtualization, data centers)
+- Legal aspects (GDPR, data protection)
+
+### Practice Questions
+
+<div class="exercise-box">
+
+<strong>❓ Sample Exam Question 1:</strong>
+
+"Explain the difference between symmetric and asymmetric encryption. Give examples of each and describe a scenario where you would use both together."
+
+<strong>💡 Hint:</strong> Think about speed, key distribution, and digital signatures.
+
+</div>
+
+<div class="exercise-box">
+
+<strong>❓ Sample Exam Question 2:</strong>
+
+"Describe the Bell–LaPadula model. How does it enforce confidentiality? What are its limitations?"
+
+<strong>💡 Hint:</strong> Consider the simple security property and the star property.
+
+</div>
+
+<div class="exercise-box">
+
+<strong>❓ Sample Exam Question 3:</strong>
+
+"An employee suspects a data breach. What steps should be taken according to GDPR? What are the timelines for notification?"
+
+<strong>💡 Hint:</strong> Think about breach notification requirements (72 hours to the supervisory authority, without undue delay to data subjects if high risk).
+
+</div>
+
+---
+
+## Quick Reference Cards
+
+### Algebraic Structures Summary
+
+| Structure | Operations | Properties |
+| :--- | :--- | :--- |
+| Group | One operation (*) | Closure, associativity, identity, inverse |
+| Abelian Group | One operation (*) | Group + commutativity |
+| Ring | Two operations (+, *) | Additive group, multiplicative semigroup, distributivity |
+| Field | Two operations (+, *) | Ring + multiplicative inverses (except zero) |
+
+### Common Cryptographic Algorithms
+
+| Type | Algorithm | Key Size | Use Case |
+| :--- | :--- | :--- | :--- |
+| Symmetric | AES | 128, 192, 256 bits | Bulk encryption |
+| Symmetric | ChaCha20 | 256 bits | High‑performance encryption |
+| Asymmetric | RSA | 1024, 2048, 4096 bits | Key exchange, signatures |
+| Asymmetric | ECDSA | 256, 384, 521 bits | Signatures (elliptic curve) |
+| Key Exchange | Diffie‑Hellman | 2048+ bits | Secure key agreement |
+| Hashing | SHA‑256 | 256 bits | Integrity, blockchain |
+| Hashing | SHA‑3 | 224‑512 bits | Modern hash standard |
+
+### GDPR Key Numbers
+
+- **72 hours** – Time to notify the supervisory authority of a breach.
+- **30 days** – Time to respond to a data subject access request (can be extended by 2 months).
+- **4%** of global turnover – Maximum fine for non‑compliance (or €20 million, whichever is higher).
+
+---
+
+*End of Course Documentation*
+```
