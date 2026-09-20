@@ -1,0 +1,59 @@
+# NNPDA Lab 05 — DevTools Console sample queries
+# Paste each block into Kibana DevTools (http://localhost:5601/app/dev_tools#/console)
+
+# 1. Check cluster health
+GET /_cluster/health
+
+# 2. List indices
+GET /_cat/indices?v
+
+# 3. Show mapping of the products index
+GET /products/_mapping
+
+# 4. Count documents
+GET /products/_count
+
+# 5. Full-text search: wireless products
+POST /products/_search
+{
+  "query": {
+    "match": {
+      "description": "wireless"
+    }
+  }
+}
+
+# 6. Exact filter: audio category
+POST /products/_search
+{
+  "query": {
+    "term": {
+      "category": "audio"
+    }
+  }
+}
+
+# 7. Price range + sort most expensive first
+POST /products/_search
+{
+  "query": {
+    "range": {
+      "price": { "gte": 50, "lte": 200 }
+    }
+  },
+  "sort": [{ "price": "desc" }]
+}
+
+# 8. Aggregation: average price per category
+POST /products/_search
+{
+  "size": 0,
+  "aggs": {
+    "by_category": {
+      "terms": { "field": "category" },
+      "aggs": {
+        "avg_price": { "avg": { "field": "price" } }
+      }
+    }
+  }
+}

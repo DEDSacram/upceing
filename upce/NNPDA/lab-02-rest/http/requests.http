@@ -1,0 +1,47 @@
+### list books (paginated)
+GET http://localhost:8081/api/books?page=0&size=10
+Accept: application/json
+
+### get one book
+GET http://localhost:8081/api/books/1
+Accept: application/json
+
+### create book (201)
+POST http://localhost:8081/api/books
+Content-Type: application/json
+
+{
+  "title": "Domain-Driven Design",
+  "author": "Eric Evans",
+  "isbn": "978-0321125217",
+  "publishedYear": 2003
+}
+
+### update book
+PUT http://localhost:8081/api/books/1
+Content-Type: application/json
+
+{
+  "title": "Effective Java 3rd",
+  "author": "Joshua Bloch",
+  "isbn": "978-0134685991",
+  "publishedYear": 2018
+}
+
+### delete book (204)
+DELETE http://localhost:8081/api/books/2
+
+### validation error (400)
+POST http://localhost:8081/api/books
+Content-Type: application/json
+
+{
+  "title": "",
+  "author": "",
+  "isbn": "bad",
+  "publishedYear": 1000
+}
+
+### not found (404)
+GET http://localhost:8081/api/books/999999
+Accept: application/json

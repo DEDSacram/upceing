@@ -1,0 +1,25 @@
+{
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "article_analyzer": {
+          "type": "custom",
+          "tokenizer": "standard",
+          "filter": ["lowercase", "asciifolding", "czech_stop", "czech_stemmer"]
+        }
+      },
+      "filter": {
+        "czech_stop": { "type": "stop", "stopwords": "_czech_" },
+        "czech_stemmer": { "type": "stemmer", "language": "czech" }
+      }
+    }
+  },
+  "mappings": {
+    "properties": {
+      "title": { "type": "text", "analyzer": "article_analyzer" },
+      "body": { "type": "text", "analyzer": "article_analyzer" },
+      "lang": { "type": "keyword" },
+      "title_suggest": { "type": "completion" }
+    }
+  }
+}

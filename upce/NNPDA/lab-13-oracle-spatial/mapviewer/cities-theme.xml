@@ -1,0 +1,3 @@
+<theme name="CITIES" datasource="mdsys">
+  <jdbc_query spatial_column="GEOM" render_style="M.CITY" jdbc_srid="4326">SELECT name, geom FROM cities</jdbc_query>
+</theme>

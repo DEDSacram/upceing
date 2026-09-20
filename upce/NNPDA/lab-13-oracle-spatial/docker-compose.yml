@@ -1,0 +1,15 @@
+services:
+  oracle:
+    image: gvenzl/oracle-xe:21-slim
+    environment:
+      - ORACLE_PASSWORD=oracle
+      - APP_USER=spatial
+      - APP_USER_PASSWORD=spatial
+    ports:
+      - "1521:1521"
+    volumes:
+      - oradata:/opt/oracle/oradata
+      - ./db/spatial-schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+      - ./db/spatial-queries.sql:/opt/spatial-queries.sql:ro
+volumes:
+  oradata:

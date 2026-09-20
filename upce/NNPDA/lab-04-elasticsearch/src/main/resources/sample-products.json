@@ -1,0 +1,10 @@
+[
+  { "id": "p1", "name": "Wireless Headphones", "description": "Wireless over-ear headphones with noise cancellation", "price": 199.99, "category": "audio" },
+  { "id": "p2", "name": "Bluetooth Speaker", "description": "Portable wireless bluetooth speaker with deep bass", "price": 89.90, "category": "audio" },
+  { "id": "p3", "name": "Mechanical Keyboard", "description": "RGB mechanical keyboard with tactile switches", "price": 129.00, "category": "computers" },
+  { "id": "p4", "name": "Wireless Mouse", "description": "Ergonomic wireless mouse with silent clicks", "price": 39.99, "category": "computers" },
+  { "id": "p5", "name": "Espresso Machine", "description": "Compact espresso machine with milk frother", "price": 249.00, "category": "kitchen" },
+  { "id": "p6", "name": "Chef Knife", "description": "Stainless steel chef knife, razor sharp", "price": 59.50, "category": "kitchen" },
+  { "id": "p7", "name": "Running Shoes", "description": "Lightweight running shoes for daily training", "price": 119.95, "category": "sport" },
+  { "id": "p8", "name": "Yoga Mat", "description": "Non-slip yoga mat with carrying strap", "price": 29.99, "category": "sport" }
+]
