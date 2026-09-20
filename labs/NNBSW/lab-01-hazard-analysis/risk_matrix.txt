@@ -1,0 +1,9 @@
+Risk matrix: score = Severity(1-5) x Likelihood(1-5)
+Bands:  1-4 LOW | 5-9 MEDIUM | 10-16 HIGH | 17-25 EXTREME (intolerable)
+
+        L1  L2  L3  L4  L5
+   S5    5  10  15  20  25
+   S4    4   8  12  16  20
+   S3    3   6   9  12  15
+   S2    2   4   6   8  10
+   S1    1   2   3   4   5

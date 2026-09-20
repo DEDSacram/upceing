@@ -1,0 +1,9 @@
+-- GNAT project for gnatprove. Run: gnatprove -P proof.gpr --level=2
+project Proof is
+   for Source_Dirs use (".");
+   for Object_Dir use "obj";
+   for Main use ("speed.adb");
+   package Prove is
+      for Proof_Switches ("Ada") use ("--level=2", "--timeout=60");
+   end Prove;
+end Proof;

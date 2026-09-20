@@ -1,0 +1,27 @@
+stakeholders:
+  - id: COO
+    role: Chief Operating Officer
+    influence: high
+    interest: high
+    concerns: [process-efficiency, cost]
+  - id: Architect
+    role: Solution Architect
+    influence: high
+    interest: high
+    concerns: [modularity, maintainability]
+  - id: CFO
+    role: Chief Financial Officer
+    influence: high
+    interest: medium
+    concerns: [cost]
+  - id: ShopClerk
+    role: End user
+    influence: low
+    interest: high
+    concerns: [service-quality, usability]
+  - id: Ops
+    role: Operations engineer
+    influence: medium
+    interest: high
+    concerns: [availability, scalability]
+  # TODO: add DPO (Data Protection Officer) with concerns [confidentiality, compliance]

@@ -1,0 +1,15 @@
+{
+  "name": "lab-08-react-query-form",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "NNPIA lab 08: React Query + Hook Form pattern starter (static, read-first)",
+  "scripts": {
+    "check": "node --check queryLogic.js"
+  },
+  "dependencies": {
+    "@tanstack/react-query": "^5.0.0",
+    "react-hook-form": "^7.0.0",
+    "axios": "^1.7.2"
+  }
+}

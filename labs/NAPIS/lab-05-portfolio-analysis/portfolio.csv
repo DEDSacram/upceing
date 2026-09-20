@@ -1,0 +1,9 @@
+name,value,health,annual_cost
+ShopApp,9,8,120000
+OrderDB,8,7,30000
+LegacyPayroll,3,2,95000
+OldIntranet,2,3,40000
+MailService,4,8,12000
+PaymentGW,9,4,80000
+CatalogSvc,7,6,25000
+ReportingTool,5,3,35000

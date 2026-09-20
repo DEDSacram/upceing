@@ -1,0 +1,5 @@
+product_id,sku,name,category,price
+1,KB-001,Keyboard,Peripherals,1500
+2,MS-001,Mouse,Peripherals,500
+3,MN-001,Monitor,Displays,4500
+4,KB-002,Ergonomic Keyboard,Peripherals,2200

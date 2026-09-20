@@ -1,0 +1,43 @@
+# Viewpoint catalogue + view matrix. Fill TODO cells.
+viewpoints:
+  - id: VP-BIZ
+    name: Business process viewpoint
+    notation: ArchiMate Business / BPMN
+    concerns: [process-efficiency, roles, service-quality]
+  - id: VP-APP
+    name: Application structure viewpoint
+    notation: ArchiMate Application / C4 container
+    concerns: [modularity, maintainability, dependencies]
+  - id: VP-TECH
+    name: Deployment viewpoint
+    notation: ArchiMate Technology / UML deployment
+    concerns: [cost, scalability, availability]
+  - id: VP-SEC
+    name: Security viewpoint
+    notation: Threat model / ArchiMate motivation
+    concerns: [confidentiality, compliance]  # TODO: add 'integrity'
+
+views:
+  - id: V-01-order-process
+    viewpoint: VP-BIZ
+    stakeholders: [COO, ShopClerk]
+    answers: "How are orders placed and fulfilled?"
+  - id: V-02-app-structure
+    viewpoint: VP-APP
+    stakeholders: [Architect, Developer]
+    answers: "Which app components depend on OrderDB?"
+  - id: V-03-deployment
+    viewpoint: VP-TECH
+    stakeholders: [TODO-stakeholder, CFO]
+    answers: "TODO: what deployment question does this answer?"
+  - id: V-04-security
+    viewpoint: VP-SEC
+    stakeholders: [TODO-stakeholder]
+    answers: "TODO: which security concern is shown?"
+
+# coverage matrix: concern -> view ids (must be non-empty for every concern)
+coverage:
+  process-efficiency: [V-01-order-process]
+  cost: [V-03-deployment]
+  confidentiality: [TODO-view]
+  maintainability: [V-02-app-structure]

@@ -1,0 +1,9 @@
+{
+  "name": "lab-05-js-async",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "NNPIA lab 05: async/await + fetch exercise, no dependencies",
+  "scripts": {
+    "start": "node async-demo.js"
+  }
+}

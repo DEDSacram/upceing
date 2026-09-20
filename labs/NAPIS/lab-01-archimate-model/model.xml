@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model xmlns="http://www.opengroup.org/xsd/archimate/3/" identifier="id-model-shop" version="3.1">
+  <name xml:lang="en">Shop EA Starter</name>
+  <elements>
+    <element identifier="id-actor-customer" type="BusinessActor">
+      <name xml:lang="en">Customer</name>
+    </element>
+    <element identifier="id-process-order" type="BusinessProcess">
+      <name xml:lang="en">Place Order</name>
+    </element>
+    <element identifier="id-service-order" type="BusinessService">
+      <name xml:lang="en">Order Service</name>
+    </element>
+    <element identifier="id-app-shop" type="ApplicationComponent">
+      <name xml:lang="en">ShopApp</name>
+    </element>
+    <element identifier="id-app-db" type="ApplicationComponent">
+      <name xml:lang="en">OrderDB</name>
+    </element>
+    <element identifier="id-node-web" type="Node">
+      <name xml:lang="en">Web Server</name>
+    </element>
+  </elements>
+  <relationships>
+    <relationship identifier="id-rel-1" type="Assignment" source="id-actor-customer" target="id-process-order"/>
+    <relationship identifier="id-rel-2" type="Realization" source="id-process-order" target="id-service-order"/>
+    <relationship identifier="id-rel-3" type="Serving" source="id-app-shop" target="id-service-order"/>
+    <relationship identifier="id-rel-4" type="Access" source="id-app-shop" target="id-app-db"/>
+    <relationship identifier="id-rel-5" type="Realization" source="id-node-web" target="id-app-shop"/>
+  </relationships>
+  <views>
+    <view identifier="id-view-main" type="Layered">
+      <name xml:lang="en">Main layered view</name>
+      <node elementRef="id-actor-customer"/>
+      <node elementRef="id-process-order"/>
+      <node elementRef="id-service-order"/>
+      <node elementRef="id-app-shop"/>
+      <node elementRef="id-app-db"/>
+      <node elementRef="id-node-web"/>
+      <connection relationshipRef="id-rel-1" source="id-actor-customer" target="id-process-order"/>
+      <connection relationshipRef="id-rel-3" source="id-app-shop" target="id-service-order"/>
+    </view>
+  </views>
+</model>

@@ -1,0 +1,8 @@
+2026-09-20 10:00:01 INFO  Service started
+2026-09-20 10:00:05 WARN  High memory usage: 82%
+2026-09-20 10:00:09 INFO  Request /api/data 200
+2026-09-20 10:00:12 ERROR Connection timeout to db:5432
+2026-09-20 10:00:15 INFO  Request /api/data 200
+2026-09-20 10:00:18 ERROR Disk latency above threshold
+2026-09-20 10:00:21 WARN  Retry attempt 1 for db:5432
+2026-09-20 10:00:25 INFO  Request /health 200

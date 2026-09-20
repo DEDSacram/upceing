@@ -1,0 +1,35 @@
+# GSN safety-case starter. Fill TODO nodes.
+nodes:
+  - id: G-01
+    type: Goal
+    text: Level crossing is acceptably safe in normal operation
+    supportedBy: [S-01, G-02, G-03, TODO-G-04, TODO-G-05]
+    inContextOf: [C-01]
+  - id: S-01
+    type: Strategy
+    text: Argue over identified hazards H-01..H-05 (see lab-01 hazard log)
+  - id: C-01
+    type: Context
+    text: Operating envelope - rural crossing, train speed <= 160 km/h, road speed <= 50 km/h
+  - id: G-02
+    type: Goal
+    text: H-01/H-02 barrier failures mitigated (redundant circuits + presence loop)
+    supportedBy: [Sn-01, Sn-02]
+  - id: G-03
+    type: Goal
+    text: H-03 warning-light outage mitigated (dual lamps + monitoring)
+    supportedBy: [Sn-03]
+  # TODO: add G-04 for H-04 (spurious brake) with evidence from lab-02 mutation suite
+  # TODO: add G-05 for H-05 (display freeze) with evidence from lab-04 analyzer + HMI test
+  - id: Sn-01
+    type: Solution
+    text: FAT report TR-042 barrier interlock tests pass (lab-01 mitigations)
+  - id: Sn-02
+    type: Solution
+    text: FMEA worksheet FW-11 for barrier subsystem
+  - id: Sn-03
+    type: Solution
+    text: Lamp monitoring test log TL-07
+  - id: A-01
+    type: Assumption
+    text: Maintenance replaces lamps within 30 days of single-lamp alarm

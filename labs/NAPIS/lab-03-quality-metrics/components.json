@@ -1,0 +1,12 @@
+{
+  "components": [
+    {"name": "ShopApp", "depends_on": ["OrderDB", "AuthService", "MailService", "PaymentGW", "CatalogSvc"], "churn": 42, "defects": 9},
+    {"name": "OrderDB", "depends_on": [], "churn": 3, "defects": 0},
+    {"name": "AuthService", "depends_on": ["UserDB"], "churn": 8, "defects": 1},
+    {"name": "MailService", "depends_on": [], "churn": 5, "defects": 2},
+    {"name": "PaymentGW", "depends_on": ["FraudCheck"], "churn": 12, "defects": 3},
+    {"name": "CatalogSvc", "depends_on": ["OrderDB"], "churn": 15, "defects": 1},
+    {"name": "UserDB", "depends_on": [], "churn": 2, "defects": 0},
+    {"name": "FraudCheck", "depends_on": [], "churn": 6, "defects": 1}
+  ]
+}

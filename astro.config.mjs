@@ -39,6 +39,28 @@ export default defineConfig({
 					]
 				},
 				{
+					label: 'Year 2: Required',
+					items: [
+						{
+							label: 'Winter Semester (ZS)',
+							items: [{ autogenerate: { directory: 'year-2-required/winter' } }]
+						},
+						{
+							label: 'Summer Semester (LS)',
+							items: [{ autogenerate: { directory: 'year-2-required/summer' } }]
+						}
+					]
+				},
+				{
+					label: 'Year 2: Optional',
+					items: [
+						{
+							label: 'Winter Semester (ZS)',
+							items: [{ autogenerate: { directory: 'year-2-optional/winter' } }]
+						}
+					]
+				},
+				{
 					label: 'Optional Courses',
 					items: [
 						{

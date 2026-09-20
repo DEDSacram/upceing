@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+             id="defs-order" targetNamespace="http://upce.cz/napis">
+  <process id="order-process" name="Order process" isExecutable="true">
+    <startEvent id="start" name="Order received">
+      <outgoing>flow1</outgoing>
+    </startEvent>
+    <serviceTask id="check-stock" name="Check stock" camunda:type="external" camunda:topic="check-stock">
+      <incoming>flow1</incoming>
+      <outgoing>flow2</outgoing>
+    </serviceTask>
+    <exclusiveGateway id="gateway-stock" name="In stock?">
+      <incoming>flow2</incoming>
+      <outgoing>flow-yes</outgoing>
+      <outgoing>flow-no</outgoing>
+    </exclusiveGateway>
+    <serviceTask id="charge-payment" name="Charge payment" camunda:type="external" camunda:topic="charge-payment">
+      <incoming>flow-yes</incoming>
+      <outgoing>flow3</outgoing>
+    </serviceTask>
+    <userTask id="ship-order" name="Ship order">
+      <incoming>flow3</incoming>
+      <outgoing>flow4</outgoing>
+    </userTask>
+    <userTask id="notify-customer" name="Notify customer (out of stock)">
+      <incoming>flow-no</incoming>
+      <outgoing>flow5</outgoing>
+    </userTask>
+    <endEvent id="end-shipped" name="Shipped">
+      <incoming>flow4</incoming>
+    </endEvent>
+    <endEvent id="end-cancelled" name="Cancelled">
+      <incoming>flow5</incoming>
+    </endEvent>
+    <sequenceFlow id="flow1" sourceRef="start" targetRef="check-stock"/>
+    <sequenceFlow id="flow2" sourceRef="check-stock" targetRef="gateway-stock"/>
+    <sequenceFlow id="flow-yes" sourceRef="gateway-stock" targetRef="charge-payment">
+      <conditionExpression xsi:type="tFormalExpression">${inStock == true}</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow-no" sourceRef="gateway-stock" targetRef="notify-customer">
+      <conditionExpression xsi:type="tFormalExpression">${inStock == false}</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow3" sourceRef="charge-payment" targetRef="ship-order"/>
+    <sequenceFlow id="flow4" sourceRef="ship-order" targetRef="end-shipped"/>
+    <sequenceFlow id="flow5" sourceRef="notify-customer" targetRef="end-cancelled"/>
+  </process>
+</definitions>

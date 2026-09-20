@@ -1,0 +1,20 @@
+# Camunda 7 (community) + Postgres. Needs Docker; no local build required.
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: camunda
+      POSTGRES_PASSWORD: camunda
+      POSTGRES_DB: camunda
+    volumes: ["camunda-db:/var/lib/postgresql/data"]
+  camunda:
+    image: camunda/camunda-bpm-platform:7.21.0
+    ports: ["8080:8080"]
+    environment:
+      DB_DRIVER: org.postgresql.Driver
+      DB_URL: jdbc:postgresql://db:5432/camunda
+      DB_USERNAME: camunda
+      DB_PASSWORD: camunda
+    depends_on: [db]
+volumes:
+  camunda-db:

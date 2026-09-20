@@ -1,0 +1,32 @@
+# Minimal YAML-like hazard log (parsed without PyYAML).
+hazards:
+  - id: H-01
+    title: Barrier fails to lower on train approach
+    severity: 5
+    likelihood: 2
+    mitigation: Redundant track-circuit + watchdog; mitigated_likelihood: 1
+    mitigated_likelihood: 1
+  - id: H-02
+    title: Barrier lowers on car underneath
+    severity: 4
+    likelihood: 3
+    mitigation: Presence loop inhibits lowering
+    mitigated_likelihood: 1
+  - id: H-03
+    title: Warning light outage
+    severity: 3
+    likelihood: 3
+    mitigation: Dual lamps + lamp monitoring
+    mitigated_likelihood: 2
+  - id: H-04
+    title: Spurious emergency brake command
+    severity: 3
+    likelihood: 2
+    mitigation: 2oo2 voting on brake command
+    mitigated_likelihood: 1
+  - id: H-05
+    title: Operator display freeze
+    severity: 2
+    likelihood: 4
+    mitigation: Display heartbeat + failover HMI
+    mitigated_likelihood: 2

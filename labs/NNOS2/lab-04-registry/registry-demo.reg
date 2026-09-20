@@ -1,0 +1,10 @@
+Windows Registry Editor Version 5.00
+
+; NNOS2 lab-04 example: creates HKCU\Software\NNOS2Lab with two values.
+; Install on Windows by double-clicking this file (imports into HKEY_CURRENT_USER,
+; no admin rights needed) or:  reg import registry-demo.reg
+; Remove with:  reg delete HKCU\Software\NNOS2Lab /f
+
+[HKEY_CURRENT_USER\Software\NNOS2Lab]
+"Greeting"="Hello from NNOS2 lab-04"
+"Counter"=dword:0000002a
