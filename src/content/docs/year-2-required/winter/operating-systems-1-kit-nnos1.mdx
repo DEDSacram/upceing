@@ -1,0 +1,950 @@
+---
+title: "Operating Systems 1 (KIT/NNOS1)"
+description: "Complete course materials for processes, threads, scheduling, synchronization, IPC, memory and virtualization"
+template: doc
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+# Operating Systems 1 (KIT/NNOS1)
+
+Welcome to Operating Systems 1! This documentation covers kernel architectures, processes, threads, Linux scheduling, race conditions, semaphores, monitors, IPC, deadlocks, virtual memory, virtualization, and OS security — with C/POSIX examples throughout.
+
+---
+
+## 📑 Table of Contents
+
+### Course Overview
+- [Course Objectives](#course-objectives)
+- [Assessment & Credit Requirements](#assessment--credit-requirements)
+- [Examination Structure](#examination-structure)
+- [Schedule](#schedule)
+
+### Lecture Materials (Weeks 1-13)
+1. [Week 1: OS Conceptions and Kernel Architecture](#week-1-os-conceptions-and-kernel-architecture)
+2. [Week 2: Processes, POSIX Signals and System Calls](#week-2-processes-posix-signals-and-system-calls)
+3. [Week 3: Threads, Reentrancy and POSIX Calls](#week-3-threads-reentrancy-and-posix-calls)
+4. [Week 4: Scheduling Algorithms and Linux Scheduling](#week-4-scheduling-algorithms-and-linux-scheduling)
+5. [Week 5: Race Conditions, SMP and Critical Section](#week-5-race-conditions-smp-and-critical-section)
+6. [Week 6: Semaphores and Mutexes](#week-6-semaphores-and-mutexes)
+7. [Week 7: Barriers and Condition Variables](#week-7-barriers-and-condition-variables)
+8. [Week 8: IPC - Pipes, Sockets and Message Queues](#week-8-ipc--pipes-sockets-and-message-queues)
+9. [Week 9: Monitors in Java and C-Sharp](#week-9-monitors-in-java-and-c-sharp)
+10. [Week 10: Deadlock, Livelock and Starvation](#week-10-deadlock-livelock-and-starvation)
+11. [Week 11: Virtual Memory and Paging](#week-11-virtual-memory-and-paging)
+12. [Week 12: Virtualization and Containers](#week-12-virtualization-and-containers)
+13. [Week 13: OS Security Principles](#week-13-os-security-principles)
+
+### Assignments & Exam
+- [Assignment Requirements](#assignment-requirements)
+- [Code Review Guide](#code-review-guide)
+- [Exam Preparation](#exam-preparation)
+- [Quick Reference Cards](#quick-reference-cards)
+
+---
+
+## Course Overview
+
+### Course Objectives
+
+<span class="badge">Core</span> <span class="badge info">Profilující</span>
+
+Students will understand and apply OS fundamentals:
+
+- **Kernel architectures** - monolithic, microkernel, hybrid; HW prerequisites
+- **Processes & threads** - implementation, POSIX API, signals, reentrancy
+- **Scheduling** - algorithms and Linux classes (deadline, RT, normal)
+- **Synchronization** - critical section, semaphores, mutexes, barriers, condvars
+- **IPC** - pipes, sockets, message queues
+- **Monitors** - Java/C# language-level synchronization
+- **Deadlocks** - prevention, avoidance, detection, recovery
+- **Virtual memory** - paging, replacement, Intel IA-32/PAE/x86-64
+- **Virtualization & security** - hypervisors, containers, permissions, attacks
+
+### Assessment & Credit Requirements
+
+<div class="exercise-box">
+
+<strong>📋 To receive credit (Zk+), students must:</strong>
+
+1. Complete **lab assignments** (POSIX processes/threads/synchronization/IPC in C)
+2. Pass **credit test** (theory + short C/POSIX tasks)
+3. Pass **final exam** (written/oral, 60%+ to pass)
+
+</div>
+
+### Examination Structure
+
+#### Format
+1. **Theory part** - kernel design, scheduling, synchronization primitives, paging
+2. **Practical part** - read/debug short C POSIX programs (fork, pthread, semaphores, pipes)
+3. **Problem analysis** - deadlock scenario, race condition, page-table walk
+
+#### Passing Criteria
+- **Minimum 60%** overall; synchronization code must be race-free
+
+### Schedule
+
+| Week | Lecture Topic | Exercise Focus |
+|------|---------------|----------------|
+| 1 | OS conceptions, kernel, HW | Syscall tracing (strace) |
+| 2 | Processes, signals, syscalls | fork/exec/signal in C |
+| 3 | Threads, reentrancy, POSIX | pthreads, errno, reentrant fns |
+| 4 | Scheduling, Linux classes | Priorities, nice, chrt |
+| 5 | Race, SMP, critical section | Demonstrate race, fix it |
+| 6 | Semaphore, mutex | Producer-consumer |
+| 7 | Barrier, condvar | Rendezvous, thread pool |
+| 8 | IPC: pipes, sockets, MQ | Pipe chat, sockets |
+| 9 | Monitors Java/C# | synchronized, lock/Monitor |
+| 10 | Deadlock/livelock/starvation | Banker's algorithm |
+| 11 | Virtual memory, paging, Intel | Page tables, faults |
+| 12 | Virtualization, containers | KVM, Docker, namespaces |
+| 13 | Security | Permissions, attacks, firewall |
+
+---
+
+## Week 1: OS Conceptions and Kernel Architecture
+
+What an OS is: resource manager + extended machine. Kernel architectures trade performance for isolation.
+
+### Kernel Architectures
+
+| Architecture | Structure | Example | Trade-off |
+|--------------|-----------|---------|-----------|
+| **Monolithic** | All services in kernel space | Linux | Fast, large TCB |
+| **Microkernel** | Minimal kernel, servers in userspace | seL4, Minix | Isolated, IPC overhead |
+| **Hybrid** | Microkernel + in-kernel fast paths | Windows NT, macOS | Balance |
+| **Exokernel** | App-level resource control | Research | Max flexibility |
+
+### HW Prerequisites
+
+- **Dual mode** (user/kernel), **MMU** for protection, **interrupts/traps**, **DMA**, timers
+- System calls cross the boundary via trap: `syscall` (x86-64) / `int 0x80` (legacy)
+
+```c
+// Minimal syscall trace: what happens under printf?
+#include <unistd.h>
+int main(void) {
+    write(STDOUT_FILENO, "hello from syscall\n", 19);
+    return 0;
+}
+// Compile: gcc -o w w.c && strace -c ./w
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Run `strace -c` on a trivial C program and on `ls`.
+
+1. List the top 5 syscalls by count/time for each.
+2. Explain the difference between a syscall, a library call, and an interrupt (3-4 sentences).
+3. Classify Linux, Windows NT, and seL4 by kernel architecture with one justification each.
+
+</div>
+
+---
+
+## Week 2: Processes, POSIX Signals and System Calls
+
+A process = address space + PCB (PID, registers, file descriptors, credentials). Created by `fork` + `exec`, controlled by signals.
+
+### Key Concepts
+
+- **PCB** - process control block: state (ready/running/blocked), PC, open files
+- **fork/exec/wait** - create, replace image, reap child (avoid zombies)
+- **POSIX signals** - async notifications: `SIGINT, SIGTERM, SIGCHLD, SIGKILL` (unkillable), `SIGSTOP`
+
+| Call | Purpose |
+|------|---------|
+| `fork()` | Clone process (0 in child, PID in parent) |
+| `execvp()` | Replace image |
+| `waitpid()` | Reap child, get status |
+| `kill/sigaction` | Send / handle signals |
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <signal.h>
+#include <sys/wait.h>
+#include <unistd.h>
+
+static void on_int(int sig) {
+    (void)sig;
+    const char m[] = "caught SIGINT\n";
+    write(STDOUT_FILENO, m, sizeof m - 1);
+}
+
+int main(void) {
+    struct sigaction sa = { .sa_handler = on_int };
+    sigaction(SIGINT, &sa, NULL);
+
+    pid_t pid = fork();
+    if (pid == 0) {
+        execlp("ls", "ls", "-l", (char *)NULL);
+        _exit(127);  // exec failed
+    }
+    int status;
+    waitpid(pid, &status, 0);
+    printf("child exited: %d\n", WEXITSTATUS(status));
+    pause();  // press Ctrl-C to test handler
+    return 0;
+}
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Extend the example:
+
+1. Handle `SIGTERM` differently from `SIGINT` (two handlers or `sa_sigaction`).
+2. Add a `SIGCHLD` handler that reaps children with `WNOHANG` in a loop.
+3. Demonstrate a zombie: fork a child that exits while the parent sleeps without waiting; observe with `ps`. Then fix it.
+
+</div>
+
+---
+
+## Week 3: Threads, Reentrancy and POSIX Calls
+
+Threads share address space, files, and code but have private stacks and registers. Global state + non-reentrant functions cause subtle bugs.
+
+### Key Concepts
+
+- **Reentrant function** - safe to re-enter (no static state, uses caller buffers). <span class="badge">Good</span> `strtok_r`, `rand_r`; <span class="badge danger">Bad</span> `strtok`, `ctime` (static buffer)
+- **Thread-local storage** - `__thread` / `pthread_key_create` for per-thread `errno`-like data
+- **POSIX calls** - `pthread_create/join/detach`, `pthread_cancel`, cleanup handlers
+
+```c
+#define _POSIX_C_SOURCE 200809L
+#include <pthread.h>
+#include <stdio.h>
+#include <string.h>
+
+static __thread int tls_counter = 0;  // per-thread storage
+
+static void *worker(void *arg) {
+    int id = *(int *)arg;
+    char buf[64], *save = NULL;
+    char line[] = "a:b:c";
+    for (char *tok = strtok_r(line, ":", &save); tok; tok = strtok_r(NULL, ":", &save)) {
+        tls_counter++;
+        snprintf(buf, sizeof buf, "thread %d token %s (#%d)\n", id, tok, tls_counter);
+        fputs(buf, stdout);
+    }
+    return NULL;
+}
+
+int main(void) {
+    pthread_t t[2]; int ids[] = {1, 2};
+    for (int i = 0; i < 2; i++) pthread_create(&t[i], NULL, worker, &ids[i]);
+    for (int i = 0; i < 2; i++) pthread_join(t[i], NULL);
+    return 0;
+}
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Demonstrate non-reentrancy:
+
+1. Write two threads calling `strtok` on different strings; observe corruption.
+2. Fix with `strtok_r`. Explain why the `_r` variant is reentrant.
+3. Replace a global counter with `__thread` storage and show per-thread values diverge correctly.
+
+</div>
+
+---
+
+## Week 4: Scheduling Algorithms and Linux Scheduling
+
+Schedulers decide who runs next. Linux combines deadline, real-time, and fair (CFS) classes in priority order.
+
+### Classical Algorithms
+
+| Algorithm | Policy | Property |
+|-----------|--------|----------|
+| FCFS | First come | Simple, convoy effect |
+| SJF/SRTF | Shortest job | Optimal avg wait, starvation risk |
+| RR | Time slice | Fair, responsive |
+| Priority | Highest first | Needs aging |
+| MLFQ | Multi-level feedback | Adaptive, general purpose |
+
+### Linux Classes (highest → lowest)
+
+1. **SCHED_DEADLINE** - EDF + CBS (runtime/period/deadline)
+2. **Real-time FIFO/RR** - static priorities 1–99 (`chrt -f/-r`)
+3. **Normal (CFS)** - `SCHED_OTHER`, dynamic vruntime; `nice` −20..19 biases weight
+
+```c
+// Set real-time FIFO priority (needs CAP_SYS_NICE / root)
+#include <sched.h>
+#include <stdio.h>
+int main(void) {
+    struct sched_param p = { .sched_priority = 10 };
+    if (sched_setscheduler(0, SCHED_FIFO, &p) != 0) {
+        perror("sched_setscheduler (try sudo/chrt)");
+        return 1;
+    }
+    printf("now SCHED_FIFO prio 10\n");
+    return 0;
+}
+// Equivalent shell: sudo chrt -f 10 ./a.out ; nice -n 10 ./a.out
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Scheduling lab:
+
+1. Run two CPU-bound loops with `nice 0` vs `nice 10`; measure wall time with `time`.
+2. Inspect with `chrt -p <pid>` and `ps -o pid,ni,cls,pri,cmd`.
+3. Explain starvation risk of pure priority scheduling and how Linux CFS/aging mitigates it.
+
+</div>
+
+---
+
+## Week 5: Race Conditions, SMP and Critical Section
+
+On SMP systems threads truly run in parallel. Unsynchronized read-modify-write is a race; the critical section must be protected by SW or HW means.
+
+### Solutions Ladder
+
+- **SW:** Peterson/Dekker (2 threads, busy wait), Lamport bakery (n threads)
+- **HW:** disable interrupts (uniprocessor only!), atomic `test-and-set`, `compare-and-swap`, `xchg`
+- **OS:** mutex/semaphore futex-backed blocking instead of spinning
+
+```c
+// Race demo: compile gcc -pthread race.c && ./a.out (expect < 200000)
+#include <pthread.h>
+#include <stdio.h>
+static long counter = 0;
+static void *inc(void *a) {
+    for (int i = 0; i < 100000; i++) counter++;  // RACE: not atomic
+    return NULL;
+}
+int main(void) {
+    pthread_t t[2];
+    pthread_create(&t[0], NULL, inc, NULL);
+    pthread_create(&t[1], NULL, inc, NULL);
+    pthread_join(t[0], NULL); pthread_join(t[1], NULL);
+    printf("counter=%ld (expected 200000)\n", counter);
+    return 0;
+}
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Fix the race three ways and compare:
+
+1. `pthread_mutex_t` around `counter++`.
+2. C11 `_Atomic long` with `atomic_fetch_add`.
+3. One lock-free design discussion: when would atomics beat a mutex here? Measure with `time` over 10 runs each.
+
+</div>
+
+---
+
+## Week 6: Semaphores and Mutexes
+
+Mutex = binary ownership lock; semaphore = counting signalling mechanism. Both built on futex + wait queues in Linux.
+
+### Semantics
+
+| Primitive | Ops | Use |
+|-----------|-----|-----|
+| **Mutex** | lock/unlock (owner) | Critical section |
+| **Binary sem** | wait/post | Signalling, lock-like |
+| **Counting sem** | wait/post, init N | Resource pool, producer-consumer |
+| **Robust/PI mutex** | priority inheritance | Avoid priority inversion |
+
+```c
+// Producer-consumer with POSIX semaphores + mutex
+#include <pthread.h>
+#include <semaphore.h>
+#include <stdio.h>
+#define N 8
+static int buf[N], in = 0, out = 0;
+static sem_t empty, full;
+static pthread_mutex_t mx = PTHREAD_MUTEX_INITIALIZER;
+
+static void *producer(void *a) {
+    for (int i = 0; i < 20; i++) {
+        sem_wait(&empty);
+        pthread_mutex_lock(&mx);
+        buf[in] = i; in = (in + 1) % N;
+        pthread_mutex_unlock(&mx);
+        sem_post(&full);
+    }
+    return NULL;
+}
+static void *consumer(void *a) {
+    for (int i = 0; i < 20; i++) {
+        int v;
+        sem_wait(&full);
+        pthread_mutex_lock(&mx);
+        v = buf[out]; out = (out + 1) % N;
+        pthread_mutex_unlock(&mx);
+        sem_post(&empty);
+        printf("got %d\n", v);
+    }
+    return NULL;
+}
+int main(void) {
+    sem_init(&empty, 0, N); sem_init(&full, 0, 0);
+    pthread_t p, c;
+    pthread_create(&p, NULL, producer, NULL);
+    pthread_create(&c, NULL, consumer, NULL);
+    pthread_join(p, NULL); pthread_join(c, NULL);
+    return 0;
+}
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Implement a counting semaphore demo:
+
+1. Limit 3 threads in a "database connection pool" of size 3 using `sem_t`.
+2. Show what breaks if you forget `sem_post` (leak) or double-post (over-release).
+3. Replace the mutex with a binary semaphore; discuss lost ownership semantics (any thread can post).
+
+</div>
+
+---
+
+## Week 7: Barriers and Condition Variables
+
+Barriers rendezvous N threads; condition variables let threads sleep until a predicate on shared state becomes true (always re-check in `while`).
+
+### Patterns
+
+- **Barrier** - `pthread_barrier_init/wait`: all meet before proceeding (phased computation)
+- **Condvar** - `pthread_cond_wait/signal/broadcast` + mutex + predicate loop
+- Spurious wakeups exist → <span class="badge danger">Bad</span> `if (cond)` vs <span class="badge">Good</span> `while (!pred)`
+
+```c
+// Thread pool wakeup with condvar (predicate loop)
+#include <pthread.h>
+#include <stdio.h>
+static pthread_mutex_t mx = PTHREAD_MUTEX_INITIALIZER;
+static pthread_cond_t cv = PTHREAD_COND_INITIALIZER;
+static int work_ready = 0;
+
+static void *worker(void *a) {
+    pthread_mutex_lock(&mx);
+    while (!work_ready)                 // predicate loop (spurious wakeups!)
+        pthread_cond_wait(&cv, &mx);
+    pthread_mutex_unlock(&mx);
+    printf("worker: processing\n");
+    return NULL;
+}
+int main(void) {
+    pthread_t t; pthread_create(&t, NULL, worker, NULL);
+    pthread_mutex_lock(&mx);
+    work_ready = 1;
+    pthread_cond_signal(&cv);
+    pthread_mutex_unlock(&mx);
+    pthread_join(t, NULL);
+    return 0;
+}
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Parallel phased computation:
+
+1. Create 4 threads + main (count 5) rendezvousing on `pthread_barrier_t` across 3 phases; print phase numbers in order.
+2. Convert the condvar example to broadcast waking 3 workers.
+3. Break it deliberately with `if` instead of `while`; explain the spurious-wakeup hazard.
+
+</div>
+
+---
+
+## Week 8: IPC — Pipes, Sockets and Message Queues
+
+IPC moves data and synchronization across processes: pipes (parent-child), FIFOs, Unix/TCP sockets, POSIX message queues.
+
+### Comparison
+
+| Mechanism | Scope | Direction | Framing |
+|-----------|-------|-----------|---------|
+| Anonymous pipe | Related processes | Unidirectional | Byte stream |
+| FIFO | Filesystem name | Unidirectional | Byte stream |
+| Unix socket | Same host | Bidirectional | Stream or datagram |
+| TCP socket | Network | Bidirectional | Stream |
+| POSIX MQ | Named queue | Messages | Prioritized messages |
+
+```c
+// Anonymous pipe: parent -> child message
+#include <stdio.h>
+#include <string.h>
+#include <sys/wait.h>
+#include <unistd.h>
+int main(void) {
+    int fd[2]; pipe(fd);
+    if (fork() == 0) {
+        close(fd[1]);
+        char buf[128]; ssize_t n = read(fd[0], buf, sizeof buf - 1);
+        buf[n > 0 ? n : 0] = '\0';
+        printf("child got: %s\n", buf);
+        _exit(0);
+    }
+    close(fd[0]);
+    const char *msg = "hello via pipe";
+    write(fd[1], msg, strlen(msg));
+    close(fd[1]); wait(NULL);
+    return 0;
+}
+```
+
+```c
+// POSIX message queue sender sketch (link -lrt on older glibc)
+// #include <mqueue.h>
+// mqd_t mq = mq_open("/demo", O_CREAT | O_WRONLY, 0600, NULL);
+// mq_send(mq, "task", 5, 1 /*prio*/);
+// mq_close(mq);
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Build a two-way chat:
+
+1. Parent↔child using **two** pipes (full duplex); handle partial reads/writes in loops.
+2. Convert to Unix-domain `SOCK_STREAM` socket pair (`socketpair`) and compare API.
+3. Send 3 prioritized messages via POSIX MQ; show the highest priority arrives first regardless of send order.
+
+</div>
+
+---
+
+## Week 9: Monitors in Java and C-Sharp
+
+A monitor = object + mutex + condition variables with structured entry. Java (`synchronized`, `wait/notify`) and C# (`lock`, `Monitor.Wait/Pulse`) both implement Hoare/Mesa-style monitors.
+
+### Equivalence Table
+
+| Concept | Java | C# |
+|---------|------|-----|
+| Enter monitor | `synchronized(obj)` / method | `lock(obj)` |
+| Wait | `obj.wait()` | `Monitor.Wait(obj)` |
+| Signal one | `obj.notify()` | `Monitor.Pulse(obj)` |
+| Signal all | `obj.notifyAll()` | `Monitor.PulseAll(obj)` |
+
+```java
+// Java monitor: bounded buffer
+public class BoundedBuffer<T> {
+    private final java.util.Queue<T> q = new java.util.LinkedList<>();
+    private final int cap;
+    public BoundedBuffer(int cap) { this.cap = cap; }
+    public synchronized void put(T v) throws InterruptedException {
+        while (q.size() == cap) wait();
+        q.add(v);
+        notifyAll();
+    }
+    public synchronized T take() throws InterruptedException {
+        while (q.isEmpty()) wait();
+        T v = q.remove();
+        notifyAll();
+        return v;
+    }
+}
+```
+
+```csharp
+// C# equivalent
+public class BoundedBuffer<T> {
+    private readonly Queue<T> q = new();
+    private readonly int cap;
+    public BoundedBuffer(int cap) { this.cap = cap; }
+    public void Put(T v) {
+        lock (q) {
+            while (q.Count == cap) Monitor.Wait(q);
+            q.Enqueue(v);
+            Monitor.PulseAll(q);
+        }
+    }
+    public T Take() {
+        lock (q) {
+            while (q.Count == 0) Monitor.Wait(q);
+            T v = q.Dequeue();
+            Monitor.PulseAll(q);
+            return v;
+        }
+    }
+}
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Readers-writers with monitors:
+
+1. Implement in Java: multiple readers OR one writer (writer-preference or reader-preference — document your choice).
+2. Port to C# with `lock`/`Monitor`.
+3. Explain why `while` re-checks are mandatory (Mesa semantics: signaled thread competes to re-enter).
+
+</div>
+
+---
+
+## Week 10: Deadlock, Livelock and Starvation
+
+Deadlock (circular wait, no progress), livelock (state churn, no progress), starvation (unfair scheduling, some thread never runs).
+
+### Coffman Conditions (all 4 ⇒ deadlock possible)
+
+1. **Mutual exclusion** 2. **Hold and wait** 3. **No preemption** 4. **Circular wait**
+
+| Strategy | Idea | Cost |
+|----------|------|------|
+| Prevention | Break a condition (ordering, atomic acquisition) | Restrictive |
+| Avoidance | Banker's algorithm (safe-state check) | Needs max claims |
+| Detection+recovery | Wait-for graph cycle → kill/rollback | Complexity |
+| Ostrich | Ignore (used more than admitted) | Risk |
+
+```c
+// Lock ordering prevents circular wait
+#include <pthread.h>
+static pthread_mutex_t A = PTHREAD_MUTEX_INITIALIZER;
+static pthread_mutex_t B = PTHREAD_MUTEX_INITIALIZER;
+
+void *t1(void *x) {
+    pthread_mutex_lock(&A); pthread_mutex_lock(&B);
+    /* critical */ pthread_mutex_unlock(&B); pthread_mutex_unlock(&A);
+    return NULL;
+}
+void *t2(void *x) {
+    pthread_mutex_lock(&A); pthread_mutex_lock(&B);  // SAME order: no cycle
+    /* critical */ pthread_mutex_unlock(&B); pthread_mutex_unlock(&A);
+    return NULL;
+}
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Dining philosophers (5):
+
+1. Implement the naive version and observe deadlock (or argue the interleaving).
+2. Fix with global lock ordering (numbered forks, pick lower first). Prove no cycle.
+3. Implement Banker's algorithm for a 3-process/2-resource instance; show a safe sequence.
+
+</div>
+
+---
+
+## Week 11: Virtual Memory and Paging
+
+Paging decouples virtual addresses from physical frames: VPN → (multilevel tables) → PFN + offset. TLB caches translations; faults handled by fetch/replacement/cleaning policies.
+
+### Policies
+
+| Policy | Options |
+|--------|---------|
+| **Fetch** | Demand paging (on fault) vs prepaging |
+| **Replacement** | OPT (ideal), FIFO, LRU (approx: clock/NRU/aging), LFU/MFU |
+| **Cleaning** | Demand vs pre-cleaning dirty pages |
+| **Allocation** | Fixed vs variable (working set, PFF) |
+
+### Intel Paging
+
+| Mode | VA split | Page sizes |
+|------|----------|------------|
+| IA-32 non-PAE | 10+10+12 (2-level) | 4 KB, 4 MB (PSE) |
+| IA-32 PAE | 2+9+9+12 (3-level) | 4 KB, 2 MB |
+| IA-32e (x86-64) | 9+9+9+9+12 (4-level PML4) | 4 KB, 2 MB, 1 GB |
+
+```c
+// Observe paging: RSS vs virtual size, page faults
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+int main(void) {
+    size_t n = 256UL * 1024 * 1024;  // 256 MB virtual
+    char *p = malloc(n);
+    printf("allocated %zu MB virtual; check /proc/self/status (VmSize vs VmRSS)\n", n >> 20);
+    getchar();                        // inspect before touching
+    memset(p, 0xAB, n);               // demand faults populate RSS
+    printf("touched all pages; compare VmRSS now\n");
+    getchar();
+    return 0;
+}
+// Watch faults: /usr/bin/time -v ./a.out  (Major/Minor pagefaults)
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Paging lab:
+
+1. Run the program; record VmSize/VmRSS before/after `memset` from `/proc/<pid>/status`.
+2. Compare `time -v` minor vs major faults; explain demand paging + copy-on-write zero page.
+3. Simulate FIFO vs LRU on reference string `1 2 3 4 1 2 5 1 2 3 4 5` with 3/4 frames; show Belady's anomaly for FIFO.
+
+</div>
+
+---
+
+## Week 12: Virtualization and Containers
+
+Virtualization multiplexes hardware: trap-and-emulate (native), hypercalls (paravirtual), OS-level namespaces/cgroups (containers).
+
+### Comparison
+
+| Approach | Mechanism | Perf | Isolation | Example |
+|----------|-----------|------|-----------|---------|
+| Full/native virt | Binary translation / HW assist (VT-x, AMD-V) | Good | Strong (separate kernels) | KVM, VMware |
+| Paravirtual | Guest hypercalls | Better | Strong | Xen-PV, VirtIO drivers |
+| Containers | Namespaces + cgroups, shared kernel | Native | Weaker (shared kernel) | Docker, LXC |
+| Unikernel | Single-address-space image | Best for niche | Single app | Research/edge |
+
+```bash
+# Containers vs VMs: inspect isolation primitives
+unshare --help            # namespaces: pid, net, mnt, uts, ipc, user
+docker run --rm -it --cpus 1 --memory 256m ubuntu bash
+# inside: ps aux (pid ns), ip addr (net ns), cat /sys/fs/cgroup/*/max (limits)
+cat /proc/cmdline | tr ' ' '\n' | grep -i -E 'kvm|hypervisor' || echo "bare or container?"
+```
+
+```c
+// Namespaces sketch: clone child into new UTS namespace
+#define _GNU_SOURCE
+#include <sched.h>
+#include <stdio.h>
+#include <sys/wait.h>
+#include <unistd.h>
+static int child(void *a) {
+    sethostname("container", 9);
+    char h[64]; gethostname(h, sizeof h);
+    printf("child hostname: %s\n", h);
+    return 0;
+}
+int main(void) {
+    char stack[65536];
+    pid_t pid = clone(child, stack + sizeof stack,
+                      CLONE_NEWUTS | SIGCHLD, NULL);
+    waitpid(pid, NULL, 0);
+    return 0;
+}
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Container vs VM analysis:
+
+1. Run `docker run --rm busybox ps` vs a KVM guest `ps`; compare kernel versions (`uname -r`) — explain why containers share the host kernel.
+2. Limit a container (`--memory`, `--cpus`) and observe OOM/throttle behaviour.
+3. Write a short decision table: when to choose VM vs container vs bare metal (3 scenarios each).
+
+</div>
+
+---
+
+## Week 13: OS Security Principles
+
+Security = consistency + least privilege + defence in depth. Cover DAC/MAC, process credentials, encryption, firewalls, and attack taxonomy.
+
+### Key Concepts
+
+- **Users/permissions** - UID/GID, rwx, setuid/setgid/sticky; capabilities split root; MAC (SELinux/AppArmor)
+- **Process isolation** - credentials, namespaces, seccomp, grsecurity; encryption at rest (LUKS) / in transit (TLS)
+- **Firewall** - netfilter/iptables/nftables: default-deny, stateful rules
+
+| Attack | Vector | Mitigation |
+|--------|--------|------------|
+| Buffer overflow | Unsafe C | ASLR, NX/DEP, stack canaries, -D_FORTIFY |
+| Privilege escalation | setuid bugs, capabilities | Least privilege, audit |
+| TOCTOU race | check-then-use | Atomic ops, O_NOFOLLOW |
+| DoS/fork bomb | Resource exhaustion | ulimit, cgroups |
+| Rootkit | Kernel compromise | Secure boot, signed modules |
+
+```bash
+# Least-privilege checklist demo
+ls -l /usr/bin/sudo               # setuid root: why minimal + audited?
+id; sudo -l                       # your capabilities
+nft list ruleset 2>/dev/null || sudo iptables -L -n | head -20
+find . -type f -perm -4000 | head # setuid inventory of a project
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Harden a toy service:
+
+1. Run it as a dedicated UID with minimal file perms (no world-writable); document the permission matrix.
+2. Add a default-deny firewall rule allowing only the service port + established traffic.
+3. Perform a threat sketch (STRIDE-lite): spoofing, tampering, DoS — one mitigation each.
+
+</div>
+
+---
+
+## Assignment Requirements
+
+### Lab Assignments
+
+<div class="exercise-box">
+
+<strong>📋 Typical lab set (C/POSIX):</strong>
+
+| Lab | Requirement |
+|-----|-------------|
+| Processes | fork/exec/wait, signal handling, zombie-free |
+| Threads | pthreads, reentrant functions, TLS |
+| Synchronization | mutex/sem/condvar producer-consumer, barrier |
+| IPC | pipes + sockets message exchange |
+| Memory/deadlock | Fault observation, Banker's algorithm |
+
+</div>
+
+### Submission Checklist
+
+<div class="checklist">
+
+- [ ] Compiles warning-free with `-Wall -Wextra -pthread`
+- [ ] No zombies (all children reaped), no leaked semaphores/MQs
+- [ ] No data races (helgrind/TSan clean: `gcc -fsanitize=thread`)
+- [ ] Man pages cited for each syscall used
+- [ ] README with build/run/test steps
+
+</div>
+
+---
+
+## Code Review Guide
+
+### What to Look For
+
+#### 1. Correctness
+- `fork` return values handled (child/parent/error)?
+- `exec` failure followed by `_exit` (not `exit` flushing twice)?
+- Condvars always in `while` predicate loops?
+
+#### 2. Resource Management
+- Every `malloc/mmap/pipe/mq_open` has a matching free/close/unlink?
+- Mutex init/destroy pairing; lock ordering documented?
+
+#### 3. Robustness
+- `EINTR` retry on slow syscalls? Partial read/write loops?
+- Signal handlers async-signal-safe only?
+
+### Code Review Example
+
+<div class="review-note">
+
+<strong>🔍 Practice Review:</strong> Identify issues:
+
+```c
+void *w(void *a) {
+    pthread_mutex_lock(&m);
+    if (!ready) pthread_cond_wait(&c, &m);  // BUG: if, not while
+    pthread_mutex_unlock(&m);
+    *shared += 1;  // BUG: unprotected access after unlock
+    return NULL;
+}
+```
+
+**Issues:** `if` instead of `while` (spurious wakeup); shared access outside lock; no error checking; unclear ownership of `shared`.
+
+</div>
+
+---
+
+## Exam Preparation
+
+### Exam Structure
+
+1. **Theory:** kernel types, scheduling classes, sync primitives, paging levels
+2. **Code reading:** spot race/deadlock/leak in 20-40 line POSIX C snippets
+3. **Problems:** Banker's algorithm, page replacement trace, scheduling Gantt chart
+
+### Key Topics to Review
+
+| Week | Topic | Key Concepts |
+|------|-------|--------------|
+| 1 | Kernel | Monolithic/μK, dual mode, syscalls |
+| 2 | Processes | fork/exec/wait, signals |
+| 3 | Threads | Reentrancy, TLS, pthreads |
+| 4 | Scheduling | CFS, RT, deadline, nice |
+| 5 | Race/SMP | Critical section, atomics |
+| 6 | Sem/mutex | Counting, ownership, PI |
+| 7 | Barrier/condvar | Predicate loops, broadcast |
+| 8 | IPC | Pipes, sockets, MQ |
+| 9 | Monitors | Java/C# equivalence |
+| 10 | Deadlock | Coffman, Banker |
+| 11 | VM | Replacement, IA-32/PAE/x86-64 |
+| 12 | Virt | Hypervisor vs containers |
+| 13 | Security | Perms, attacks, firewall |
+
+### Practice Questions
+
+<div class="exercise-box">
+
+<strong>📝 Sample Exam Questions:</strong>
+
+1. Compare monolithic vs microkernel; where does a syscall boundary cost arise?
+2. Why must `pthread_cond_wait` be called with the mutex held and in a `while` loop?
+3. Given allocation/max/available matrices, is the state safe? Give the sequence.
+4. Walk a 4-level x86-64 translation for a sample VA; where does the TLB help?
+5. Order these locks to avoid deadlock; which Coffman condition did you break?
+
+</div>
+
+---
+
+## Quick Reference Cards
+
+### POSIX Crib
+
+```bash
+# Processes & signals
+ps -ef --forest; kill -TERM <pid>; trap 'echo hi' INT
+strace -f -e trace=process,signal ./a.out
+
+# Threads & sync
+gcc -Wall -Wextra -pthread -fsanitize=thread t.c
+valgrind --tool=helgrind ./a.out
+
+# Scheduling
+nice -n 10 ./job; chrt -f 20 ./rt; chrt -p <pid>
+
+# IPC
+ipcs -q; ls -l /dev/mqueue/; ss -x | head
+```
+
+### Pthreads/Mutex/Condvar
+
+```c
+pthread_create(&t, NULL, fn, arg); pthread_join(t, NULL);
+pthread_mutex_lock(&m); /* crit */ pthread_mutex_unlock(&m);
+while (!pred) pthread_cond_wait(&cv, &m);
+sem_wait(&s); /* ... */ sem_post(&s);
+pipe(fd); socketpair(AF_UNIX, SOCK_STREAM, 0, sv);
+```
+
+---
+
+*End of Course Documentation*
+
+**Last Updated:** 2026-09-20
+**Course Code:** KIT/NNOS1
+**Credits:** 6 Zk+

@@ -1,0 +1,1001 @@
+---
+title: "Software Safety and Reliability (KST/NNBSW)"
+description: "Complete course materials for dependable software: hazards, human factors, V&V, SPARK/Ada, IEC 61508, EN 50128 and safety-critical domains"
+template: doc
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+# Software Safety and Reliability (KST/NNBSW)
+
+Welcome to Software Safety and Reliability! This guide covers why software fails, how complexity and human cognition contribute to defects, what testing can and cannot prove, and how rigorous processes, safe languages (Ada/SPARK), verification and standards (ISO, IEC 61508, EN 50128) build dependable systems for avionics and nuclear applications.
+
+---
+
+## 📑 Table of Contents
+
+### Course Overview
+- [Course Objectives](#course-objectives)
+- [Assessment & Credit Requirements](#assessment--credit-requirements)
+- [Examination Structure](#examination-structure)
+- [Schedule](#schedule)
+
+### Lecture Materials (Weeks 1-13)
+1. [Week 1: Introduction into the Subject](#week-1-introduction-into-the-subject)
+2. [Week 2: Errors and Their Consequences](#week-2-errors-and-their-consequences)
+3. [Week 3: System Complexity and Its Consequences](#week-3-system-complexity-and-its-consequences)
+4. [Week 4: How People Solve Constructive Tasks](#week-4-how-people-solve-constructive-tasks)
+5. [Week 5: Cognitive Limits of the Programmer](#week-5-cognitive-limits-of-the-programmer)
+6. [Week 6: Testing and Its Limits](#week-6-testing-and-its-limits)
+7. [Week 7: Development Process](#week-7-development-process)
+8. [Week 8: Programming Language Safety](#week-8-programming-language-safety)
+9. [Week 9: OS, COTS and Generic Systems](#week-9-os-cots-and-generic-systems)
+10. [Week 10: Verification, Validation, Assessment, ISO](#week-10-verification-validation-assessment-iso)
+11. [Week 11: SPARK I — Contracts and Flow Analysis](#week-11-spark-i--contracts-and-flow-analysis)
+12. [Week 12: SPARK II — Proof and Information Flow](#week-12-spark-ii--proof-and-information-flow)
+13. [Week 13: IEC 61508, EN 50128, Avionics and Nuclear](#week-13-iec-61508-en-50128-avionics-and-nuclear)
+
+### Assignments & Exam
+- [Assignment Requirements](#assignment-requirements)
+- [Code Review Guide](#code-review-guide)
+- [Exam Preparation](#exam-preparation)
+- [Quick Reference Cards](#quick-reference-cards)
+
+---
+
+## Course Overview
+
+### Course Objectives
+
+<span class="badge">Core</span> <span class="badge info">Safety-critical</span> <span class="badge warn">Elective A</span>
+
+After completing the course, students will be able to:
+
+- **Classify software errors** — faults, failures, hazards, accidents; explain famous incidents (Therac-25, Ariane 5, Mars Climate Orbiter).
+- **Analyse complexity** — coupling, state explosion, emergent behaviour, normal accidents theory.
+- **Apply human-factors insight** — constructive problem solving, cognitive load, slips vs mistakes.
+- **Argue testing limits** — Dijkstra's dictum, coverage criteria, oracle problem, mutation testing.
+- **Select lifecycle models** — V-model, iterative, formal process evidence, traceability.
+- **Judge language safety** — strong typing, Ada/Spark vs C, undefined behaviour, Ravenscar profile.
+- **Assess COTS and OS risk** — SOUP, service history, partitioning, MILS separation kernels.
+- **Perform V&V** — reviews, static analysis, model checking, proof; ISO 9001 / ISO 26262 / ISO 15408 context.
+- **Write SPARK contracts** — pre/postconditions, loop invariants, proof with GNATprove.
+- **Navigate standards** — SIL levels in IEC 61508, SSIL in EN 50128, DO-178C objectives, IEC 60880 for nuclear.
+
+### Assessment & Credit Requirements
+
+<div class="exercise-box">
+
+<strong>📋 To receive credit (Zk+), students must:</strong>
+
+1. Submit a **hazard analysis mini-project** (fault tree + FMEA for a chosen subsystem).
+2. Submit a **SPARK laboratory task** — contracted Ada package proved with GNATprove (flow + proof, zero unproved checks).
+3. Pass a **mid-term test** on error taxonomy, complexity and testing limits (min. 60 %).
+4. Attend lab sessions and defend both submissions.
+
+</div>
+
+### Examination Structure
+
+#### Full-time Format
+1. **Written test** — taxonomy, standards (SIL/SSIL/DAL), V&V techniques, SPARK reading.
+2. **Oral examination** — hazard analysis discussion + SPARK proof explanation + one standard in depth.
+
+#### Distance Format
+1. **Oral examination via MS Teams** — theoretical questions, SPARK code walkthrough, case-study analysis.
+
+#### Passing Criteria
+- **Minimum 60 %** overall; each part (theory, SPARK, standards) must reach at least 50 %.
+- Grade E requires correct SIL/SSIL classification and reading a simple SPARK contract.
+
+### Schedule
+
+| Week | Lecture Topic | Exercise Focus |
+|------|---------------|----------------|
+| 1 | Introduction into the subject | Safety vocabulary quiz |
+| 2 | Errors and their consequences | Incident case studies |
+| 3 | System complexity | Coupling metrics |
+| 4 | Constructive tasks | Specification exercise |
+| 5 | Cognitive limits | Code review under load |
+| 6 | Testing and its limits | Coverage + mutation |
+| 7 | Development process | V-model traceability |
+| 8 | Language safety | Ada vs C comparison |
+| 9 | OS, COTS, generic systems | SOUP assessment |
+| 10 | V&V, assessment, ISO | Review checklists |
+| 11 | SPARK I | Contracts + flow |
+| 12 | SPARK II | Proof + invariants |
+| 13 | IEC 61508, EN 50128, avionics, nuclear | SIL/SSIL/DAL mapping |
+
+---
+
+## Week 1: Introduction into the Subject
+
+Safety is not reliability, and neither equals security — but all three overlap in dependable systems.
+
+### Safety vs Reliability vs Security
+
+| Property | Question asked | Measure |
+|----------|---------------|---------|
+| **Reliability** | Does it keep working? | MTBF, failure rate |
+| **Safety** | Does failure harm anyone? | Hazard rate, risk |
+| **Security** | Can it be made to harm? | Vulnerability count |
+| **Availability** | Is it there when needed? | Uptime % |
+
+> **Rule:** A reliable system can be unsafe (a missile that always hits the wrong target). An unreliable system is rarely safe.
+
+### Basic Vocabulary (dependability tree)
+
+- **Fault** — defect in code/design (e.g. missing range check).
+- **Error** — wrong internal state (e.g. overflowed variable).
+- **Failure** — externally visible deviation from service.
+- **Hazard** — system state that can lead to an accident.
+- **Accident** — realised harm to people, environment, property.
+- **Risk** — `Risk = Severity × Probability` (sometimes × exposure × avoidability).
+
+### Why Safety-Critical Software Is Special
+
+1. **Low-probability, high-consequence events** — testing rarely observes them.
+2. **Regulatory oversight** — evidence and independence are mandatory, not optional.
+3. **Long lifetimes** — 20–40 years in rail, avionics, nuclear; maintenance dominates risk.
+4. **Systems view** — software is safe only inside its system context (sensors, operators, physics).
+
+```ada
+-- Ada: a tiny illustration of "system context matters"
+-- The same function is safe or unsafe depending on its caller contract.
+package Sensors is
+   type Pressure_Bar is range 0 .. 350;
+   function Read_Pressure return Pressure_Bar;
+   --  Safety note: caller must handle stale-sensor flag;
+   --  software alone cannot know the pipe is leaking.
+end Sensors;
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Build a dependability vocabulary card deck. For each term (fault, error, failure, hazard, accident, risk, integrity level) write a one-sentence definition plus one concrete example from everyday software (e.g. a navigation app). Then classify: is a wrong map route a fault, failure, or hazard? Justify in 3–4 sentences.
+
+</div>
+
+---
+
+## Week 2: Errors and Their Consequences
+
+History is the best teacher: every famous accident maps to a small, very human error amplified by its context.
+
+### Classic Case Studies
+
+| Incident | Root cause | Lesson |
+|----------|-----------|--------|
+| **Therac-25 (1985–87)** | Race condition + reused code without hardware interlocks | Never rely on software alone for interlocks; test concurrency |
+| **Ariane 5 (1996)** | 64-bit float → 16-bit int overflow in reused Ariane 4 code | Re-validate assumptions on reuse; handle conversions |
+| **Mars Climate Orbiter (1999)** | Imperial vs metric units between teams | Interface contracts include units |
+| **Knight Capital (2012)** | Dead feature flag reactivated on deployment | Deployment safety = software safety |
+| **Boeing 737 MAX MCAS** | Single sensor input + hidden function | Redundancy, transparency, pilot override |
+
+### Error Taxonomy
+
+- **Slips** — correct plan, wrong execution (typo, off-by-one).
+- **Lapses** — forgotten step (uninitialised variable).
+- **Mistakes** — wrong plan (wrong algorithm for the physics).
+- **Violations** — deliberate deviation (skipping the checklist).
+
+> Slips are caught by tooling; mistakes are caught by reviews, models and domain experts. No single barrier catches everything — hence *defence in depth*.
+
+### Consequences Scale
+
+| Class | Example | Typical response |
+|-------|---------|-----------------|
+| Inconvenience | UI glitch | Patch |
+| Economic loss | Trading outage | Post-mortem, compensation |
+| Mission loss | Satellite lost | Investigation board |
+| Injury / fatality | Medical device | Recall, regulation, prosecution |
+| Catastrophe | Reactor, aircraft | International standards change |
+
+```ada
+-- Ariane-style conversion: the Ada way is to make overflow explicit.
+procedure Navigate (Horizontal_Bias : in Float) is
+   subtype Int16 is Integer range -32_768 .. 32_767;
+   Bias_I : Int16;
+begin
+   --  Constraint_Error is raised instead of silent wrap-around.
+   Bias_I := Int16 (Horizontal_Bias);
+exception
+   when Constraint_Error =>
+      --  Safe fallback: use last valid value, flag degradation.
+      Bias_I := 0;
+end Navigate;
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Pick one incident from the table. Write a half-page "fault → error → failure → hazard → accident" chain for it, then propose two barriers (one technical, one process) that would plausibly have broken the chain. Present as a 5-row table.
+
+</div>
+
+---
+
+## Week 3: System Complexity and Its Consequences
+
+Complex systems fail in complex ways: Perrow's *Normal Accidents* argues that tight coupling plus interactive complexity makes some accidents inevitable — only the damage is manageable.
+
+### Sources of Complexity
+
+1. **State explosion** — `n` booleans give `2**n` states; testing covers a fraction.
+2. **Coupling** — shared globals, hidden channels, time dependencies.
+3. **Concurrency** — interleavings multiply faster than tests.
+4. **Configuration** — feature flags × environments × versions.
+5. **Socio-technical coupling** — operators, procedures, organisations.
+
+### Coupling and Cohesion
+
+| Metric | Good | Bad |
+|--------|------|-----|
+| Coupling (afferent/efferent) | Low, explicit interfaces | High, hidden globals |
+| Cohesion | One reason to change | Grab-bag modules |
+| Cyclomatic complexity | < 10 per unit | > 20 (untestable) |
+
+### Emergence and Tight Coupling
+
+- **Linear systems** — failures are traceable (a pump stops → pressure drops).
+- **Complex systems** — failures are surprising (two correct components interact wrongly).
+- **Tight coupling** — no slack: a delay propagates instantly (power grids, trading).
+- **Mitigations** — partitioning, rate limiting, timeouts, fail-safe defaults, simplicity budgets.
+
+```ada
+-- Low coupling: explicit package interface hides representation.
+package Valve_Control is
+   type Valve_State is (Open, Closed, Fault);
+   procedure Set_Valve (V : in out Valve_State; Command : Boolean);
+   --  No globals visible; fault state is explicit, not a hidden flag.
+end Valve_Control;
+
+package body Valve_Control is
+   procedure Set_Valve (V : in out Valve_State; Command : Boolean) is
+   begin
+      if V = Fault then
+         return;  -- fail-safe: latched fault needs reset procedure
+      elsif Command then
+         V := Open;
+      else
+         V := Closed;
+      end if;
+   end Set_Valve;
+end Valve_Control;
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Compute a rough coupling report for a 3-module program of your choice: list every cross-module dependency (calls, shared data, config flags). Then remove or encapsulate at least two dependencies and show the before/after dependency table. Maximum one page.
+
+</div>
+
+---
+
+## Week 4: How People Solve Constructive Tasks
+
+Programming is a *constructive* task: unlike diagnosis (find the fault), construction (design the solution) has no single right answer — quality depends on how the solver frames the problem.
+
+### Models of Problem Solving
+
+- **Means–ends analysis** — work backwards from the goal (natural for debugging).
+- **Plan-then-code** — experts sketch architecture first, then fill in.
+- **Opportunistic** — jump between levels as insight strikes; tools must support it.
+- **Test-first framing** — examples constrain the design space early.
+
+### Specification Gap
+
+Most defects originate *before* coding: ambiguous, incomplete or contradictory requirements.
+
+| Requirement smell | Example | Fix |
+|-------------------|---------|-----|
+| Vagueness | "fast response" | Quantify: "p95 < 200 ms" |
+| Unverifiable | "user-friendly" | Acceptance test |
+| Missing exception | "valve opens on command" | "…unless latched fault" |
+| Implicit domain knowledge | "normal pressure" | Range + units |
+
+### Constructive Quality Levers
+
+1. Small, reviewable steps with fast feedback.
+2. Explicit assumptions log (every "obviously…" is a future bug).
+3. Worked examples before abstractions.
+4. Checklists at hand-off points (spec → design → code → test).
+
+```ada
+-- Turning a vague requirement into a checkable contract (preview of SPARK).
+package Dosing is
+   --  Requirement: "Dose must be safe."
+   --  Constructive refinement: explicit bounds + units.
+   type Milligrams is range 0 .. 500;
+   procedure Administer (Dose : Milligrams);
+   --  Assumption log: pump accuracy +/- 2 mg handled by hardware interlock.
+end Dosing;
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Take the requirement "The system shall shut down safely on over-temperature." Rewrite it as five testable sub-requirements (thresholds, hysteresis, timing, sensor-failure behaviour, operator indication). Each must be verifiable by test, review or analysis — mark which.
+
+</div>
+
+---
+
+## Week 5: Cognitive Limits of the Programmer
+
+Human working memory holds about 4 chunks; programs hold thousands. Every method, tool and notation is a prosthesis for that gap.
+
+### Processing Capacity
+
+- **Working memory** — ~4 items; chunking (patterns, names) extends it.
+- **Attention** — single-threaded; interruptions cost 10–20 minutes of context rebuild.
+- **Long-term memory** — pattern library built by deliberate practice, not by reading alone.
+
+### Consequences for Code
+
+| Limit | Symptom in code | Countermeasure |
+|-------|----------------|----------------|
+| Small working memory | Deep nesting, long parameter lists | Extract function, introduce types |
+| Inattentional blindness | Missed edge case in review | Checklists, second reader |
+| Confirmation bias | Tests that prove it works | Tests designed to break it |
+| Optimism bias | "That cannot happen" | Assert + handle the "impossible" |
+| Hindsight bias | "The bug was obvious" | Blameless post-mortems |
+
+> **Rule:** If understanding a unit requires holding more than ~4 facts simultaneously, the unit is too complex — restructure, don't memorise.
+
+### Designing for Fallible Humans
+
+1. Make illegal states unrepresentable (types, ranges, SPARK predicates).
+2. Make the safe path the easy path (defaults, builders, interlocks).
+3. Make errors loud and local (assert early, fail fast, clear messages).
+4. Protect review capacity: small diffs, quiet rooms, no review marathons.
+
+```ada
+-- Make illegal states unrepresentable: ranges instead of comments.
+package Infusion is
+   --  <span class="badge danger">Bad</span>: Integer Rate; -- must be 0..100, checked somewhere (maybe)
+   --  <span class="badge">Good</span>: constrained subtype checked everywhere automatically
+   subtype Rate_Ml_H is Integer range 0 .. 100;
+   procedure Set_Rate (R : Rate_Ml_H);
+end Infusion;
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Take a 60+ line function you wrote in the past. Count (a) nesting depth, (b) parameters + globals read, (c) distinct concepts. Refactor until no unit exceeds depth 2 and 3 parameters. Attach before/after metrics in a 3-row table.
+
+</div>
+
+---
+
+## Week 6: Testing and Its Limits
+
+Testing shows the presence of bugs, never their absence (Dijkstra). For safety, testing is necessary — and provably insufficient.
+
+### What Testing Cannot Do
+
+- **Exhaust the input space** — even 32-bit input has 4 billion values.
+- **Prove absence** — passing tests sample behaviour; proof reasons about all behaviour.
+- **Fix the oracle problem** — for novel physics, who knows the "right" answer?
+- **Cover the environment** — timing, EMI, sensor drift, cosmic rays.
+
+### Coverage Hierarchy
+
+| Criterion | Measures | Strength |
+|-----------|----------|----------|
+| Statement | Lines executed | Weak |
+| Branch / decision | Both outcomes | Baseline for safety |
+| MC/DC | Each condition independently affects outcome | Required by DO-178C Level A |
+| Mutation score | Artificial faults caught | Measures test quality, not code |
+
+### Sensible Test Strategy for Safety
+
+1. Requirements-based tests (every requirement → ≥1 test).
+2. Structural coverage appropriate to integrity level (branch → MC/DC).
+3. Robustness tests (out-of-range, null, stale, Byzantine inputs).
+4. Static analysis + proof for what tests cannot reach.
+
+```ada
+-- A testable Ada unit with explicit boundary behaviour.
+package Limiter is
+   function Clamp (X : Integer) return Integer range 0 .. 100
+   with Post => Limiter.Clamp'Result in 0 .. 100;
+end Limiter;
+
+--  Tests must still probe: -1, 0, 50, 100, 101, Integer'First, Integer'Last.
+--  MC/DC applies once conditions combine (see Week 11 contracts).
+```
+
+```bash
+# Example: mutation-testing mindset with gcov (C projects) or GNAT coverage
+gnatprove -P project.gpr --mode=prove
+gnatcov run --level=branch+decision --target=qemu ./test_runner
+gnatcov coverage --level=branch+decision --annotate=xcov obj/*.xcov
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Write boundary tests for the `Clamp` function above (Ada, or any language): at least 7 cases covering edges, just-inside, just-outside and extremes. Then deliberately mutate the implementation twice (e.g. `>` → `>=`) and confirm your tests kill both mutants. Report the kill table.
+
+</div>
+
+---
+
+## Week 7: Development Process
+
+Process is the scaffolding that makes safety repeatable: it forces the right artefacts to exist, reviewed, traced and versioned — even when the team changes.
+
+### Lifecycle Models
+
+| Model | Idea | Safety fit |
+|-------|------|-----------|
+| Waterfall / V-model | Phase per level, test mirrors design | Strong traceability; classic for certification |
+| Iterative / Agile + hardening | Sprints + safety backlog, continuous V&V | Works if evidence discipline is kept |
+| Formal / Correct-by-construction | Spec → refinement → proof (B, SPARK) | Highest assurance, highest skill cost |
+
+### The V-Model in One Picture
+
+```
+Requirements ────── Acceptance test
+     System design ── System test
+       Module design ── Integration test
+         Coding ──────── Unit test
+```
+
+Every left-side artefact has a right-side check; traceability links them bidirectionally.
+
+### Process Evidence Checklist
+
+- Versioned requirements with unique IDs (`REQ-042`).
+- Trace matrix: requirement → design → code → test.
+- Review records with independent reviewer + disposition of every comment.
+- Configuration management: baselines, change impact analysis.
+- Tool qualification notes (compiler, prover, test harness trust level).
+
+```ada
+-- Traceability lives in comments/contracts: link code to requirements.
+procedure Emergency_Stop
+with Global  => null,
+     Depends => null,
+     --  REQ-042: stop actuators within 50 ms of button press.
+     --  REQ-043: latched stop requires deliberate reset.
+     Post    => Actuators_Off;
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Build a mini trace matrix for a 3-requirement subsystem (e.g. over-temperature shutdown from Week 4): rows = requirements, columns = design element, code unit, test case, result. Every cell must be filled; empty cells are findings. Submit as a Markdown table.
+
+</div>
+
+---
+
+## Week 8: Programming Language Safety
+
+Language choice is a safety control: strong static guarantees eliminate whole defect classes before testing starts.
+
+### Unsafe by Default (C/C++)
+
+- Buffer overflows, use-after-free, data races, integer wrap.
+- Undefined behaviour: the compiler may assume it never happens — and optimise accordingly.
+- MISRA C/C++ and CERT C constrain the language, but the holes remain.
+
+### Safe by Construction (Ada/SPARK)
+
+| Feature | Ada | SPARK subset |
+|---------|-----|-------------|
+| Strong typing + ranges | ✅ | ✅ + proof |
+| No implicit conversions | ✅ | ✅ |
+| Array bounds checking | ✅ (runtime) | ✅ (proved absent) |
+| Aliasing restrictions | Partial | Strict (flow analysis) |
+| Dynamic allocation | Controlled | Forbidden (or bounded) |
+| Contracts (`Pre`/`Post`) | Ada 2012 aspects | Proved by GNATprove |
+
+### Ravenscar Profile
+
+A deterministic Ada subset for high-integrity real-time: fixed tasks, no dynamic allocation, no asynchronous transfer of control — schedulability becomes analysable.
+
+```ada
+-- <span class="badge danger">Bad</span> C: silent overflow, no contract
+-- int add(int a, int b) { return a + b; }
+
+-- <span class="badge">Good</span> Ada/SPARK: overflow is an error, contract is checkable
+package Safe_Math is
+   function Add (A, B : Integer) return Integer
+   with Pre  => (if A > 0 and B > 0 then A <= Integer'Last - B),
+        Post => Add'Result = A + B;
+end Safe_Math;
+```
+
+```ada
+-- Ravenscar-compatible task skeleton (no dynamic features)
+pragma Profile (Ravenscar);
+protected Button_State is
+   procedure Press;
+   entry Wait_Press;
+private
+   Pressed : Boolean := False;
+end Button_State;
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Rewrite three small C functions (string copy, bounded add, table lookup) in Ada using constrained subtypes and preconditions so that buffer overflow, integer overflow and out-of-bounds access are impossible by construction. Annotate each eliminated defect class in a comment.
+
+</div>
+
+---
+
+## Week 9: OS, COTS and Generic Systems
+
+You rarely certify a whole stack from silicon up. Real projects compose an RTOS, libraries, and COTS/SOUP components — each an assurance debt that must be repaid with evidence or architecture.
+
+### Key Terms
+
+- **COTS** — commercial off-the-shelf (bought, not built).
+- **SOUP** (IEC 62304) / **pre-existing software** — software of unknown provenance used in a safety function.
+- **Generic / parametrised systems** — PLCs, configurators: safety depends on configuration data as much as code.
+- **Service history** — field evidence that a component behaved well (needs relevance + version match).
+
+### Strategies for COTS/SOUP
+
+| Strategy | How | Cost |
+|----------|-----|------|
+| Wrap and monitor | Watchdogs, plausibility checks, diverse redundancy | Runtime overhead |
+| Partition | MILS separation kernel, hypervisor, MMU isolation | Integration effort |
+| Qualify by history | Collect versions, hours, failure data, bug lists | Evidence effort |
+| Re-develop critical part | Replace the risky 5 % | Development effort |
+| Avoid | Don't use it in the safety function | Feature effort |
+
+### OS Considerations
+
+- General-purpose OS (Linux, Windows): huge API surface, non-deterministic scheduling — acceptable for SIL 1–2 with monitoring, rarely alone for SIL 3–4.
+- RTOS with certification kit (e.g. FreeRTOS SafeRTOS, PikeOS, VxWorks Cert): bounded behaviour, traceability artefacts.
+- Separation kernels (MILS): prove non-interference between partitions.
+
+```ada
+-- Architectural mitigation: plausibility monitor around a SOUP sensor driver.
+package Monitored_Sensor is
+   function Read_Filtered return Integer range 0 .. 100;
+end Monitored_Sensor;
+
+package body Monitored_Sensor is
+   Last_Good : Integer range 0 .. 100 := 0;
+   function Raw_Read return Integer is separate;  -- SOUP binding
+   function Read_Filtered return Integer range 0 .. 100 is
+      R : constant Integer := Raw_Read;
+   begin
+      if R in 0 .. 100 and abs (R - Last_Good) <= 20 then
+         Last_Good := R;
+      end if;
+      return Last_Good;  -- fail-freeze on implausible input
+   end Read_Filtered;
+end Monitored_Sensor;
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Write a one-page SOUP assessment for a library you use (e.g. a JSON parser): version, supplier, licence, known CVEs, service-history argument, safety functions it touches, and two mitigations (monitor + partition or wrapper). Conclude: accept, conditionally accept, or reject — with reasons.
+
+</div>
+
+---
+
+## Week 10: Verification, Validation, Assessment, ISO
+
+Verification asks "did we build it right?", validation asks "did we build the right thing?", assessment asks "prove it — independently".
+
+### V&V Technique Ladder
+
+| Level | Techniques | Catches |
+|-------|-----------|---------|
+| 1 — Reviews | Inspections, walkthroughs, checklists | Mistakes, spec gaps |
+| 2 — Static analysis | Lint, abstract interpretation, flow analysis | Slips, aliasing, dead code |
+| 3 — Dynamic testing | Unit/integration/system, fuzzing | Behavioural deviations |
+| 4 — Formal | Model checking, proof (SPARK), abstract proof | All-inputs guarantees |
+| 5 — Independent assessment | Separate team/authority audits evidence | Blind spots, bias |
+
+### Independence Matters
+
+Higher integrity levels demand more independent V&V (author ≠ reviewer ≠ assessor). Independence defeats confirmation bias — the author tests what they believe, the stranger tests what they doubt.
+
+### ISO and Related Standards Map
+
+| Standard | Scope | Key idea |
+|----------|-------|---------|
+| ISO 9001 | Quality management | Process discipline |
+| ISO/IEC 25010 | Product quality model | Reliability, safety as qualities |
+| ISO 26262 | Automotive | ASIL A–D, V-model work products |
+| ISO 15408 (Common Criteria) | Security evaluation | EAL levels, protection profiles |
+| ISO 19011 | Auditing | How assessments are run |
+| IEC 61508 / EN 50128 / DO-178C | Safety (generic/rail/avionics) | Weeks 13 detail |
+
+```ada
+-- A review-ready unit: small, contracted, no hidden state.
+package Pump_Logic is
+   type Pump_Cmd is (Run, Stop);
+   function Decide (Level_Ok, Temp_Ok : Boolean) return Pump_Cmd
+   with Post => (if not (Level_Ok and Temp_Ok) then Decide'Result = Stop);
+   --  Review checklist: requirements linked? defaults safe? all inputs used?
+end Pump_Logic;
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Inspect the `Decide` function above (implement it in any language first). Run a 10-point checklist review (naming, contracts, branch coverage, boundary values, globals, error paths, units, timing assumptions, traceability, testability) and file findings as review comments with severity (major/minor) and disposition.
+
+</div>
+
+---
+
+## Week 11: SPARK I — Contracts and Flow Analysis
+
+SPARK is the provable subset of Ada: contracts state intent, flow analysis checks information discipline, and GNATprove verifies both without running the program.
+
+### Toolchain Setup
+
+```bash
+# ALIRE (recommended) or GNAT Community
+alr toolchain --select gnat_native
+alr printenv
+gnatprove --version
+```
+
+Project file excerpt:
+
+```ada
+-- spark_project.gpr
+project Spark_Project is
+   for Source_Dirs use ("src");
+   for Object_Dir use "obj";
+   package Prove is
+      for Proof_Switches ("Ada") use ("--level=2", "--timeout=60");
+   end Prove;
+end Spark_Project;
+```
+
+### Core Contract Aspects
+
+| Aspect | Meaning | Example |
+|--------|---------|---------|
+| `Pre` | Caller must guarantee | `Pre => X in 0 .. 100` |
+| `Post` | Callee guarantees (`'Result`, `'Old`) | `Post => F'Result >= F'Old` |
+| `Contract_Cases` | Behaviour split by condition | Normal vs degraded mode |
+| `Global` / `Depends` | Data-flow frame | `Global => null` |
+| `Loop_Invariant` | Holds every iteration | Key to proof (Week 12) |
+
+### First Contracted Package
+
+```ada
+package Thermostat with SPARK_Mode is
+   subtype Temp_C is Integer range -40 .. 150;
+   type Heater is (On, Off);
+
+   function Control (T : Temp_C; Set_Point : Temp_C) return Heater
+   with
+      Global  => null,
+      Depends => (Control'Result => (T, Set_Point)),
+      Post    => (if T < Set_Point - 2 then Control'Result = On
+                  elsif T > Set_Point + 2 then Control'Result = Off);
+end Thermostat;
+
+package body Thermostat with SPARK_Mode is
+   function Control (T : Temp_C; Set_Point : Temp_C) return Heater is
+   begin
+      if T < Set_Point - 2 then
+         return On;
+      elsif T > Set_Point + 2 then
+         return Off;
+      else
+         return Off;  -- hysteresis hold simplified; refine in lab
+      end if;
+   end Control;
+end Thermostat;
+```
+
+Run flow analysis:
+
+```bash
+gnatprove -P spark_project.gpr --mode=flow
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Specify and implement a SPARK package `Limiter` with a `Clamp` function (range 0..100) carrying full `Global`/`Depends`/`Pre`/`Post` contracts. Run `gnatprove --mode=flow` and fix every flow warning (uninitialised reads, hidden globals, ineffective assignments). Submit sources + prover output showing no flow errors.
+
+</div>
+
+---
+
+## Week 12: SPARK II — Proof and Information Flow
+
+Flow analysis proves *discipline* (no aliasing surprises, no unread initialisation); proof proves *correctness* (contracts hold for all inputs). Loop invariants and information-flow policies complete the picture.
+
+### From Flow to Proof
+
+```bash
+gnatprove -P spark_project.gpr --mode=prove --level=2
+# Goal: "0 unproved checks", i.e. no possible overflow, index violation, or contract breach.
+```
+
+Common unproved-check causes: missing `Pre`, missing `Loop_Invariant`, too-weak `Post`, hidden initialisation path.
+
+### Loop Invariants
+
+```ada
+package Summer with SPARK_Mode is
+   type Arr is array (Positive range <>) of Integer;
+   function Total (A : Arr) return Integer
+   with Pre => A'Length <= 1_000 and
+              (for all I in A'Range => A (I) in 0 .. 1_000);
+end Summer;
+
+package body Summer with SPARK_Mode is
+   function Total (A : Arr) return Integer is
+      S : Integer := 0;
+   begin
+      for I in A'Range loop
+         S := S + A (I);
+         pragma Loop_Invariant (S >= 0);
+         pragma Loop_Invariant (S <= (I - A'First + 1) * 1_000);
+      end loop;
+      return S;
+   end Total;
+end Summer;
+```
+
+### Information Flow and Declassification
+
+```ada
+package Voting with SPARK_Mode is
+   --  Policy: individual votes never flow to the public tally channel directly.
+   type Vote is (Yes, No);
+   procedure Cast (V : Vote) with Global => (In_Out => Tally_State);
+   function Tally return Integer with Global => (Input => Tally_State);
+private
+   Tally_State : Integer := 0;
+end Voting;
+```
+
+GNATprove checks `Global`/`Depends` frames: a leak outside the declared flow is a finding, not a style nit.
+
+### Proof Debugging Playbook
+
+1. Read the *first* unproved check; later ones are often consequences.
+2. Strengthen `Pre` (narrow the promise) or weaken `Post` (promise less) — then re-tighten.
+3. Add `Assert`/`Loop_Invariant` stepping stones.
+4. Raise `--level` or add `--timeout` before restructuring.
+5. Isolate: extract the tricky 10 lines into a lemma procedure.
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Extend the Week 11 `Limiter` (or `Thermostat`) with an array-processing procedure (e.g. clamp a whole sensor vector) including a loop invariant strong enough for full proof at `--level=2`. Deliver prover output with zero unproved checks plus a 5-line note explaining what the invariant states and why the prover needs it.
+
+</div>
+
+---
+
+## Week 13: IEC 61508, EN 50128, Avionics and Nuclear
+
+Standards convert "be careful" into auditable obligations: integrity levels scale rigour, independence and evidence with risk.
+
+### IEC 61508 (Generic Functional Safety)
+
+- **SIL 1–4**: higher SIL = lower tolerable failure rate + more rigorous techniques.
+- SIL 4 target: `10⁻⁹ – 10⁻⁸` dangerous failures/hour (continuous mode).
+- Key parts: hazard & risk analysis → safety requirements → design/V&V → assessment → operation.
+- **Technique tables** (Annex A/B): for each SIL, techniques are `–` (not recommended), `R` (recommended), `HR` (highly recommended) — e.g. formal proof is HR at SIL 3–4.
+
+| SIL | Typical meaning | Example techniques (HR) |
+|-----|----------------|------------------------|
+| 1 | Minor injury protection | Structured design, boundary testing |
+| 2 | Serious injury protection | Traceability, branch coverage, FMEA |
+| 3 | Life-threatening, few fatalities | MC/DC, diverse redundancy, static analysis |
+| 4 | Catastrophic, multiple fatalities | Formal proof, proven-in-use + diversity |
+
+### EN 50128 (Railway Software)
+
+- **SSIL 0–4** mirrors SILs for rail signalling, interlocking, ETCS onboard.
+- Mandatory artefacts per SSIL: Software Safety Plan, V&V Plan/Report, traceability, assessor independence (SSIL 3–4 require independent assessment body).
+- Strong emphasis on configuration control of generic systems + application data (track layout data is safety-critical too).
+
+### Avionics: DO-178C / ED-12C and Nuclear: IEC 60880
+
+| Domain | Standard | Levels | Notable demands |
+|--------|----------|--------|-----------------|
+| Avionics | DO-178C | DAL A (catastrophic) → E (no effect) | MC/DC at Level A, tool qualification (DO-330), parameter data items |
+| Nuclear I&C | IEC 60880 (Cat. A), IEC 62138 (Cat. B/C) | Safety classes 1–3 | Diversity & defence-in-depth, determinism, long-life documentation, regulatory licensing |
+
+```ada
+-- Evidence-friendly code: every safety requirement traced, every check provable.
+package Interlock with SPARK_Mode is
+   --  REQ-50128-07 (SSIL 4): routes lock only if all track sections free.
+   --  REQ-61508-11 (SIL 3):   single sensor fault never unlocks a route.
+   type Section_Array is array (Positive range <>) of Boolean;  -- True = free
+   function All_Free (S : Section_Array) return Boolean
+   with
+      Global  => null,
+      Depends => (All_Free'Result => S),
+      Post    => (if All_Free'Result then (for all I in S'Range => S (I)));
+end Interlock;
+```
+
+### Mapping Across Domains
+
+| IEC 61508 SIL | EN 50128 SSIL | DO-178C DAL (approx.) | Automotive ASIL (approx.) |
+|---------------|--------------|----------------------|--------------------------|
+| 4 | 4 | A | D (+extra) |
+| 3 | 3 | A/B | D |
+| 2 | 2 | C | B/C |
+| 1 | 1 | D | A/B |
+
+> Mappings are indicative, never automatic — each standard's objectives must be met on its own terms.
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Classify three systems (rail interlocking, infusion pump, flight display) into SIL / SSIL / DAL: justify severity, exposure and avoidability for each, then list five concrete V&V evidence items the highest-classified system would need (e.g. MC/DC report, proof log, independence statement). One page maximum.
+
+</div>
+
+---
+
+## Assignment Requirements
+
+### Hazard Analysis Mini-Project
+
+Pick a subsystem (rail crossing, infusion pump, drone geofence). Deliver:
+
+<div class="checklist">
+
+- [ ] System boundary + assumptions log
+- [ ] Hazard list with severity (5+ hazards)
+- [ ] One fault tree (top event → basic events, AND/OR gates)
+- [ ] One FMEA table (failure mode, cause, effect, detection, RPN or SIL claim)
+- [ ] Two derived safety requirements with IDs and verification method
+- [ ] One-page risk summary (ALARP argument)
+
+</div>
+
+### SPARK Laboratory Task
+
+<div class="checklist">
+
+- [ ] SPARK package with full contracts (`Pre`/`Post`/`Global`/`Depends`)
+- [ ] `gnatprove --mode=flow` clean
+- [ ] `gnatprove --mode=prove --level=2` with zero unproved checks
+- [ ] README: how to build, prover version, proof summary
+- [ ] Defence: explain one contract and one invariant orally
+
+</div>
+
+---
+
+## Code Review Guide
+
+### What to Look For (Safety Reviews)
+
+1. **Hazard coverage** — does every hazard trace to a requirement and a check?
+2. **Fail-safe defaults** — unpowered/unknown states drift to safety.
+3. **Defensive depth** — range checks, plausibility, monitors, not just happy path.
+4. **Concurrency** — shared state, Ravenscar compliance, deadline analysis.
+5. **Evidence** — IDs, rationale, test/proof artefacts attached.
+
+<div class="review-note">
+
+<strong>🔍 Practice Review:</strong> Identify issues in this code:
+
+```ada
+procedure Set_Speed (S : Integer) is
+begin
+   Motor_Speed := S;  -- global, unchecked
+end Set_Speed;
+```
+
+**Issues to identify:**
+1. No range constraint — negative/huge speeds accepted
+2. Hidden global (`Motor_Speed`) — no `Global` contract
+3. No requirement trace, no fail-safe on invalid input
+4. Race condition if called from multiple tasks
+5. No proof or test evidence; fix with subtype + contract + monitor
+
+</div>
+
+---
+
+## Exam Preparation
+
+### Key Topics to Review
+
+| Week | Topic | Key Concepts |
+|------|-------|--------------|
+| 1 | Intro | Safety vs reliability vs security, risk |
+| 2 | Errors | Therac-25, Ariane 5, slips/mistakes |
+| 3 | Complexity | Coupling, emergence, normal accidents |
+| 4 | Constructive tasks | Specification gap, assumptions |
+| 5 | Cognition | Working memory, checklists |
+| 6 | Testing limits | Coverage, MC/DC, mutation |
+| 7 | Process | V-model, traceability |
+| 8 | Language safety | Ada/SPARK, Ravenscar |
+| 9 | COTS/OS | SOUP, partitioning, monitors |
+| 10 | V&V, ISO | Independence, technique ladder |
+| 11–12 | SPARK | Contracts, invariants, proof |
+| 13 | Standards | SIL/SSIL/DAL, DO-178C, IEC 60880 |
+
+<div class="exercise-box">
+
+<strong>📝 Sample Exam Questions:</strong>
+
+1. Distinguish fault, error, failure, hazard with a Therac-25 example.
+2. Why is testing insufficient for SIL 4? Name two complementary techniques.
+3. Read a SPARK `Post` + `Loop_Invariant` and explain what is proved.
+4. Assign SIL/SSIL to a level-crossing controller and justify.
+5. Compare DO-178C Level A with IEC 61508 SIL 4 evidence.
+
+</div>
+
+---
+
+## Quick Reference Cards
+
+### Dependability Vocabulary
+
+```
+Fault -> Error -> Failure -> Hazard -> Accident
+Risk = Severity x Probability (x Exposure x Avoidability)
+SIL 1-4 | SSIL 0-4 | DAL A-E | ASIL A-D
+V&V: review > static > test > proof > independent assessment
+```
+
+### GNATprove Commands
+
+```bash
+alr printenv
+gnatprove -P proj.gpr --mode=flow
+gnatprove -P proj.gpr --mode=prove --level=2 --timeout=60
+gnatprove -P proj.gpr --mode=prove -j4 --report=all
+```
+
+### SPARK Contract Cheatsheet
+
+```ada
+procedure P (X : in out T)
+with
+   Global  => (In_Out => State),
+   Depends => ((State, X) => (State, X)),
+   Pre     => X in Valid_Range,
+   Post    => X in Valid_Range and (if X'Old = Bad then X = Safe_Default);
+pragma Loop_Invariant (...);  -- inside loops
+pragma Assert (...);          -- stepping stone for the prover
+```
+
+---
+
+*End of Course Documentation*
+
+**Last Updated:** 2026-09-20
+**Course Code:** KST/NNBSW
+**Credits:** 5 | Completion: Zk+ | Elective A

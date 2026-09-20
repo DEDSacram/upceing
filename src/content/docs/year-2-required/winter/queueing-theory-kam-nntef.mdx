@@ -1,0 +1,826 @@
+---
+title: "Queueing Theory (KAM/NNTEF)"
+description: "Complete course materials for queueing systems, Markov chains, Kendall classification and simulation"
+template: doc
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+# Queueing Theory (KAM/NNTEF)
+
+Welcome to the Queueing Theory course! This documentation contains all lecture materials on mass service systems, Markov chains, Kendall classification, analytical models (M/M/1 through M/Ek/1), simulation methods, exercises, assignment guidelines, and exam preparation resources.
+
+---
+
+## 📑 Table of Contents
+
+### Course Overview
+- [Course Objectives](#course-objectives)
+- [Assessment & Credit Requirements](#assessment--credit-requirements)
+- [Examination Structure](#examination-structure)
+- [Schedule](#schedule)
+
+### Lecture Materials (Weeks 1-13)
+1. [Week 1: Introduction to Queueing Theory - History and Basic Elements](#week-1-introduction-to-queueing-theory--history-and-basic-elements)
+2. [Week 2: Simulation Models and Monte Carlo Method](#week-2-simulation-models-and-monte-carlo-method)
+3. [Week 3: Markov Chains](#week-3-markov-chains)
+4. [Week 4: Kendall Classification](#week-4-kendall-classification)
+5. [Week 5: M/M/1 System](#week-5-mm1-system)
+6. [Week 6: M/M/n System with Infinite Queue](#week-6-mm-n-system-with-infinite-queue)
+7. [Week 7: M/M/n System with Finite Queue](#week-7-mm-n-system-with-finite-queue)
+8. [Week 8: M/M/n System with Losses](#week-8-mm-n-system-with-losses)
+9. [Week 9: Closed System](#week-9-closed-system)
+10. [Week 10: M/D/1 System](#week-10-md1-system)
+11. [Week 11: M/G/1 System](#week-11-mg1-system)
+12. [Week 12: M/Ek/1 System](#week-12-mek1-system)
+13. [Week 13: Comparison of Individual Systems](#week-13-comparison-of-individual-systems)
+
+### Assignments & Exam
+- [Assignment Requirements](#assignment-requirements)
+- [Code Review Guide](#code-review-guide)
+- [Exam Preparation](#exam-preparation)
+- [Quick Reference Cards](#quick-reference-cards)
+
+---
+
+## Course Overview
+
+### Course Objectives
+
+<span class="badge">Core</span> <span class="badge info">Theoretical</span>
+
+Students will master the theory and practice of mass service (queueing) systems:
+
+- **Queueing fundamentals** - arrival processes, service discipline, system elements
+- **Simulation** - physical vs mathematical models, Monte Carlo method
+- **Markov chains** - discrete/continuous chains, steady-state analysis
+- **Kendall notation** - A/B/c/K/m/Z classification of all systems
+- **Analytical models** - M/M/1, M/M/n (infinite, finite, loss), closed, M/D/1, M/G/1, M/Ek/1
+- **Performance measures** - L, Lq, W, Wq, utilization, blocking probability
+- **Model selection** - comparing systems, dimensioning server capacity
+
+### Assessment & Credit Requirements
+
+<div class="exercise-box">
+
+<strong>📋 To receive credit (Zk+), students must:</strong>
+
+1. Complete **seminar coursework** (simulation + analytical calculations)
+2. Pass **credit test** focused on formulas and model selection
+3. Pass **oral/written exam** (theory + worked example, 60%+ to pass)
+
+</div>
+
+### Examination Structure
+
+#### Format
+1. **Theory part** - definitions, Kendall notation, Markov properties, derivation ideas
+2. **Worked example** - compute L, Lq, W, Wq or blocking probability for a given system
+3. **Simulation question** - Monte Carlo estimation or interpretation of results
+
+#### Passing Criteria
+- **Minimum 60%** overall; analytical example must be dimensionally correct
+- Grade E requires correct model identification + steady-state condition check
+
+### Schedule
+
+| Week | Lecture Topic | Exercise Focus |
+|------|---------------|----------------|
+| 1 | Introduction, history, basic elements | Identify λ, μ, S in scenarios |
+| 2 | Simulation models, Monte Carlo | Python random experiments |
+| 3 | Markov chains | Transition matrices, steady state |
+| 4 | Kendall classification | Classify A/B/c/K notation |
+| 5 | M/M/1 system | L, W formulas, stability ρ < 1 |
+| 6 | M/M/n infinite queue | Erlang C, scaling servers |
+| 7 | M/M/n finite queue | Erlang, finite K blocking |
+| 8 | M/M/n losses (Erlang B) | Loss probability dimensioning |
+| 9 | Closed system (finite population) | Machine repair model |
+| 10 | M/D/1 deterministic service | Pollaczek-Khintchine special case |
+| 11 | M/G/1 general service | P-K formula, variance effect |
+| 12 | M/Ek/1 Erlang service | k-stage service analysis |
+| 13 | Comparison of systems | Model selection case studies |
+
+---
+
+## Week 1: Introduction to Queueing Theory — History and Basic Elements
+
+Brief introduction to mass service systems: from Erlang's telephone exchanges (1909) to modern call centres, networks, and manufacturing.
+
+### History
+
+- **A. K. Erlang (1909)** - telephone traffic, Erlang B/C formulas. <span class="badge">Founder</span>
+- **Kendall (1953)** - A/B/c notation for queueing systems
+- **Little (1961)** - Little's law L = λW, universal conservation law
+- **Modern use** - networks, hospitals, logistics, cloud provisioning
+
+### Basic Elements
+
+| Element | Symbol | Meaning |
+|---------|--------|---------|
+| Arrival rate | λ | Mean customers arriving per time unit |
+| Service rate | μ | Mean services completed per server per time unit |
+| Servers | c / n / S | Number of parallel servers |
+| Traffic intensity | ρ = λ/(cμ) | Utilization per server (must be < 1 for stability) |
+| Queue discipline | FIFO/LIFO/PRI | Order of service |
+
+> **Rule:** Steady state exists only if ρ < 1 (for infinite-queue systems). Always check stability first.
+
+### Little's Law
+
+```python
+# Little's law: L = lambda * W, Lq = lambda * Wq
+lam = 10.0   # arrivals per hour
+W = 0.5      # hours in system
+L = lam * W
+print(f"Mean number in system L = {L}")
+# W = Wq + 1/mu ;  L = Lq + lam/mu
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> A bank branch receives 20 customers/hour. Mean service time is 2 minutes, one clerk.
+
+1. Compute λ (per hour), μ (per hour), ρ. Is the system stable?
+2. Using Little's law, if W = 5 min, what is L?
+3. Name the arrival process, service mechanism, and queue discipline you assume.
+
+**Hint:** μ = 60 / service_time_minutes. ρ = λ/μ.
+
+</div>
+
+---
+
+## Week 2: Simulation Models and Monte Carlo Method
+
+Simulation replaces intractable analysis. Distinguish physical vs mathematical models and use Monte Carlo sampling.
+
+### Simulation Models
+
+| Model | Description | Example |
+|-------|-------------|---------|
+| **Physical** | Scaled real object | Wind tunnel, testbed network |
+| **Mathematical analytical** | Closed-form equations | M/M/1 formulas |
+| **Mathematical simulation** | Event-driven sampling | Discrete-event queue simulator |
+
+### Monte Carlo Method
+
+Estimate expectations by random sampling: exponential inter-arrivals via inverse transform `−ln(U)/λ`.
+
+```python
+import random, math, statistics
+
+def simulate_mm1(lam, mu, n=20000):
+    t = 0.0
+    server_free = 0.0
+    waits = []
+    for _ in range(n):
+        t += random.expovariate(lam)          # next arrival
+        service = random.expovariate(mu)      # service time
+        start = max(t, server_free)
+        waits.append(start - t)
+        server_free = start + service
+    return statistics.mean(waits)
+
+print("Estimated Wq:", simulate_mm1(lam=8, mu=10))
+print("Theory  Wq:", 8 / (10 * (10 - 8)))
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Write a Monte Carlo estimator for P(wait > 5 min) in an M/M/1 queue with λ=8/h, μ=10/h.
+
+1. Run 20 000 customers, record waits as above.
+2. Estimate the probability and compare runs with different seeds.
+3. Explain why the estimate converges (law of large numbers in 2-3 sentences).
+
+</div>
+
+---
+
+## Week 3: Markov Chains
+
+Markov chains model memoryless transitions between states (number of customers in system).
+
+### Key Concepts
+
+- **Markov property** - future depends only on present state: `P(Xn+1 | Xn, ..., X0) = P(Xn+1 | Xn)`
+- **Discrete-time (DTMC)** - transition matrix P, n-step probabilities via P^n
+- **Continuous-time (CTMC)** - birth-death process with rates λn (birth), μn (death); queueing systems are birth-death processes
+- **Steady state π** - solves π = πP (DTMC) or balance equations λn·pn = μn+1·pn+1 (CTMC)
+
+| Concept | Formula |
+|---------|---------|
+| Chapman-Kolmogorov | P^(m+n) = P^m · P^n |
+| Global balance (CTMC) | flow out = flow in per state |
+| Birth-death solution | pn = p0 · Π(λi/μi+1) |
+
+```python
+import numpy as np
+
+P = np.array([[0.7, 0.3],
+              [0.4, 0.6]])
+# steady state: pi = pi @ P, sum(pi) = 1
+w, v = np.linalg.eig(P.T)
+pi = np.real(v[:, np.isclose(w, 1)].flatten())
+pi = pi / pi.sum()
+print("Steady state:", pi)
+print("P^10:\n", np.linalg.matrix_power(P, 10))
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> A two-state chain has P = [[0.8, 0.2],[0.5, 0.5]].
+
+1. Compute P² by hand or in Python.
+2. Find the stationary distribution π.
+3. Interpret π as long-run fraction of time in each state.
+
+</div>
+
+---
+
+## Week 4: Kendall Classification
+
+Kendall notation compactly describes any queueing system: **A/B/c/K/m/Z**.
+
+### Notation
+
+| Symbol | Meaning | Common values |
+|--------|---------|---------------|
+| **A** | Arrival distribution | M (exponential), D (deterministic), Ek (Erlang-k), G (general) |
+| **B** | Service distribution | M, D, Ek, G |
+| **c** | Number of servers | 1, n, ∞ |
+| **K** | System capacity | ∞ (default), finite K |
+| **m** | Population size | ∞ (default), finite M |
+| **Z** | Queue discipline | FIFO (default), LIFO, PRI, SIRO |
+
+Examples: <span class="badge">M/M/1</span> single server infinite queue, <span class="badge">M/M/n/K</span> multi-server finite capacity, <span class="badge danger">M/M/n/n</span> pure loss system.
+
+```python
+def kendall(arrival, service, servers, capacity="inf", population="inf", discipline="FIFO"):
+    s = f"{arrival}/{service}/{servers}"
+    if capacity != "inf" or population != "inf" or discipline != "FIFO":
+        s += f"/{capacity}/{population}/{discipline}"
+    return s
+
+print(kendall("M", "M", 1))          # M/M/1
+print(kendall("M", "M", 3, 50))      # M/M/3/50
+print(kendall("M", "D", 2))          # M/D/2
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Classify each scenario in Kendall notation:
+
+1. Petrol station, 3 pumps, exponential arrivals/services, room for 10 cars total.
+2. Hospital emergency, Poisson arrivals, general service times, 2 doctors, unlimited waiting room.
+3. Call centre trunk with 5 lines, blocked calls lost (no waiting).
+
+**Hint:** Lost calls mean capacity = number of servers.
+
+</div>
+
+---
+
+## Week 5: M/M/1 System
+
+The fundamental single-server model: Poisson arrivals λ, exponential service μ, ρ = λ/μ < 1.
+
+### Formulas
+
+| Measure | Formula |
+|---------|---------|
+| Utilization | ρ = λ/μ |
+| Empty system | p0 = 1 − ρ |
+| n customers | pn = (1−ρ)ρ^n |
+| Mean in system | L = ρ/(1−ρ) |
+| Mean in queue | Lq = ρ²/(1−ρ) |
+| Time in system | W = 1/(μ−λ) |
+| Time in queue | Wq = λ/(μ(μ−λ)) |
+
+> **Rule:** Wq explodes as ρ → 1. A server at 90% utilization has L = 9 — small λ increases cause huge queues.
+
+```python
+def mm1(lam, mu):
+    assert lam < mu, "Unstable: rho >= 1"
+    rho = lam / mu
+    L = rho / (1 - rho)
+    Lq = rho**2 / (1 - rho)
+    W = 1 / (mu - lam)
+    Wq = lam / (mu * (mu - lam))
+    return dict(rho=rho, L=L, Lq=Lq, W=W, Wq=Wq)
+
+for lam in (6, 8, 9.5):
+    print(lam, mm1(lam, mu=10))
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> λ = 12/h, μ = 15/h (M/M/1).
+
+1. Compute ρ, L, Lq, W, Wq (show units).
+2. What is P(system empty)? P(more than 3 customers)?
+3. Simulate in Python (Week 2 code) and compare Wq with theory.
+
+</div>
+
+---
+
+## Week 6: M/M/n System with Infinite Queue
+
+Multiple parallel servers share one unbounded queue (bank counters, checkouts). Erlang C gives waiting probability.
+
+### Key Concepts
+
+- **Stability:** ρ = λ/(nμ) < 1
+- **Erlang C** - probability an arrival must wait: C(n, a) where a = λ/μ (offered load)
+- **Wq** = C(n,a) / (nμ − λ); **Lq** = λ·Wq; **L** = Lq + a
+
+| n=1 | Reduces to M/M/1 |
+|-----|------------------|
+| n↑ | Waiting probability drops sharply (pooling effect) |
+
+```python
+import math
+
+def erlang_c(n, a):
+    # a = lam/mu offered load, rho = a/n < 1
+    s = sum(a**k / math.factorial(k) for k in range(n))
+    term = a**n / (math.factorial(n) * (1 - a / n))
+    return term / (s + term)
+
+def mmn_inf(lam, mu, n):
+    a = lam / mu
+    assert a / n < 1, "Unstable"
+    C = erlang_c(n, a)
+    Wq = C / (n * mu - lam)
+    Lq = lam * Wq
+    return dict(a=a, rho=a/n, C=C, Wq=Wq, Lq=Lq, L=Lq + a)
+
+print(mmn_inf(lam=18, mu=10, n=2))
+print(mmn_inf(lam=18, mu=10, n=3))
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> λ = 30/h, μ = 10/h. Compare n = 4 vs n = 5 servers.
+
+1. Compute ρ, Erlang C, Wq, Lq for both.
+2. Plot or tabulate how Wq falls with n.
+3. Explain the pooling benefit in one paragraph.
+
+</div>
+
+---
+
+## Week 7: M/M/n System with Finite Queue
+
+Capacity K limits total customers (waiting room size). Arrivals finding K customers are turned away — finite waiting room, proper queue mode.
+
+### Key Concepts
+
+- **State space** 0..K; always stable (losses cap load)
+- **Blocking probability** pK (Erlang-type finite formula)
+- **Effective arrival rate** λeff = λ(1 − pK); Little's law uses λeff
+- As K → ∞, converges to infinite-queue model
+
+```python
+import math
+
+def mmn_finite(lam, mu, n, K):
+    a = lam / mu
+    rho = a / n
+    p = [1.0]
+    for k in range(1, K + 1):
+        mu_k = min(k, n) * mu
+        p.append(p[-1] * lam / mu_k)
+    norm = sum(p)
+    probs = [x / norm for x in p]
+    pK = probs[K]
+    lam_eff = lam * (1 - pK)
+    L = sum(k * probs[k] for k in range(K + 1))
+    Lq = sum(max(0, k - n) * probs[k] for k in range(K + 1))
+    W = L / lam_eff
+    Wq = Lq / lam_eff
+    return dict(pK=pK, lam_eff=lam_eff, L=L, Lq=Lq, W=W, Wq=Wq)
+
+print(mmn_finite(lam=10, mu=6, n=2, K=5))
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> A car wash has n=2 bays, room for K=6 cars total, λ=10/h, μ=6/h.
+
+1. Compute blocking probability pK and λeff.
+2. Compute L, Lq, W, Wq.
+3. What happens to pK if K grows to 10? Discuss the trade-off (capacity vs lost customers).
+
+</div>
+
+---
+
+## Week 8: M/M/n System with Losses
+
+Pure loss system M/M/n/n: no waiting room, blocked arrivals lost. Dimensioned by **Erlang B** formula. Classic: telephone trunks.
+
+### Erlang B
+
+```
+B(n, a) = (a^n / n!) / Σ_{k=0}^{n} (a^k / k!),   a = λ/μ
+```
+
+- Carried load = a(1 − B); utilization per server = a(1−B)/n
+- Recursive computation avoids factorial overflow
+
+```python
+import math
+
+def erlang_b(n, a):
+    # iterative (stable) version
+    B = 1.0
+    for k in range(1, n + 1):
+        B = (a * B) / (k + a * B)
+    return B
+
+a = 4.0  # Erlangs
+for n in range(2, 8):
+    print(n, round(erlang_b(n, a), 4))
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Offered load a = 6 Erlangs. Grade of service requires B ≤ 0.01.
+
+1. Find the smallest n meeting the requirement (loop over n).
+2. Compute carried load and mean busy servers.
+3. Explain why adding one trunk helps less as n grows (diminishing returns).
+
+</div>
+
+---
+
+## Week 9: Closed System
+
+Finite population of M customers circulates (machine repair model): a failed machine joins the repair queue; repaired machines return to population.
+
+### Machine Repair Model M/M/n/M/M
+
+- Population M, each working machine fails at rate λ; repair rate μ per repairman
+- Arrival rate depends on state: λk = (M−k)λ
+- Throughput = λeff = mean failure rate = mean repair completion rate
+- Key metrics: mean down machines L, availability, repairman utilization
+
+```python
+import math
+
+def machine_repair(M, lam, mu, n=1):
+    # lam: failure rate per machine, mu: repair rate
+    p = [1.0]
+    for k in range(1, M + 1):
+        arr = (M - k + 1) * lam
+        srv = min(k, n) * mu
+        p.append(p[-1] * arr / srv)
+    norm = sum(p)
+    probs = [x / norm for x in p]
+    L = sum(k * probs[k] for k in range(M + 1))
+    lam_eff = sum((M - k) * lam * probs[k] for k in range(M + 1))
+    W = L / lam_eff
+    return dict(L=L, throughput=lam_eff, W=W, p0=probs[0])
+
+print(machine_repair(M=5, lam=0.5, mu=2.0, n=1))
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> M = 6 machines, each fails once per 8 h (λ = 0.125/h), one repairman μ = 1/h.
+
+1. Compute L (mean down), throughput, mean downtime W.
+2. Recompute with n = 2 repairmen. Is the second repairman worth it?
+3. Relate to a closed M/M/1//M queue: why does λeff < Mλ?
+
+</div>
+
+---
+
+## Week 10: M/D/1 System
+
+Poisson arrivals, **deterministic** service time (constant 1/μ). Less variability → shorter queues than M/M/1. Special case of M/G/1.
+
+### Formulas
+
+- ρ = λ/μ < 1
+- Lq = ρ² / (2(1−ρ)); Wq = Lq/λ; W = Wq + 1/μ; L = λW
+- Exactly **half** the M/M/1 queue (variance term vanishes)
+
+| System | Lq |
+|--------|-----|
+| M/M/1 | ρ²/(1−ρ) |
+| M/D/1 | ρ²/(2(1−ρ)) <span class="badge">½ of M/M/1</span> |
+
+```python
+def md1(lam, mu):
+    rho = lam / mu
+    assert rho < 1
+    Lq = rho**2 / (2 * (1 - rho))
+    Wq = Lq / lam
+    W = Wq + 1 / mu
+    return dict(rho=rho, Lq=Lq, Wq=Wq, W=W, L=lam * W)
+
+print("M/D/1:", md1(8, 10))
+
+def mm1_Lq(lam, mu):
+    rho = lam / mu
+    return rho**2 / (1 - rho)
+
+print("M/M/1 Lq:", mm1_Lq(8, 10))
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Automated toll gate: λ = 200 cars/h, constant service 15 s.
+
+1. Compute μ, ρ, Lq, Wq.
+2. Compare with M/M/1 having the same mean service. Quantify the variance benefit.
+3. Simulate deterministic service in Python (replace expovariate with constant) and verify Wq.
+
+</div>
+
+---
+
+## Week 11: M/G/1 System
+
+Poisson arrivals, **general** service distribution (mean E[S] = 1/μ, variance Var[S]). **Pollaczek-Khintchine** formula shows variance hurts.
+
+### Pollaczek-Khintchine
+
+```
+ρ = λ·E[S]
+Lq = λ²·E[S²] / (2(1−ρ))     where E[S²] = Var[S] + E[S]²
+Wq = Lq / λ ;  W = Wq + E[S]
+```
+
+- Higher service variance → longer queues even at same ρ. <span class="badge warn">Variance matters</span>
+- M/M/1 and M/D/1 are special cases (E[S²] = 2/μ² and 1/μ²)
+
+```python
+def mg1(lam, E_S, E_S2):
+    rho = lam * E_S
+    assert rho < 1
+    Lq = (lam**2 * E_S2) / (2 * (1 - rho))
+    Wq = Lq / lam
+    return dict(rho=rho, Lq=Lq, Wq=Wq, W=Wq + E_S)
+
+# M/M/1 as M/G/1: E[S]=1/mu, E[S^2]=2/mu^2
+print("M/M/1 via PK:", mg1(8, 0.1, 2/100))
+# M/D/1 as M/G/1: E[S^2]=E[S]^2
+print("M/D/1 via PK:", mg1(8, 0.1, 0.01))
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> λ = 5/h, E[S] = 0.15 h. Compare service variance Var = 0.005 vs Var = 0.05.
+
+1. Compute E[S²], ρ, Lq, Wq for both cases.
+2. Explain intuitively why variance increases waiting.
+3. Give a real example where reducing variance (standardization) cuts queues.
+
+</div>
+
+---
+
+## Week 12: M/Ek/1 System
+
+Erlang-k service: k exponential stages in series, each rate kμ. Bridges D (k→∞) and M (k=1). Models multi-phase service (check-in + scan + pack).
+
+### Formulas
+
+- E[S] = 1/μ, Var[S] = 1/(kμ²), E[S²] = (k+1)/(kμ²)
+- Via P-K: Lq = ρ²(k+1) / (2k(1−ρ))
+- k=1 → M/M/1; k→∞ → M/D/1
+
+```python
+def mek1(lam, mu, k):
+    rho = lam / mu
+    assert rho < 1
+    Lq = (rho**2 * (k + 1)) / (2 * k * (1 - rho))
+    return dict(rho=rho, Lq=Lq, Wq=Lq / lam)
+
+for k in (1, 2, 4, 10):
+    print(f"k={k}:", mek1(8, 10, k))
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> λ = 8/h, μ = 10/h. Compute Lq for k = 1, 2, 5.
+
+1. Tabulate and plot Lq vs k.
+2. At what k is the queue within 10% of M/D/1?
+3. Describe a service process well modelled by k = 3 stages.
+
+</div>
+
+---
+
+## Week 13: Comparison of Individual Systems
+
+Choose the right model: compare waiting, blocking, and sensitivity across all systems at equal load.
+
+### Summary Table
+
+| System | Lq (ρ<1) | Key property |
+|--------|----------|--------------|
+| M/M/1 | ρ²/(1−ρ) | Baseline |
+| M/D/1 | ρ²/(2(1−ρ)) | Half of M/M/1 |
+| M/Ek/1 | ρ²(k+1)/(2k(1−ρ)) | Between M and D |
+| M/G/1 | λ²E[S²]/(2(1−ρ)) | Variance penalty |
+| M/M/n/∞ | Erlang C based | Pooling gain |
+| M/M/n/K | Finite, λeff | Blocking trade-off |
+| M/M/n/n | Erlang B | Pure loss |
+| Closed M/M/n/M | State-dependent λ | Finite population |
+
+```python
+lam, mu = 8, 10
+rho = lam / mu
+print(f"rho = {rho}")
+print("M/M/1 Lq:", rho**2 / (1 - rho))
+print("M/D/1 Lq:", rho**2 / (2 * (1 - rho)))
+for k in (2, 4):
+    print(f"M/E{k}/1 Lq:", (rho**2 * (k+1)) / (2*k*(1-rho)))
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Case study — a clinic (λ = 9/h, mean service 6 min).
+
+1. Compute Wq under M/M/1, M/D/1, M/E2/1 assumptions.
+2. Recommend a model: which assumption fits a doctor's consultation best? Justify.
+3. Propose two operational changes (add server vs reduce variance) and quantify each with formulas.
+
+</div>
+
+---
+
+## Assignment Requirements
+
+### Coursework
+
+<div class="exercise-box">
+
+<strong>📋 Coursework consists of:</strong>
+
+| Part | Requirement | Example |
+|------|-------------|---------|
+| **Simulation** | Monte Carlo model of a chosen queue | Python simulator + statistics |
+| **Analytical** | Compute L, Lq, W, Wq / Erlang B for assigned parameters | Hand + code verification |
+| **Model choice** | Justify Kendall model for a real scenario | Call centre, workshop, network |
+
+</div>
+
+### Submission Checklist
+
+<div class="checklist">
+
+- [ ] Stability condition ρ < 1 checked (or blocking computed)
+- [ ] Units consistent (λ, μ in same time unit)
+- [ ] Little's law cross-check L = λW passes
+- [ ] Simulation agrees with theory within confidence
+- [ ] Kendall notation stated and justified
+- [ ] Code runs standalone with seed set
+
+</div>
+
+---
+
+## Code Review Guide
+
+### What to Look For
+
+#### 1. Correctness
+- Arrival/service distributions match the model?
+- λ, μ in identical time units?
+- Erlang B/C implemented with stable iteration?
+
+#### 2. Stability & Edge Cases
+- ρ ≥ 1 handled (error or finite-capacity fallback)?
+- Division by (1−ρ) guarded?
+
+#### 3. Simulation Quality
+- Enough replications? Warm-up period discarded? Seed fixed?
+
+### Code Review Example
+
+<div class="review-note">
+
+<strong>🔍 Practice Review:</strong> Identify issues:
+
+```python
+def queue_stats(lam, mu):
+    rho = lam / mu
+    L = rho / (1 - rho)   # what if lam >= mu?
+    return L              # no W, no units, no validation
+```
+
+**Issues:** no stability check (ZeroDivisionError/negative L); no validation of inputs; returns only L; no docstring/units; no simulation cross-check.
+
+</div>
+
+---
+
+## Exam Preparation
+
+### Exam Structure
+
+1. **Theory:** Markov property, Kendall notation, Little's law, P-K intuition
+2. **Example:** full M/M/1, M/M/n, Erlang B, or M/G/1 computation
+3. **Simulation:** interpret Monte Carlo output, suggest experiment design
+
+### Key Topics to Review
+
+| Week | Topic | Key Concepts |
+|------|-------|--------------|
+| 1 | Intro | Erlang history, λ/μ/ρ, Little's law |
+| 2 | Simulation | Physical vs mathematical, Monte Carlo |
+| 3 | Markov | Memorylessness, balance equations |
+| 4 | Kendall | A/B/c/K/m/Z |
+| 5 | M/M/1 | L, Lq, W, Wq, ρ<1 |
+| 6 | M/M/n ∞ | Erlang C, pooling |
+| 7 | M/M/n finite | pK, λeff |
+| 8 | Losses | Erlang B |
+| 9 | Closed | Machine repair, state-dependent λ |
+| 10 | M/D/1 | Half of M/M/1 |
+| 11 | M/G/1 | Pollaczek-Khintchine, variance |
+| 12 | M/Ek/1 | k stages |
+| 13 | Comparison | Model selection |
+
+### Practice Questions
+
+<div class="exercise-box">
+
+<strong>📝 Sample Exam Questions:</strong>
+
+1. State Little's law and use it to derive L from W.
+2. When does M/M/1 have a steady state? What happens if ρ ≥ 1?
+3. Compute Erlang B for n=3, a=2. How many trunks for B ≤ 1%?
+4. Derive M/D/1 Lq from the P-K formula.
+5. Compare M/M/1 vs M/D/1 waiting at ρ=0.8. Explain the difference.
+
+</div>
+
+---
+
+## Quick Reference Cards
+
+### Core Formulas
+
+```python
+# Stability: rho = lam / (c*mu) < 1  (infinite queue systems)
+# Little: L = lam*W ; Lq = lam*Wq ; W = Wq + 1/mu
+# M/M/1: L = rho/(1-rho) ; W = 1/(mu-lam)
+# M/D/1: Lq = rho**2/(2*(1-rho))
+# M/G/1 (P-K): Lq = lam**2 * E_S2 / (2*(1-rho))
+# Erlang B (losses): iterative B = a*B/(k + a*B)
+```
+
+### Kendall Cheat Sheet
+
+| Code | Meaning |
+|------|---------|
+| M | Exponential / Poisson (memoryless) |
+| D | Deterministic (constant) |
+| Ek | Erlang-k staged |
+| G | General |
+| c/K/m | servers / capacity / population |
+
+---
+
+*End of Course Documentation*
+
+**Last Updated:** 2026-09-20
+**Course Code:** KAM/NNTEF
+**Credits:** 6 Zk+

@@ -1,0 +1,185 @@
+---
+title: "State Final Exam (ITN)"
+description: "Guidance for the ITN state final exam: compulsory and elective topic checklists, preparation plan and sample questions"
+template: doc
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+# State Final Exam (ITN)
+
+Guidance for the Information Technology (ITN) state final exam: what to revise, how to plan preparation, and sample questions per subject. Pair this page with the individual course files for full materials.
+
+---
+
+## 📑 Table of Contents
+
+- [Exam Format](#exam-format)
+- [Compulsory Topics Checklist](#compulsory-topics-checklist)
+- [Elective Topics Checklist](#elective-topics-checklist)
+- [Preparation Plan](#preparation-plan)
+- [Sample Questions per Subject](#sample-questions-per-subject)
+- [Exam-Day Checklist](#exam-day-checklist)
+
+---
+
+## Exam Format
+
+- **Parts:** (1) compulsory subjects block, (2) elective block (your chosen A + B subjects), (3) diploma thesis defence.
+- **Form:** oral examination before a committee; you draw questions and present with reasoning, often with a whiteboard or short demo.
+- **Passing:** demonstrate connected understanding, not memorised slides — explain trade-offs, work an example, justify a design choice.
+
+---
+
+## Compulsory Topics Checklist
+
+<div class="checklist">
+
+### Theory & Models
+- [ ] Formal languages: regular expressions, Chomsky hierarchy, finite automata, lexical analysis (KAM/NNTEI)
+- [ ] Context-free grammars: derivation trees, CNF/GNF, pushdown automata, parsing
+- [ ] Turing machines: variants, decidability, complexity classes (P/NP), reductions
+
+### Systems & OS
+- [ ] Processes vs threads, POSIX signals/calls, scheduling classes (Linux: deadline, RT, normal) (KIT/NNOS1)
+- [ ] Synchronization: race conditions, semaphores, mutexes, monitors, deadlocks/starvation
+- [ ] Virtual memory: paging policies, multilevel tables, x86-64; virtualization vs containers
+- [ ] Windows track: processes, memory, registry, WMI, PowerShell, security (KST/NNOS2)
+
+### Data & Software Engineering
+- [ ] Databases: JDBC, Hibernate/JPA, Spring Boot, REST/SOAP, Elasticsearch, Docker (KST/NNPDA)
+- [ ] Data warehousing: OLTP vs OLAP, star/snowflake, ETL/ELT, OLAP + CUBE/ROLLUP, BI (KIT/NNDSK)
+- [ ] Enterprise architecture: ArchiMate views, BPMN/Camunda, portfolio analysis, SOA (KST/NAPIS)
+- [ ] Project lifecycle: requirements → UML → iterative delivery → docs → presentation (KST/NNPRO)
+- [ ] Queueing theory: Kendall notation, M/M/1, M/M/n variants, M/G/1, closed systems (KAM/NNTEF)
+
+</div>
+
+---
+
+## Elective Topics Checklist
+
+<div class="checklist">
+
+### Elective A (one examined)
+- [ ] Safety & reliability: fault-error-failure chains, SIL/SSIL, V&V, SPARK contracts, IEC 61508 / EN 50128 (KST/NNBSW)
+- [ ] Modeling & simulation: ABAsim agents, message addressing, hybrid sync, Petri nets, conservative vs optimistic (KST/NNTMS)
+
+### Elective B (one examined)
+- [ ] 3D graphics: pipeline + spaces, GLSL lighting, MVP transforms, curves, textures, shadows, animation (KST/NNPG3)
+- [ ] Networks: SDN/OpenFlow, IPv6, QUIC, 5G slicing, EVPN-VXLAN, automation, Zero Trust, PQC (KST/NNTPS)
+
+</div>
+
+---
+
+## Preparation Plan
+
+### 6-Week Plan
+
+| Week | Focus | Output |
+|------|-------|--------|
+| 1 | Theory (automata, complexity) + queueing formulas | 1-page formula sheet |
+| 2 | OS 1+2: sync, memory, scripting | Solved sync + paging exercises |
+| 3 | Data: JPA/REST + warehousing + enterprise views | Mini trace: req → model → query |
+| 4 | Elective A deep dive | Lab demo rehearsed (SPARK proof / simulator run) |
+| 5 | Elective B deep dive | Lab demo rehearsed (GL scene / Mininet flows) |
+| 6 | Mock exams: draw 3 questions, present aloud 15 min each | Gap list → patch revision |
+
+### Method
+
+1. One A4 "battle sheet" per subject: definitions, one diagram, one worked example.
+2. Speak answers aloud with a timer; the committee tests reasoning under follow-ups.
+3. Rehearse exactly one live demo per elective (proof log, simulation plot, shader, flow table).
+4. Trade mock questions with a peer; grade each other on correctness + clarity.
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> This week, produce battle sheets for two compulsory subjects and run one 15-minute mock answer (record it). Note every follow-up question you could not answer — that list is next week's syllabus.
+
+</div>
+
+---
+
+## Sample Questions per Subject
+
+### Theoretical Informatics (KAM/NNTEI)
+
+1. Convert a regular expression to an NFA, then to a DFA — where can state explosion bite?
+2. Show a grammar in CNF and build its derivation tree; why does CNF help parsing complexity?
+3. Sketch a Turing machine deciding a language; argue why the halting problem is undecidable.
+4. Prove a problem NP-complete by reduction (template: 3-SAT → your problem).
+
+### Operating Systems 1 & 2 (KIT/NNOS1, KST/NNOS2)
+
+1. Compare deadline vs FIFO/RR vs CFS scheduling with an example workload each.
+2. Solve a producer-consumer with semaphores; then show the monitor version — what changed?
+3. Walk a page-table lookup (4-level x86-64) including a TLB miss; explain demand paging.
+4. Diagnose a deadlock from a lock-ordering diagram; propose prevention vs detection.
+5. Write a PowerShell snippet for a registry + service audit; explain WMI's role.
+
+### Programming Database Applications (KST/NNPDA)
+
+1. Contrast JDBC vs JPA/Hibernate for one CRUD flow; where do N+1 queries come from?
+2. Design a REST endpoint with validation + JWT auth; then sketch the SOAP equivalent.
+3. Explain an Elasticsearch → Kibana → Logstash pipeline for application logs.
+
+### Data Warehousing (KIT/NNDSK)
+
+1. Model a sales mart as star vs snowflake; write a CUBE/ROLLUP query over it.
+2. ETL vs ELT: when does each win? Sketch an ODI-style incremental load.
+
+### Enterprise Architecture (KST/NAPIS)
+
+1. Draw two ArchiMate views (business + application) of one process and link them.
+2. Model an order process in BPMN; where do Solution Building Blocks plug in?
+
+### Queueing Theory (KAM/NNTEF)
+
+1. Classify a system in Kendall notation; compute mean queue for M/M/1 from λ, μ.
+2. Compare M/M/n with infinite vs finite queue vs losses — which metric decides capacity?
+
+### Elective: Safety (KST/NNBSW)
+
+1. Build a fault → error → failure → hazard → accident chain for a real incident.
+2. Read a SPARK postcondition + loop invariant; state what is proved.
+3. Assign SIL/SSIL/DAL to a level-crossing controller and name five evidence artefacts.
+
+### Elective: Simulation (KST/NNTMS)
+
+1. Contrast event-driven vs agent-driven control on a traffic node example.
+2. Explain addressed vs group vs broadcast messaging in an agent hierarchy.
+3. CMB null messages vs Time Warp anti-messages; define GVT and fossil collection.
+
+### Elective: 3D Graphics (KST/NNPG3)
+
+1. Trace a vertex model → screen, naming every matrix and space.
+2. Why Blinn-Phong in linear space? Explain acne vs peter-panning in shadow maps.
+3. Write the linear-blend skinning equation; explain weight rules.
+
+### Elective: Networks (KST/NNTPS)
+
+1. Trace a packet through OpenFlow tables; when is the controller consulted?
+2. Plan IPv6 addressing + RA-guard for a campus; why /64 per LAN?
+3. Explain EVPN-VXLAN: what BGP advertises and why flooding disappears.
+
+---
+
+## Exam-Day Checklist
+
+<div class="checklist">
+
+- [ ] ID, thesis printout/slides, battle sheets (if allowed), water
+- [ ] One demo ready per elective (offline fallback: screenshots + logs)
+- [ ] Structure every answer: definition → example → trade-off → conclusion
+- [ ] Say "I don't know, but I'd approach it by…" rather than guessing silently
+- [ ] Manage time: 2–3 minutes per sub-question, leave room for follow-ups
+
+</div>
+
+---
+
+*End of Guidance*
+
+**Last Updated:** 2026-09-20
+**Exam Code:** ITN_S_19

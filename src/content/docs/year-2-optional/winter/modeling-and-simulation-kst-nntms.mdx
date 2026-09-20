@@ -1,0 +1,962 @@
+---
+title: "Modeling and Simulation (KST/NNTMS)"
+description: "Complete course materials for modeling and simulation: trainers, planning, agent-based ABAsim, message passing, hybrid sync, AI, Petri nets, distributed simulation"
+template: doc
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+# Modeling and Simulation (KST/NNTMS)
+
+Welcome to Modeling and Simulation! From on-line trainers to agent-based ABAsim architectures, hybrid discrete-continuous synchronization, Petri nets and distributed conservative/optimistic protocols — this guide builds working Python simulators week by week.
+
+---
+
+## 📑 Table of Contents
+
+### Course Overview
+- [Course Objectives](#course-objectives)
+- [Assessment & Credit Requirements](#assessment--credit-requirements)
+- [Examination Structure](#examination-structure)
+- [Schedule](#schedule)
+
+### Lecture Materials (Weeks 1-13)
+1. [Week 1: On-line vs Off-line Simulation and Trainers](#week-1-on-line-vs-off-line-simulation-and-trainers)
+2. [Week 2: Simulation for Planning — Reactive vs Pro-active](#week-2-simulation-for-planning--reactive-vs-pro-active)
+3. [Week 3: Autonomous Agents and ABAsim](#week-3-autonomous-agents-and-abasim)
+4. [Week 4: Agent Decomposition — Internal Components](#week-4-agent-decomposition--internal-components)
+5. [Week 5: Case Study — Agent-Based Traffic Simulator](#week-5-case-study--agent-based-traffic-simulator)
+6. [Week 6: Message Passing in Hierarchical Agent Systems](#week-6-message-passing-in-hierarchical-agent-systems)
+7. [Week 7: Discrete-Continuous Synchronization](#week-7-discrete-continuous-synchronization)
+8. [Week 8: AI and Soft Computing in Simulators](#week-8-ai-and-soft-computing-in-simulators)
+9. [Week 9: Petri Nets I — Foundations](#week-9-petri-nets-i--foundations)
+10. [Week 10: Petri Nets II — Processes and Components](#week-10-petri-nets-ii--processes-and-components)
+11. [Week 11: Distributed and Parallel Simulation](#week-11-distributed-and-parallel-simulation)
+12. [Week 12: Conservative Synchronization](#week-12-conservative-synchronization)
+13. [Week 13: Optimistic Synchronization](#week-13-optimistic-synchronization)
+
+### Assignments & Exam
+- [Assignment Requirements](#assignment-requirements)
+- [Code Review Guide](#code-review-guide)
+- [Exam Preparation](#exam-preparation)
+- [Quick Reference Cards](#quick-reference-cards)
+
+---
+
+## Course Overview
+
+### Course Objectives
+
+<span class="badge">Core</span> <span class="badge info">Simulation</span> <span class="badge warn">Elective A</span>
+
+Students will learn to:
+
+- **Distinguish on-line and off-line simulation** — trainers, hardware-/human-in-the-loop, real-time constraints.
+- **Use simulation for planning** — reactive (what-if now) vs pro-active (lookahead, contingency) approaches.
+- **Design agent-based simulators** — ABAsim architecture, agent decomposition, event- vs process- vs agent-driven control.
+- **Build a traffic simulator case study** — nodes, links, vehicle agents, hierarchical messaging.
+- **Implement message passing** — addressed, partially addressed and broadcast messages in hierarchies.
+- **Synchronize hybrid models** — discrete events with continuous dynamics (quantization, zero-crossing).
+- **Apply AI/soft computing** — fuzzy control, heuristics, learning for agent decisions.
+- **Model with Petri nets** — enabling/firing, reachability, modelling of processes and components.
+- **Parallelise simulation** — partitioning, conservative (Chandy-Misra-Bryant, lookahead) and optimistic (Time Warp, GVT, rollback) synchronization.
+
+### Assessment & Credit Requirements
+
+<div class="exercise-box">
+
+<strong>📋 To receive credit (Zk+), students must:</strong>
+
+1. Submit a **traffic-node simulator** (agent-based, Python) with message-passing hierarchy and documented experiments.
+2. Submit a **Petri-net modelling task** — net for a chosen process + reachability analysis (boundedness, deadlocks).
+3. Pass a **mid-term test** on simulation paradigms and synchronization basics (min. 60 %).
+
+</div>
+
+### Examination Structure
+
+#### Full-time Format
+1. **Written test** — paradigms, ABAsim, Petri-net analysis, conservative vs optimistic protocols.
+2. **Oral examination** — walkthrough of the traffic simulator + one synchronization protocol in depth.
+
+#### Distance Format
+1. **Oral examination via MS Teams** — theory questions, code walkthrough, small live modelling task.
+
+#### Passing Criteria
+- **Minimum 60 %** overall; simulation code must run and produce interpreted results.
+
+### Schedule
+
+| Week | Lecture Topic | Exercise Focus |
+|------|---------------|----------------|
+| 1 | On-line vs off-line, trainers | Latency budget |
+| 2 | Reactive vs pro-active planning | What-if scenarios |
+| 3 | Agents, ABAsim | Minimal agent loop |
+| 4 | Agent decomposition | Sense-deliberate-act |
+| 5 | Traffic case study | Node simulation |
+| 6 | Message passing | Addressing schemes |
+| 7 | Discrete-continuous sync | Hybrid loop |
+| 8 | AI/soft computing | Fuzzy controller |
+| 9 | Petri nets I | Firing + reachability |
+| 10 | Petri nets II | Process models |
+| 11 | Distributed/parallel sims | Partitioning |
+| 12 | Conservative sync | Null messages |
+| 13 | Optimistic sync | Rollback + GVT |
+
+---
+
+## Week 1: On-line vs Off-line Simulation and Trainers
+
+Off-line simulation answers "what would happen"; on-line simulation answers "what is happening right now, fast enough to act on".
+
+### Definitions
+
+| Aspect | Off-line | On-line |
+|--------|----------|---------|
+| Coupling to reality | Decoupled, historical/fictional inputs | Coupled to live process or operator |
+| Time | Virtual, as-fast-as-possible | Real-time (or scaled), deadlines matter |
+| Purpose | Design, analysis, planning | Training, control, decision support |
+| Failure mode | Wrong numbers | Missed deadline = wrong behaviour |
+
+### Training Simulators
+
+- **Part-task trainers** — one skill (e.g. pump start-up sequence).
+- **Full-scope trainers** — whole control room replica for operators.
+- **Hardware-in-the-loop (HIL)** — real controller, simulated plant.
+- **Human-in-the-loop** — operator decisions feed back into the scenario.
+- Fidelity ladder: physical → functional → psychological fidelity; more is not always better.
+
+### Real-Time Discipline
+
+Fixed step `dt`, worst-case execution time (WCET) per step `< dt`, jitter bounds, deterministic replay via seeded RNG and event logs.
+
+```python
+"""Off-line (as-fast-as-possible) vs on-line (real-time paced) loop."""
+import time
+
+def simulate_offline(step, n_steps, dt):
+    t, state = 0.0, 0.0
+    for _ in range(n_steps):
+        state = step(state, dt)
+        t += dt
+    return state
+
+def simulate_online(step, n_steps, dt):
+    t, state = 0.0, 0.0
+    for _ in range(n_steps):
+        deadline = time.perf_counter() + dt
+        state = step(state, dt)          # must finish before deadline
+        t += dt
+        slack = deadline - time.perf_counter()
+        if slack < 0:
+            raise TimeoutError(f"Overrun at t={t}: {-slack*1000:.1f} ms late")
+        time.sleep(slack)
+    return state
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Implement a first-order tank model (`dh/dt = (qin - k*sqrt(h)) / A`) with both loops above at `dt = 0.05`. Measure the WCET of your step over 1000 runs. Decide the largest `dt`-safe model complexity (add a second tank) that still meets the on-line deadline, and report overrun statistics.
+
+</div>
+
+---
+
+## Week 2: Simulation for Planning — Reactive vs Pro-active
+
+Planners use simulators either to react to the present or to rehearse the future before committing.
+
+### Two Planning Styles
+
+| Style | Question | Simulator role |
+|-------|----------|---------------|
+| **Reactive** | "A disruption happened — what now?" | Fast what-if evaluation of candidate responses |
+| **Pro-active** | "What could happen — are we ready?" | Lookahead search, contingency plans, robustness envelopes |
+
+### Planning Loop with Simulation
+
+```
+sense -> update model -> generate options -> simulate each -> rank -> commit -> monitor
+```
+
+Key design choices: horizon length, scenario branching factor, evaluation metric (cost, lateness, risk), re-planning trigger.
+
+### Monte Carlo for Plans
+
+Run each candidate plan against sampled disturbances (demand spikes, breakdowns); compare distributions, not point estimates.
+
+```python
+"""Reactive choice between two dispatch plans under random demand."""
+import random
+
+def simulate_plan(plan: str, demand: list[float]) -> float:
+    cost = 0.0
+    stock = 10.0
+    for d in demand:
+        stock += (8.0 if plan == "steady" else 12.0) - d
+        if stock < 0:
+            cost += 100.0 + abs(stock) * 10  # stockout penalty
+            stock = 0
+        cost += 1.0 * (8.0 if plan == "steady" else 12.0)
+    return cost
+
+def choose_plan(scenarios: int = 500, seed: int = 7) -> dict:
+    rng = random.Random(seed)
+    totals = {"steady": [], "surge": []}
+    for _ in range(scenarios):
+        demand = [rng.gauss(9, 3) for _ in range(24)]
+        for p in totals:
+            totals[p].append(simulate_plan(p, demand))
+    return {p: sum(v) / len(v) for p, v in totals.items()}
+
+print(choose_plan())
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Extend the script: add a third plan ("adaptive": produce 12 when stock < 5 else 6). Compare mean cost plus 90th percentile across 1000 scenarios. Write a 5-line recommendation: which plan is best for average cost vs worst-case risk, and what re-planning trigger you would deploy on-line?
+
+</div>
+
+---
+
+## Week 3: Autonomous Agents and ABAsim
+
+Agent-based simulation replaces one global update function with many local decision-makers interacting — macro-patterns (jams, queues) emerge from micro-rules.
+
+### Agent Definition
+
+An agent is **autonomous** (owns its thread of control), **reactive** (senses), **pro-active** (pursues goals) and **social** (communicates). A thermostat is reactive; a negotiating delivery van is an agent.
+
+### ABAsim Architecture
+
+```
+Environment (space, physics, resources)
+  |-- Agent 1: sensors | deliberation | actuators | mailbox
+  |-- Agent 2: ...
+  |-- ...
+  |-- Scheduler: time advance + message delivery + conflict resolution
+```
+
+ABAsim separates *world dynamics* (movement, queues) from *agent minds* (decisions), so either can be replaced independently.
+
+### Event- vs Process- vs Agent-Driven Control
+
+| Paradigm | State advance | Best for |
+|----------|--------------|----------|
+| Event-driven | Next-event queue | Queues, networks |
+| Process-driven | Coroutine life-cycles | Manufacturing flow |
+| Agent-driven | Sense–think–act per agent per tick | Traffic, crowds, markets |
+
+```python
+"""Minimal ABAsim-style loop: agents + environment + scheduler."""
+from dataclasses import dataclass, field
+
+@dataclass
+class Agent:
+    name: str
+    position: float = 0.0
+    speed: float = 1.0
+    mailbox: list = field(default_factory=list)
+
+    def sense(self, env) -> dict:
+        ahead = [a for a in env.agents if a is not self and 0 < a.position - self.position < 5]
+        return {"gap": min((a.position - self.position for a in ahead), default=999.0)}
+
+    def deliberate(self, percept: dict) -> float:
+        return 0.0 if percept["gap"] < 2.0 else self.speed  # stop-and-go rule
+
+    def act(self, cmd: float, dt: float) -> None:
+        self.position += cmd * dt
+
+class Env:
+    def __init__(self, agents): self.agents = agents
+
+def run(env: Env, ticks: int, dt: float = 1.0):
+    for _ in range(ticks):
+        for a in env.agents:            # sense-deliberate-act, order shuffled in practice
+            a.act(a.deliberate(a.sense(env)), dt)
+    return [(a.name, round(a.position, 2)) for a in env.agents]
+
+print(run(Env([Agent("v1", 0.0, 2.0), Agent("v2", 6.0, 1.0)]), 5))
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Add a third agent type `Cautious` (stops when gap < 4) and run a 3-agent platoon for 50 ticks. Plot or tabulate positions every 10 ticks and describe the emergent pattern (platoon forms? shockwave?). One paragraph + table.
+
+</div>
+
+---
+
+## Week 4: Agent Decomposition — Internal Components
+
+Real agents are not one function: perception filters noise, deliberation selects intentions, action executes skills, memory keeps state, and communication ports connect the hierarchy.
+
+### Canonical Decomposition
+
+```
+sensors -> perception -> beliefs -> deliberation -> intentions -> action -> actuators
+              ^                        |    ^                         |
+              +------ memory ----------+    +------ mailbox -----------+
+```
+
+- **Perception** — denoises, discretises, detects events (e.g. "gap critical").
+- **Deliberation** — BDI (beliefs–desires–intentions) or utility maximisation.
+- **Action** — skill library with preconditions and durations.
+- **Memory** — episodic (what happened) + semantic (map, parameters).
+
+### Agent-Based vs Event/Process Simulators Revisited
+
+| Question | Event-driven | Agent-based |
+|----------|-------------|-------------|
+| Who decides? | Global scheduler | Each agent locally |
+| Heterogeneity? | Awkward | Natural (per-agent rules) |
+| Emergence? | Designed in | Observed out |
+| Calibration? | Rates/fits | Behaviour + rates |
+
+```python
+"""BDI-flavoured agent: beliefs, desires, intentions as explicit state."""
+from dataclasses import dataclass, field
+
+@dataclass
+class BDIAgent:
+    beliefs: dict = field(default_factory=dict)
+    desires: list = field(default_factory=lambda: ["keep_gap", "save_fuel"])
+    intentions: list = field(default_factory=list)
+
+    def perceive(self, gap: float):
+        self.beliefs["gap"] = gap
+        self.beliefs["critical"] = gap < 2.0
+
+    def deliberate(self):
+        self.intentions = ["brake"] if self.beliefs.get("critical") else ["cruise"]
+
+    def act(self):
+        return 0.0 if "brake" in self.intentions else 2.0
+
+a = BDIAgent()
+for gap in (5.0, 1.2, 3.0):
+    a.perceive(gap); a.deliberate()
+    print(gap, "->", a.intentions, a.act())
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Refactor the Week 3 agent into `Perception`, `Deliberation`, `Action` classes with unit-testable interfaces. Write three unit tests (perception threshold, deliberation choice, action saturation) and show they pass. Submit code + test log.
+
+</div>
+
+---
+
+## Week 5: Case Study — Agent-Based Traffic Simulator
+
+Transportation nodes (intersections, ramps, stations) are the classic ABAsim showcase: vehicle agents, link resources, signal controllers, all interacting.
+
+### Model Elements
+
+- **Links** — capacity, free-flow speed, queue storage.
+- **Nodes** — conflict matrix (which movements block which), signal phases.
+- **Vehicle agents** — origin, destination, desired speed, car-following rule.
+- **Controller agent** — phase switching (fixed-time → actuated → adaptive).
+
+### Car-Following in Five Lines
+
+`v_next = min(v_desired, v_leader_gap_rule, v_signal_rule)` — every extension (IDM, Gipps) refines these three terms.
+
+### Minimal Node Simulator
+
+```python
+"""Two-approach intersection: N-S green while E-W queues, then swap."""
+from collections import deque
+
+class Approach:
+    def __init__(self, name): self.name, self.queue = name, deque()
+    def arrive(self, vid): self.queue.append(vid)
+    def discharge(self): return self.queue.popleft() if self.queue else None
+
+class Signal:
+    def __init__(self, phases=("NS", "EW"), green=3): self.phases, self.green = phases, green
+    def phase_at(self, t): return self.phases[(t // self.green) % len(self.phases)]
+
+def simulate(arrivals_ns, arrivals_ew, steps=12, green=3):
+    ns, ew, sig = Approach("NS"), Approach("EW"), Signal(green=green)
+    served = []
+    for t in range(steps):
+        for v in arrivals_ns.get(t, []): ns.arrive(v)
+        for v in arrivals_ew.get(t, []): ew.arrive(v)
+        active = ns if sig.phase_at(t) == "NS" else ew
+        v = active.discharge()
+        if v is not None: served.append((t, active.name, v))
+    return served, len(ns.queue) + len(ew.queue)
+
+arr_ns = {0: ["n1", "n2"], 1: ["n3"], 4: ["n4"]}
+arr_ew = {0: ["e1"], 2: ["e2", "e3"]}
+print(simulate(arr_ns, arr_ew))
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Add an actuated controller: extend green while the active queue is non-empty (max 6 steps), else switch. Compare fixed-time vs actuated on the arrival pattern above using total waiting vehicles (sum of queue lengths over time). Report both numbers and the winning policy.
+
+</div>
+
+---
+
+## Week 6: Message Passing in Hierarchical Agent Systems
+
+Agents rarely talk peer-to-peer only: platoons, intersections and fleets form hierarchies, and addressing determines who hears what.
+
+### Three Addressing Modes
+
+| Mode | Recipients | Example |
+|------|-----------|---------|
+| **Addressed** | One named agent | "Vehicle n3: stop at line" |
+| **Partially addressed** | Attribute group | "All vehicles on link L7: slow to 30" |
+| **Non-addressed (broadcast)** | Everyone in scope | "Signal turning red in 3 s" |
+
+### Hierarchy and Scoping
+
+Region → intersection → approach → vehicle. Messages flow down (commands), up (reports) or sideways (negotiation). Scoping rules prevent city-wide spam from a local event.
+
+### Implementation Sketch
+
+```python
+"""Hierarchical message bus with three addressing modes."""
+from dataclasses import dataclass, field
+
+@dataclass
+class Message:
+    topic: str
+    payload: dict
+    to: str | None = None          # addressed
+    group: str | None = None       # partially addressed
+    # neither set -> broadcast within scope
+
+@dataclass
+class AgentNode:
+    name: str
+    groups: set = field(default_factory=set)
+    inbox: list = field(default_factory=list)
+    def matches(self, msg: Message) -> bool:
+        if msg.to: return msg.to == self.name
+        if msg.group: return msg.group in self.groups
+        return True  # broadcast
+
+class Bus:
+    def __init__(self): self.agents: list[AgentNode] = []
+    def send(self, msg: Message):
+        for a in self.agents:
+            if a.matches(msg): a.inbox.append(msg)
+
+bus = Bus()
+for n, g in [("n3", {"link-L7"}), ("n4", {"link-L7"}), ("sig1", {"ctrl"})]:
+    bus.agents.append(AgentNode(n, g))
+bus.send(Message("slow", {"v": 30}, group="link-L7"))
+bus.send(Message("stop", {}, to="n3"))
+bus.send(Message("phase", {"in": 3}))
+print([(a.name, len(a.inbox)) for a in bus.agents])  # n3:3, n4:2, sig1:1
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Extend the bus with hierarchical scopes (`region/city/node`): a broadcast at node scope reaches only that node's members. Demonstrate with 6 agents in 2 nodes that a node-local broadcast stays local while a region broadcast reaches all. Show inbox counts as evidence.
+
+</div>
+
+---
+
+## Week 7: Discrete-Continuous Synchronization
+
+Traffic lights are discrete; vehicle motion is continuous. Hybrid simulators must keep both clocks consistent without missing events (a car crossing the stop line *between* integration steps).
+
+### The Core Problem
+
+- Discrete part jumps at events; continuous part flows via ODEs.
+- Dangers: missed zero-crossings, Zeno behaviour (infinite events in finite time), time skew between solvers.
+
+### Synchronization Techniques
+
+| Technique | Idea | Trade-off |
+|-----------|------|-----------|
+| Fixed small step | Sample everything finely | Simple, wasteful, still misses fast events |
+| Zero-crossing detection | Bracket sign changes, bisect | Accurate, needs continuous monitors |
+| Quantized-state (QSS) | Update on state change, not time | Efficient for sparse activity |
+| Co-simulation master (FMI-style) | Orchestrates sub-simulators, rollback on mismatch | Standardised, master complexity |
+
+```python
+"""Hybrid loop: integrate motion, detect stop-line crossing between steps."""
+def simulate_hybrid(x0=20.0, v=-5.0, stop_line=0.0, dt=0.5, steps=10):
+    x, t, events = x0, 0.0, []
+    for _ in range(steps):
+        x_new = x + v * dt                      # Euler integration (continuous part)
+        if x > stop_line >= x_new:              # zero-crossing guard (discrete event)
+            frac = (x - stop_line) / (x - x_new)
+            events.append(round(t + frac * dt, 3))
+            x_new = stop_line                   # clamp: vehicle stops at line
+            v = 0.0                             # signal red -> discrete state change
+        x, t = x_new, t + dt
+    return events, round(x, 3)
+
+print(simulate_hybrid())  # crossing time localised inside the step
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Replace Euler with Heun (predictor-corrector) in the loop and add bisection refinement of the crossing time to 1e-4. Report crossing times from both integrators for `dt` in {0.5, 0.1} and explain which error source (integration vs event localisation) dominates.
+
+</div>
+
+---
+
+## Week 8: AI and Soft Computing in Simulators
+
+Agents must decide under uncertainty with incomplete data — the home turf of fuzzy logic, heuristics, metaheuristics and learning.
+
+### Toolbox Map
+
+| Method | Role in simulator | Example |
+|--------|-------------------|---------|
+| Fuzzy control | Smooth rules from vague inputs | Signal green extension from "long queue" |
+| Heuristics | Fast decent decisions | Nearest-vehicle-first dispatch |
+| Metaheuristics (GA, SA, ACO) | Offline optimisation of parameters | Signal timing plans |
+| Reinforcement learning | Online policy learning | Adaptive ramp metering |
+| Neural nets | Surrogate models of slow physics | Emissions estimator |
+
+### Fuzzy Controller Example
+
+```python
+"""Fuzzy green-extension: long queue AND short wait -> extend a lot."""
+def triangular(x, a, b, c):
+    return max(0.0, min((x - a) / (b - a + 1e-9), (c - x) / (c - b + 1e-9)))
+
+def fuzzy_extend(queue: float, wait: float) -> float:
+    long_q, short_w = triangular(queue, 5, 10, 15), triangular(wait, 0, 5, 10)
+    med_q, med_w = triangular(queue, 0, 5, 10), triangular(wait, 5, 15, 25)
+    extend_big, extend_small = min(long_q, short_w), min(med_q, med_w)
+    return round((extend_big * 6 + extend_small * 2) / max(1e-9, extend_big + extend_small), 2)
+
+print(fuzzy_extend(queue=12, wait=3))   # -> ~6 s
+print(fuzzy_extend(queue=4, wait=18))   # -> ~2 s
+```
+
+### Heuristic vs Optimal
+
+Simulators evaluate heuristics *in silico* before deployment: a 5 % worse plan that runs 100× faster often wins on-line.
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Implement a hill-climbing search over two signal parameters (cycle length, green split) using the Week 5 simulator as the fitness function (minimise total waiting). Run 30 iterations from two starting points and report best parameters + waiting improvement over the default.
+
+</div>
+
+---
+
+## Week 9: Petri Nets I — Foundations
+
+Petri nets model concurrency, choice, synchronization and resource contention graphically *and* formally — ideal for simulator components.
+
+### Definition
+
+A net `N = (P, T, F, W, M0)`: places `P`, transitions `T`, arcs `F`, weights `W`, initial marking `M0`. Tokens in places = distributed state.
+
+### Enabling and Firing Rules
+
+- **Enabled**: every input place holds ≥ arc weight tokens.
+- **Firing**: consumes input tokens, produces output tokens (atomic, non-deterministic choice on conflict).
+
+### Reachability Graph
+
+Nodes = markings reachable from `M0`; edges = firings. Answers boundedness (finite graph?), deadlocks (sink nodes?), liveness.
+
+```python
+"""Minimal Petri-net engine: enabling, firing, reachability BFS."""
+from collections import deque
+
+class Net:
+    def __init__(self, places, transitions, arcs_in, arcs_out, marking):
+        self.places, self.transitions = places, transitions
+        self.inp, self.out, self.m0 = arcs_in, arcs_out, dict(marking)
+
+    def enabled(self, marking, t):
+        return all(marking.get(p, 0) >= w for p, w in self.inp.get(t, {}).items())
+
+    def fire(self, marking, t):
+        m = dict(marking)
+        for p, w in self.inp.get(t, {}).items(): m[p] -= w
+        for p, w in self.out.get(t, {}).items(): m[p] = m.get(p, 0) + w
+        return m
+
+    def reachability(self):
+        seen, q = set(), deque([tuple(sorted(self.m0.items()))])
+        seen.add(q[0])
+        while q:
+            key = q.popleft()
+            m = dict(key)
+            for t in self.transitions:
+                if self.enabled(m, t):
+                    k = tuple(sorted(self.fire(m, t).items()))
+                    if k not in seen: seen.add(k); q.append(k)
+        return seen
+
+net = Net(["p1", "p2"], ["t1"],
+          {"t1": {"p1": 1}}, {"t1": {"p2": 1}}, {"p1": 2, "p2": 0})
+print(sorted(net.reachability()))
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Model mutual exclusion (2 processes, 1 semaphore) as a Petri net in the engine above. Compute the reachability set, then answer: bounded? deadlock-free? is the critical section ever shared? Quote markings as evidence.
+
+</div>
+
+---
+
+## Week 10: Petri Nets II — Processes and Components
+
+Beyond analysis: use nets as *executable specifications* of technological processes and simulator blocks.
+
+### Modelling Patterns
+
+| Pattern | Net shape | Use |
+|---------|-----------|-----|
+| Sequence | Chain | Assembly steps |
+| Choice / conflict | Shared input place | Routing, failures |
+| Fork–join | Split + sync transition | Parallel tasks |
+| Mutual exclusion | Semaphore place | Shared resource |
+| Bounded buffer | Producer/consumer + capacity place | Queues |
+
+### From Net to Simulator Component
+
+Each transition = guarded action with duration; the net *is* the control logic, the tokens *are* the state — no hidden flags.
+
+```python
+"""Producer-consumer with capacity 2 as an executable net fragment."""
+prod_cons = Net(
+    ["free", "buf", "ready"], ["produce", "consume"],
+    {"produce": {"free": 1}, "consume": {"buf": 1}},
+    {"produce": {"buf": 1}, "consume": {"free": 1, "ready": 1}},
+    {"free": 2, "buf": 0, "ready": 0},
+)
+graph = prod_cons.reachability()
+print("markings:", len(graph))
+# Invariant check: free + buf == 2 in every marking?
+print(all(dict(m)["free"] + dict(m)["buf"] == 2 for m in graph))
+```
+
+### Coloured and Timed Extensions
+
+- **Coloured nets** — tokens carry data (vehicle IDs, job types).
+- **Timed nets** — transitions have delays (processing times, travel times).
+- **Hierarchical nets** — subnets hide detail; interfaces stay small.
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Model a two-machine line with a buffer of capacity 3 (`M1 -> buffer -> M2`, each machine one job at a time). Build the net, compute reachability, and report: number of markings, buffer-overflow safety (invariant), and one deadlock scenario if M2 breaks (add a `fail` transition and re-analyse).
+
+</div>
+
+---
+
+## Week 11: Distributed and Parallel Simulation
+
+One machine is too slow or too small — partition the model across logical processes (LPs) and keep virtual time coherent.
+
+### Why Distribute Agent Sims
+
+- Scale (millions of agents), speed (multi-core/cluster), geography (federated trainers), fault isolation.
+
+### Partitioning
+
+| Strategy | Idea | Risk |
+|----------|------|------|
+| Spatial | Region per LP | Border chatter |
+| Functional | Subsystem per LP | Load imbalance |
+| Agent-based | Agent groups migrate | Migration cost |
+
+Goal: balance load, minimise cross-LP messages, maximise **lookahead** (how far an LP can safely advance without outside input).
+
+### Time Management Overview
+
+- **Conservative** (Week 12) — never advance past a possible incoming event; safe, can deadlock/starve on zero lookahead.
+- **Optimistic** (Week 13) — advance freely, roll back on causality violation; fast, needs state saving + anti-messages.
+
+```python
+"""Two-LP ping-pong: the causality problem in one screen."""
+import heapq
+
+class LP:
+    def __init__(self, name): self.name, self.clock, self.inbox = name, 0.0, []
+    def send(self, other, t, payload): heapq.heappush(other.inbox, (t, payload))
+    def step(self):
+        if self.inbox:
+            t, p = heapq.heappop(self.inbox)
+            self.clock = max(self.clock, t)   # local causality: never go backwards here
+            return (self.clock, p)
+        self.clock += 1.0
+        return (self.clock, None)
+
+a, b = LP("A"), LP("B")
+a.send(b, 5.0, "hello")
+print(a.step(), b.step(), b.step())  # B jumps to 5.0 on message arrival
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Partition the Week 5 intersection across 2 LPs (NS vs EW + signal in LP0, arrivals generator in LP1). List every cross-LP message type with its timestamp source, then identify which messages bound the lookahead and propose one change that doubles it.
+
+</div>
+
+---
+
+## Week 12: Conservative Synchronization
+
+Conservative protocols guarantee "no causality error ever" by blocking: an LP advances only when every input channel provably holds no earlier event.
+
+### Chandy-Misra-Bryant (CMB)
+
+- FIFO channels, each LP waits until all input queues are non-empty, then processes the smallest timestamp.
+- **Deadlock risk**: empty channels block cycles → fix with **null messages** carrying lookahead promises ("nothing before T+L").
+
+### Lookahead Is Everything
+
+Lookahead `L` = minimum simulated delay on a path (link travel time, service time). Larger `L` → fewer null messages → more parallelism. Zero lookahead → serialization.
+
+### Null-Message Sketch
+
+```python
+"""CMB-style LP with lookahead-based null messages (single channel demo)."""
+import heapq
+
+class CL:
+    def __init__(self, lookahead): self.q, self.lookahead, self.clock = [], lookahead, 0.0
+    def receive(self, t, real=True): heapq.heappush(self.q, (t, real))
+    def safe_time(self):
+        return self.q[0][0] if self.q else float("inf")
+    def advance(self):
+        t, real = heapq.heappop(self.q)
+        self.clock = t
+        # promise downstream: nothing earlier than clock + lookahead
+        return (f"null entertaining t>={t + self.lookahead}", real)
+
+lp = CL(lookahead=2.0)
+lp.receive(3.0); lp.receive(7.0, real=False)
+print("safe:", lp.safe_time(), "->", lp.advance(), "clock:", lp.clock)
+```
+
+### When Conservative Wins
+
+Sparse events with good lookahead (networks with propagation delay, manufacturing with service times), hard real-time federations (HLA time-managed federates), systems where rollback state is huge.
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Simulate two LPs exchanging timestamped messages with lookaheads L1 = L2 = 1. Count null messages needed for 20 events with (a) plain CMB and (b) demand-driven / conditional-event optimisation of your design. Report both counts and explain where the savings came from.
+
+</div>
+
+---
+
+## Week 13: Optimistic Synchronization
+
+Time Warp bets that causality violations are rare: LPs race ahead, detect stragglers, roll back, cancel wrong messages with anti-messages, and garbage-collect via Global Virtual Time (GVT).
+
+### Jefferson's Time Warp
+
+1. **Execute freely** — process smallest local event, save state snapshots.
+2. **On straggler** (message with `t < clock`) — roll back to last snapshot `≤ t`, re-execute.
+3. **Cancel errors** — send anti-messages annihilating wrongly sent messages (possibly cascading rollbacks).
+4. **Commit via GVT** — `GVT = min(all LP clocks, in-transit timestamps)`; states older than GVT are fossil-collected, I/O older than GVT is committed.
+
+### State Saving Options
+
+| Method | Cost model | Best when |
+|--------|-----------|-----------|
+| Copy state saving | Memory-heavy, simple | Small states |
+| Incremental / event sourcing | Log deltas, replay | Large states, rare rollback |
+| Reverse computation | Zero memory, CPU on rollback | Invertible events |
+
+```python
+"""Time-Warp rollback toy: snapshots + straggler + anti-message log."""
+class OptimisticLP:
+    def __init__(self): self.clock, self.snaps, self.sent, self.log = 0.0, {0.0: 0}, [], []
+    def run_to(self, t, delta):
+        self.snaps[self.clock] = self.log.copy()
+        self.clock = t
+        self.log.append(delta)
+        self.sent.append((t, delta))
+    def straggler(self, t, delta):
+        # roll back to latest snapshot <= t
+        base = max(s for s in self.snaps if s <= t)
+        self.clock = t
+        self.log = self.snaps[base] + [delta]
+        anti = [m for m in self.sent if m[0] > base]  # messages to cancel
+        self.sent = [m for m in self.sent if m[0] <= base]
+        return f"rolled back to {base}, anti-messages: {anti}"
+
+lp = OptimisticLP()
+lp.run_to(5.0, "a"); lp.run_to(9.0, "b")
+print(lp.straggler(6.0, "straggler!"), "| clock:", lp.clock, "| log:", lp.log)
+```
+
+### GVT and Fossil Collection
+
+GVT computation (Mattern, Samadi) runs concurrently; everything below GVT is certain history — safe to delete snapshots, release I/O, confirm billing. Infrequent GVT → memory blowup; too frequent → overhead.
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Extend the toy with a two-LP message exchange where LP-B receives a straggler. Show the snapshot table before/after, the anti-message list, and the GVT value after recovery (assume in-transit set given). Conclude in 3 lines when you would pick optimistic over conservative for your traffic simulator.
+
+</div>
+
+---
+
+## Assignment Requirements
+
+### Simulator Project (Traffic Node)
+
+<div class="checklist">
+
+- [ ] Agent-based design (vehicle + controller agents, ABAsim separation)
+- [ ] Hierarchical messaging (addressed + group + broadcast demonstrated)
+- [ ] Experiments: at least 2 policies compared with a metric (waiting, throughput)
+- [ ] Reproducible runs (seeded RNG, config file, logged results)
+- [ ] README with architecture diagram (ASCII), how to run, results interpretation
+
+</div>
+
+### Petri-Net Task
+
+<div class="checklist">
+
+- [ ] Net for a chosen process (production, protocol, intersection)
+- [ ] Reachability computation with the course engine (or equivalent)
+- [ ] Boundedness, deadlock and invariant verdicts with evidence
+- [ ] One extension discussed (coloured, timed or hierarchical)
+
+</div>
+
+---
+
+## Code Review Guide
+
+### What to Look For
+
+1. **Time discipline** — single clock advance policy, no hidden `time.sleep` in model code.
+2. **Determinism** — seeded RNG, documented tie-breaking, replay instructions.
+3. **Separation** — world dynamics vs agent minds vs I/O.
+4. **Event safety** — zero-crossings guarded, no missed between-step events.
+5. **Causality** — distributed parts declare lookahead / rollback strategy.
+
+<div class="review-note">
+
+<strong>🔍 Practice Review:</strong> Identify issues in this code:
+
+```python
+def step(agents):
+    import random
+    for a in agents:
+        a.position += random.random() * 2  # unseeded, unlogged
+        if a.position > 100:
+            a.position = 0  # teleport: violates conservation, no event recorded
+```
+
+**Issues:** unseeded RNG (non-reproducible); movement decoupled from `dt`/speed model; wrap-around silently destroys distance statistics; no event log; iteration order bias. Fix with seeded RNG, `dt`-scaled physics, explicit wrap event + counter.
+
+</div>
+
+---
+
+## Exam Preparation
+
+### Key Topics to Review
+
+| Week | Topic | Key Concepts |
+|------|-------|--------------|
+| 1 | On/off-line | Real-time deadlines, HIL |
+| 2 | Planning | Reactive vs pro-active, Monte Carlo |
+| 3–4 | Agents | ABAsim, BDI, paradigms |
+| 5–6 | Traffic + messages | Nodes, addressing modes |
+| 7 | Hybrid sync | Zero-crossing, QSS, FMI |
+| 8 | AI/soft | Fuzzy, heuristics, RL |
+| 9–10 | Petri nets | Firing, reachability, patterns |
+| 11–13 | Distributed | Partitioning, CMB/null, Time Warp/GVT |
+
+<div class="exercise-box">
+
+<strong>📝 Sample Exam Questions:</strong>
+
+1. Compare on-line and off-line simulation on coupling, time and failure modes.
+2. Contrast event-driven, process-driven and agent-driven control with an example each.
+3. Explain addressed vs partially addressed vs broadcast messaging in a hierarchy.
+4. Describe zero-crossing detection in a hybrid loop; why is fixed-step sampling unsafe?
+5. Contrast CMB null messages with Time Warp anti-messages; define GVT and its uses.
+
+</div>
+
+---
+
+## Quick Reference Cards
+
+### Simulator Loop Cheatsheet
+
+```python
+# Deterministic, seeded, logged main loop
+import random
+rng = random.Random(42)
+clock, dt, log = 0.0, 0.1, []
+while clock < 100.0:
+    for a in sorted(agents, key=lambda x: x.name):  # fixed order = replayable
+        a.step(dt, rng)
+    log.append(snapshot(clock, agents))
+    clock += dt
+```
+
+### Petri-Net Analysis Checklist
+
+```
+enabled(t) <=> forall p in in(t): M(p) >= W(p,t)
+fire: M' = M - in + out
+reachability BFS -> bounded? (finite) | deadlocks? (sinks) | invariants? (weighted sums)
+```
+
+### Conservative vs Optimistic
+
+```
+Conservative: wait for safety (null msgs + lookahead) | never rolls back
+Optimistic:   race ahead, roll back on stragglers (anti-msgs + GVT) | needs snapshots
+GVT = min(LP clocks, in-transit timestamps); fossil-collect below GVT
+```
+
+---
+
+*End of Course Documentation*
+
+**Last Updated:** 2026-09-20
+**Course Code:** KST/NNTMS
+**Credits:** 5 | Completion: Zk+ | Elective A

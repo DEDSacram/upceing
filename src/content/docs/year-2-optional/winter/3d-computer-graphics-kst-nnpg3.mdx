@@ -1,0 +1,868 @@
+---
+title: "3D Computer Graphics and Graphic API (KST/NNPG3)"
+description: "Complete course materials for 3D graphics: colour and light, Maya modeling, MEL scripting, OpenGL pipeline, shaders, curves, textures, transforms, projection and animation"
+template: doc
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+# 3D Computer Graphics and Graphic API (KST/NNPG3)
+
+Welcome to 3D Computer Graphics! From colour science and Maya modeling through MEL scripting into the OpenGL pipeline — shaders, curves, textures, transforms, projection, shadows and animation — this guide pairs theory with runnable GLSL/OpenGL examples.
+
+---
+
+## 📑 Table of Contents
+
+### Course Overview
+- [Course Objectives](#course-objectives)
+- [Assessment & Credit Requirements](#assessment--credit-requirements)
+- [Examination Structure](#examination-structure)
+- [Schedule](#schedule)
+
+### Lecture Materials (Weeks 1-13)
+1. [Week 1: Introduction to 3D Graphics](#week-1-introduction-to-3d-graphics)
+2. [Week 2: Colours and Light](#week-2-colours-and-light)
+3. [Week 3: Modeling Tools — Autodesk Maya](#week-3-modeling-tools--autodesk-maya)
+4. [Week 4: Modeling of 3D Objects](#week-4-modeling-of-3d-objects)
+5. [Week 5: Advanced Scripting with MEL](#week-5-advanced-scripting-with-mel)
+6. [Week 6: OpenGL Pipeline, Primitives and Structures](#week-6-opengl-pipeline-primitives-and-structures)
+7. [Week 7: OpenGL Shaders](#week-7-opengl-shaders)
+8. [Week 8: Curves](#week-8-curves)
+9. [Week 9: Textures](#week-9-textures)
+10. [Week 10: Transformations](#week-10-transformations)
+11. [Week 11: Screening](#week-11-screening)
+12. [Week 12: Projection, Shadows and Shading](#week-12-projection-shadows-and-shading)
+13. [Week 13: Animation](#week-13-animation)
+
+### Assignments & Exam
+- [Assignment Requirements](#assignment-requirements)
+- [Code Review Guide](#code-review-guide)
+- [Exam Preparation](#exam-preparation)
+- [Quick Reference Cards](#quick-reference-cards)
+
+---
+
+## Course Overview
+
+### Course Objectives
+
+<span class="badge">Core</span> <span class="badge info">Graphics</span> <span class="badge warn">Elective B</span>
+
+Students will be able to:
+
+- **Explain the 3D pipeline** — modelling, world/projection/screen spaces, rasterisation.
+- **Work with colour and light** — colour spaces, gamma, Phong/Blinn-Phong models.
+- **Model in Autodesk Maya** — meshes, NURBS, UVs, scene graph, basic rigging preparation.
+- **Script with MEL/Python** — procedural modelling, batch scene processing.
+- **Program modern OpenGL** — VAO/VBO/EBO, GLSL shaders, uniforms, framebuffers.
+- **Use curves and surfaces** — Bézier, B-splines, NURBS evaluation and tessellation.
+- **Apply textures** — sampling, filtering, mipmaps, normal/parallax mapping.
+- **Master transforms** — homogeneous matrices, model/view/projection composition, quaternions.
+- **Render convincingly** — clipping, culling, depth, shadows (shadow maps), shading models.
+- **Animate** — keyframes, interpolation, skeletal skinning, simple particle systems.
+
+### Assessment & Credit Requirements
+
+<div class="exercise-box">
+
+<strong>📋 To receive credit (Zk+), students must:</strong>
+
+1. Submit a **Maya modeling task** — modelled, UV-mapped object with rendered turntable (images + scene file).
+2. Submit an **OpenGL mini-project** — interactive scene (transforms + lighting + texture + simple animation, keyboard/mouse control).
+3. Pass a **mid-term test** on pipeline, colour and transforms (min. 60 %).
+
+</div>
+
+### Examination Structure
+
+#### Full-time Format
+1. **Practical defence** — walkthrough of the OpenGL project (shader code explained live).
+2. **Oral examination** — pipeline, shading, curves, projection, animation theory.
+
+#### Distance Format
+1. **Oral examination via MS Teams** — screen-shared demo + theory questions.
+
+#### Passing Criteria
+- **Minimum 60 %** overall; OpenGL project must compile and render correctly.
+
+### Schedule
+
+| Week | Lecture Topic | Exercise Focus |
+|------|---------------|----------------|
+| 1 | Intro to 3D graphics | Coordinate systems |
+| 2 | Colours and light | Gamma + Phong |
+| 3 | Maya tools | Navigation + primitives |
+| 4 | Modeling 3D objects | Quad topology |
+| 5 | MEL scripting | Procedural city |
+| 6 | OpenGL pipeline | First triangle |
+| 7 | Shaders | Custom lighting |
+| 8 | Curves | Bézier evaluation |
+| 9 | Textures | Mipmaps + normal map |
+| 10 | Transforms | MVP composition |
+| 11 | Screening | Viewport + picking |
+| 12 | Projection/shadows/shading | Shadow map |
+| 13 | Animation | Keyframes + skinning |
+
+---
+
+## Week 1: Introduction to 3D Graphics
+
+3D graphics turns scene descriptions (geometry + materials + lights + camera) into 2D images through a fixed sequence of spaces and tests.
+
+### Fundamental Terms
+
+- **Vertex** — point with attributes (position, normal, UV, colour).
+- **Primitive** — point, line, triangle (GPUs love triangles).
+- **Mesh** — connected primitives sharing vertices.
+- **Scene graph** — hierarchy of transforms (arm → forearm → hand).
+- **Rasterisation** — converting projected triangles to fragments (pixels-in-waiting).
+
+### The Pipeline at a Glance
+
+```
+Model space -> [Model] -> World -> [View] -> Camera -> [Projection]
+  -> Clip space -> perspective divide -> NDC -> viewport -> Screen
+  -> rasterise -> fragment shader -> depth/stencil tests -> framebuffer
+```
+
+### Spaces Cheat Table
+
+| Space | Coordinates | Defined by |
+|-------|------------|-----------|
+| Model | Object-local | Artist |
+| World | Scene-global | Model matrices |
+| View/camera | Camera at origin, −Z forward | View matrix |
+| Clip | Homogeneous `w` kept | Projection matrix |
+| NDC | Divided by `w`, [−1, 1] | Hardware |
+| Screen | Pixels | Viewport |
+
+```c
+// Minimal modern OpenGL triangle (C + GLFW + GLAD, excerpt)
+float verts[] = { -0.5f,-0.5f,0.0f,  0.5f,-0.5f,0.0f,  0.0f,0.5f,0.0f };
+GLuint VAO, VBO;
+glGenVertexArrays(1, &VAO); glGenBuffers(1, &VBO);
+glBindVertexArray(VAO);
+glBindBuffer(GL_ARRAY_BUFFER, VBO);
+glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW);
+glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+glEnableVertexAttribArray(0);
+// render loop: glUseProgram(prog); glBindVertexArray(VAO); glDrawArrays(GL_TRIANGLES, 0, 3);
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Extend the triangle to a coloured quad (2 triangles, indexed with EBO, per-vertex colours). Draw it wireframe (`glPolygonMode`) and solid side by side in one window (two viewports via `glViewport` + scissor). Screenshot both.
+
+</div>
+
+---
+
+## Week 2: Colours and Light
+
+Colour is physics (spectra) mapped through biology (cones) into numbers (RGB) — and every step can surprise you.
+
+### Colour Spaces
+
+| Space | Channels | Use |
+|-------|----------|-----|
+| sRGB | R,G,B (gamma-encoded) | Displays, textures |
+| Linear RGB | R,G,B (physical light) | Lighting math — convert before shading! |
+| HSV/HSL | Hue, saturation, value | UI pickers |
+| CIE XYZ / Lab | Perceptual | Colour difference metrics |
+
+> **Rule:** Do lighting in linear space, store/display in sRGB. Forgetting the conversion washes out or crushes every render.
+
+### Light Components (Phong)
+
+`I = ambient + diffuse·max(N·L,0) + specular·max(R·V,0)^shininess` — Blinn-Phong replaces `R·V` with `N·H` (half-vector), cheaper and smoother.
+
+### Gamma
+
+```glsl
+// sRGB <-> linear helpers (fragment shader)
+vec3 toLinear(vec3 c) { return pow(c, vec3(2.2)); }
+vec3 toSRGB(vec3 c)   { return pow(c, vec3(1.0 / 2.2)); }
+```
+
+```glsl
+// Blinn-Phong fragment shader (linear space lighting)
+#version 330 core
+in vec3 vN; in vec3 vPos; in vec2 vUV;
+out vec4 FragColor;
+uniform vec3 uLightPos, uViewPos, uLightColor, uAlbedo;
+uniform float uShininess;
+void main() {
+    vec3 N = normalize(vN), L = normalize(uLightPos - vPos);
+    vec3 V = normalize(uViewPos - vPos), H = normalize(L + V);
+    float diff = max(dot(N, L), 0.0);
+    float spec = pow(max(dot(N, H), 0.0), uShininess);
+    vec3 lin = uAlbedo * (0.1 + diff) * uLightColor + spec * uLightColor;
+    FragColor = vec4(pow(lin, vec3(1.0 / 2.2)), 1.0); // back to sRGB
+}
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Render the same lit sphere twice: once with and once without linear-space conversion. Capture both, then measure (eyeball + histogram) how mid-tones differ. Write 4 lines explaining which is correct and why textures need `GL_SRGB8_ALPHA8` handling.
+
+</div>
+
+---
+
+## Week 3: Modeling Tools — Autodesk Maya
+
+Maya organises everything as nodes in a dependency graph: transform nodes position, shape nodes hold geometry, shader nodes shade.
+
+### Interface Essentials
+
+- **Viewports** — persp/top/front/side, wireframe/shaded/X-ray toggles.
+- **Outliner / Hypergraph** — scene hierarchy vs full dependency graph.
+- **Channel Box + Attribute Editor** — fast numeric edits vs full node control.
+- **Shelf + Hotbox** — keep extrusion, bevel, bridge on speed-dial.
+
+### Core Primitive Workflow
+
+1. Create primitive (cube, cylinder, sphere) with sane subdivisions.
+2. Freeze transforms, delete history before export milestones.
+3. Model half + mirror (symmetry), keep quads, avoid n-gons on deforming parts.
+4. Name everything (`chr_hand_L_geo`); groups mirror the future rig.
+
+### Scene Hygiene Checklist
+
+| Check | Command / action |
+|-------|-----------------|
+| Frozen transforms | Modify → Freeze Transformations |
+| Clean history | Edit → Delete by Type → History |
+| No n-gons in bend areas | Mesh → Cleanup |
+| Units + grid | centimetres, power-of-two textures |
+| Named materials | `mat_metal_dark`, not `blinn3` |
+
+```mel
+// MEL: quick shelf setup sanity — list unnamed junk quickly
+ls -sl;
+print("Selected: " + `ls -sl`);
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Build a low-poly lantern from primitives only (cylinder body, torus rings, cone cap, emissive core): max 1500 quads, frozen transforms, clean history, named nodes. Submit shaded + wireframe viewport screenshots and the `.ma` file.
+
+</div>
+
+---
+
+## Week 4: Modeling of 3D Objects
+
+Good topology deforms, subdivides and shades predictably; bad topology fights every later step.
+
+### Mesh Rules
+
+- Prefer **quads**; triangles are acceptable on flat rigid parts; n-gons invite shading artefacts.
+- **Edge loops** follow muscles/joints (eyes, mouth, knuckles, elbows).
+- Even density: sudden subdivision jumps cause pinching under smoothing.
+- Poles (valence ≠ 4) belong on flat areas, never in bend zones.
+
+### NURBS vs Polygons
+
+| Aspect | NURBS | Polygons |
+|--------|-------|----------|
+| Surface | Exact smooth patches | Approximated facets |
+| Editing | CVs, weights, trim curves | Vertices, edges, sculpt |
+| Best for | Car bodies, bottles | Characters, game assets |
+| Export | Tessellate at render time | Direct to GPU |
+
+### UV Mapping Basics
+
+Unwrap with minimal stretching (checker preview!), pack islands with padding for mip bleeding, keep texel density uniform across hero parts.
+
+```mel
+// MEL: planar UV project + checker preview on selected mesh
+polyPlanarProjection -ch 1 -type Plane -i 1 -kir 0 ch;
+createRenderNode -asShader surfaceShader -n checkerMat;
+sets -renderable true -noSurfaceShader true -empty -name checkerSG;
+connectAttr -f checkerMat.outColor checkerSG.surfaceShader;
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Model a stylised hand (mitten + thumb is fine) with correct edge loops at two knuckles. Show wireframe close-ups of both joints plus a checker-textured shaded view proving distortion-free UVs. List your polycount and pole positions.
+
+</div>
+
+---
+
+## Week 5: Advanced Scripting with MEL
+
+MEL (and Maya Python) turn hours of clicking into one command: procedural cities, forests, batch renames, render automation.
+
+### MEL Essentials
+
+```mel
+// MEL: procedural column of boxes with decreasing size
+for ($i = 0; $i < 12; $i++) {
+    string $b[] = `polyCube -w 2 -h 0.5 -d 2 -n ("block_" + $i)`;
+    move -r 0 ($i * 0.55) 0 $b[0];
+    float $s = 1.0 - $i * 0.05;
+    scale -r $s 1 $s $b[0];
+}
+```
+
+### Python in Maya (Recommended for Logic)
+
+```python
+# Maya Python: rename a selection prefix + freeze transforms
+import maya.cmds as cmds
+sel = cmds.ls(sl=True) or []
+for i, o in enumerate(sel):
+    new = cmds.rename(o, f"prop_{i:02d}_geo")
+    cmds.makeIdentity(new, apply=True, t=1, r=1, s=1)
+print(f"renamed {len(sel)} nodes")
+```
+
+### Batch Patterns
+
+- Loop over `ls -type mesh`, apply cleanup, export each group as FBX.
+- Read a CSV of building footprints → extrude a city block.
+- Pre-render validation: check n-gons, missing UVs, unassigned materials.
+
+```mel
+// MEL: find meshes without shading assignment
+string $meshes[] = `ls -type mesh`;
+for ($m in $meshes) {
+    string $sg[] = `listConnections -type shadingEngine $m`;
+    if (size($sg) == 0) print("UNSHADED: " + $m + "\n");
+}
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Write a MEL/Python script generating aパラmetrised fence (posts + 2 rails, N segments, spacing/gate parameters via a tiny UI or arguments). Regenerate with 3 parameter sets and screenshot each. Submit script + screenshots.
+
+</div>
+
+---
+
+## Week 6: OpenGL Pipeline, Primitives and Structures
+
+Modern OpenGL = you own the buffers and shaders; the fixed function pipeline is gone.
+
+### Buffer Objects
+
+| Object | Holds | Notes |
+|--------|-------|-------|
+| VBO | Vertex attributes | `GL_STATIC_DRAW` vs `GL_DYNAMIC_DRAW` |
+| EBO | Indices | Saves memory, enables shared verts |
+| VAO | Attribute layout state | Bind once, draw many |
+| UBO/SSBO | Uniform blocks / storage | Camera data, particle arrays |
+| FBO | Off-screen targets | Post-processing, shadow maps |
+
+### Draw Path
+
+VAO bind → program use → uniforms → `glDrawElements` → vertex shader per vertex → clipping/culling → rasterisation → fragment shader per fragment → depth/stencil/blend → framebuffer.
+
+```c
+// Indexed quad + render loop skeleton
+GLuint VAO, VBO, EBO;
+float v[] = { /*pos(3) + color(3)*/ -0.5f,-0.5f,0, 1,0,0,  0.5f,-0.5f,0, 0,1,0,
+               0.5f,0.5f,0, 0,0,1,  -0.5f,0.5f,0, 1,1,0 };
+unsigned idx[] = {0,1,2, 2,3,0};
+// ... upload, attrib pointers (stride 6 floats) ...
+while (!glfwWindowShouldClose(win)) {
+    glClearColor(0.1f,0.1f,0.12f,1.0f); glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glUseProgram(prog); glBindVertexArray(VAO);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    glfwSwapBuffers(win); glfwPollEvents();
+}
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Render a spinning cube with per-face colours using an EBO (8 vertices, 36 indices). Add depth testing and back-face culling; demonstrate the visual difference with culling on/off via screenshots and one sentence each on what broke.
+
+</div>
+
+---
+
+## Week 7: OpenGL Shaders
+
+Shaders are small programs on the GPU: vertex (geometry transform), fragment (colour), plus optional geometry/tessellation/compute stages.
+
+### Stage Responsibilities
+
+| Stage | Input → Output | Typical job |
+|-------|---------------|-------------|
+| Vertex | attributes → clip pos + varyings | MVP transform, normals |
+| (Tessellation) | patches → denser mesh | Curve/surface subdivision |
+| (Geometry) | primitives → new primitives | Billboards, wireframe |
+| Fragment | interpolated varyings → colour | Lighting, texturing |
+| (Compute) | buffers → buffers | Particles, culling |
+
+### Uniforms and Varyings
+
+```glsl
+// vertex: MVP + normal matrix + UV passthrough
+#version 330 core
+layout (location = 0) in vec3 aPos;
+layout (location = 1) in vec3 aNormal;
+layout (location = 2) in vec2 aUV;
+out vec3 vN; out vec3 vPos; out vec2 vUV;
+uniform mat4 uModel, uView, uProj;
+void main() {
+    vec4 world = uModel * vec4(aPos, 1.0);
+    vPos = world.xyz;
+    vN = mat3(transpose(inverse(uModel))) * aNormal;
+    vUV = aUV;
+    gl_Position = uProj * uView * world;
+}
+```
+
+```glsl
+// fragment: texture * Blinn-Phong (pairs with vertex above)
+#version 330 core
+in vec3 vN; in vec3 vPos; in vec2 vUV;
+out vec4 FragColor;
+uniform sampler2D uTex; uniform vec3 uLightPos, uViewPos;
+void main() {
+    vec3 albedo = texture(uTex, vUV).rgb;
+    vec3 N = normalize(vN), L = normalize(uLightPos - vPos);
+    vec3 V = normalize(uViewPos - vPos), H = normalize(L + V);
+    float dif = max(dot(N, L), 0.0), spec = pow(max(dot(N, H), 0.0), 64.0);
+    FragColor = vec4(albedo * (0.08 + dif) + spec * 0.4, 1.0);
+}
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Add a `uMode` uniform switching between (0) full lighting, (1) normals visualisation (`N*0.5+0.5`), (2) UV visualisation. Screenshot all three modes on the same mesh and explain in two lines what each debug view reveals.
+
+</div>
+
+---
+
+## Week 8: Curves
+
+Curves define paths, profiles, animations — and surfaces are just curves swept through space.
+
+### Bézier Essentials
+
+Cubic Bézier: `B(t) = (1−t)³P0 + 3(1−t)²tP1 + 3(1−t)t²P2 + t³P3`. de Casteljau evaluates stably; Bernstein form differentiates cleanly. B-splines join segments with continuity control; NURBS add weights (exact circles/conics).
+
+### Continuity Ladder
+
+| Level | Guarantees | Visible artefact if broken |
+|-------|-----------|---------------------------|
+| C⁰/G⁰ | Points meet | Crack |
+| C¹/G¹ | Tangents align | Shading seam / velocity jump |
+| C² | Curvature continuous | Reflection wobble |
+
+```python
+# Cubic Bezier evaluation (de Casteljau) — also handy for CPU-side tessellation
+def bezier(p0, p1, p2, p3, t):
+    a = tuple((1-t)*a + t*b for a, b in zip(p0, p1))
+    b = tuple((1-t)*a + t*b for a, b in zip(p1, p2))
+    c = tuple((1-t)*a + t*b for a, b in zip(p2, p3))
+    d = tuple((1-t)*a + t*b for a, b in zip(a, b))
+    e = tuple((1-t)*a + t*b for a, b in zip(b, c))
+    return tuple((1-t)*a + t*b for a, b in zip(d, e))
+
+print([round(bezier((0,0),(1,2),(3,2),(4,0),t)[0], 2) for t in (0, .5, 1)])
+```
+
+```glsl
+// Tessellation evaluation shader idea (eval along u, patches from control points)
+#version 410 core
+layout(isolines) in;
+uniform mat4 uMVP;
+void main() {
+    float u = gl_TessCoord.x;
+    vec4 p0 = gl_in[0].gl_Position, p1 = gl_in[1].gl_Position;
+    vec4 p2 = gl_in[2].gl_Position, p3 = gl_in[3].gl_Position;
+    vec4 p = (1.-u)*(1.-u)*(1.-u)*p0 + 3.*(1.-u)*(1.-u)*u*p1
+           + 3.*(1.-u)*u*u*p2 + u*u*u*p3;
+    gl_Position = uMVP * p;
+}
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Implement Catmull-Rom → Bézier conversion for a 5-point path, tessellate at 8/32/128 segments, and render or plot all three. Report max deviation of the 8-segment version from the 128-segment reference. One figure + numbers.
+
+</div>
+
+---
+
+## Week 9: Textures
+
+Textures are functions over surfaces: colour today, normals/roughness/AO tomorrow.
+
+### Sampling Pipeline
+
+UV → wrap (repeat/mirror/clamp) → min/mag filter → mipmap level → texel → (sRGB decode) → shader.
+
+| Choice | Options | Avoid |
+|--------|---------|-------|
+| Min filter | Nearest / linear / mipmap variants | Non-mipmapped minification (shimmer) |
+| Mipmaps | Generated, bias-tunable | Missing mips on NPOT without support |
+| Anisotropy | 1–16× | Grazing-angle blur without it |
+| Seams | Padding, mirrored UVs | Bleeding across atlas neighbours |
+
+```c
+// Texture upload with mipmaps + anisotropy (stb_image assumed)
+int w, h, ch; unsigned char *px = stbi_load("brick.png", &w, &h, &ch, 4);
+GLuint tex; glGenTextures(1, &tex); glBindTexture(GL_TEXTURE_2D, tex);
+glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB8_ALPHA8, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, px);
+glGenerateMipmap(GL_TEXTURE_2D);
+glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+float maxAniso = 0; glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY, &maxAniso);
+glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY, maxAniso > 8 ? 8 : maxAniso);
+stbi_image_free(px);
+```
+
+```glsl
+// Normal mapping fragment excerpt (TBN assumed from vertex stage)
+vec3 nTex = texture(uNormalMap, vUV).rgb * 2.0 - 1.0;
+vec3 N = normalize(TBN * nTex); // perturb, then light as usual
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Texture a cube with a checker image at min filters (nearest / linear / mipmap-linear) viewed at a grazing angle. Screenshot all three, then enable 8× anisotropy on the best and screenshot again. Describe aliasing differences in 3 sentences.
+
+</div>
+
+---
+
+## Week 10: Transformations
+
+One matrix chain rules every vertex: `clip = P · V · M · position`.
+
+### Homogeneous Matrices
+
+| Transform | 4×4 form | Notes |
+|-----------|----------|-------|
+| Translation | Identity + `t` in last column | Order matters! |
+| Rotation | 3×3 orthonormal | Use quaternions to compose/lerp |
+| Scale | Diagonal | Non-uniform breaks normals (use normal matrix) |
+| Projection | Perspective / ortho | Bakes depth mapping |
+
+### Composition Order (Column-Major GLM)
+
+```c
+// C / GLM-style: orbit camera + spinning model
+mat4 model = rotate_y(time) * translate(2.0f, 0.0f, 0.0f) * scale(0.5f);
+mat4 view  = look_at(eye, center, up);
+mat4 proj  = perspective(radians(45.0f), aspect, 0.1f, 100.0f);
+mat4 mvp   = proj * view * model;
+glUniformMatrix4fv(uMVP, 1, GL_FALSE, mvp.data);
+```
+
+```glsl
+// Normal matrix done right (non-uniform scale safe)
+vN = mat3(transpose(inverse(uModel))) * aNormal;
+```
+
+### Quaternions in Brief
+
+Compact, gimbal-lock-free rotations; `slerp` interpolates orientations smoothly — the backbone of skeletal animation (Week 13).
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Build a 3-joint robot arm with hierarchical matrices (shoulder → elbow → wrist). Drive joints with sliders/keys and verify that moving the shoulder moves the whole chain while the wrist moves only the gripper. Submit code + two poses screenshots.
+
+</div>
+
+---
+
+## Week 11: Screening
+
+"Screening" here = everything between clip space and pixels: clipping, viewport mapping, culling, depth/stencil, blending and picking.
+
+### Clip → Screen Chain
+
+1. **Clipping** — Cohen–Sutherland (lines) / Sutherland–Hodgman (polygons) against the view volume.
+2. **Perspective divide** — `/w` → NDC.
+3. **Viewport transform** — NDC → window pixels (`glViewport`).
+4. **Per-fragment tests** — scissor → stencil → depth → blending → framebuffer.
+
+### Culling and Depth
+
+| Technique | Culls | Cost |
+|-----------|-------|------|
+| Back-face culling | Wrong-winding triangles | Free-ish, needs consistent winding |
+| Frustum culling (CPU) | Off-screen objects | Bounding-volume tests |
+| Occlusion culling | Hidden objects | Queries / Hi-Z |
+| Depth test | Hidden fragments | Per-fragment, hardware-fast |
+
+```c
+// Viewport split + picking via scissor + unproject
+glViewport(0, 0, w/2, h);          // left: solid
+// draw scene...
+glViewport(w/2, 0, w/2, h);        // right: wireframe overlay
+glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+// draw scene again...
+// picking: read depth + unproject
+float depth; glReadPixels(mx, my, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth);
+// world = inverse(P*V) * vec4(ndcX, ndcY, depth*2-1, 1); divide by w
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Implement mouse picking on 3 cubes (ray from `unproject`, closest AABB hit). Highlight the picked cube and print its name + distance. Demonstrate with a screenshot and a 3-line description of your ray construction.
+
+</div>
+
+---
+
+## Week 12: Projection, Shadows and Shading
+
+Projection shapes perception (perspective drama vs CAD precision); shadows anchor objects; shading models sell materials.
+
+### Projection Methods
+
+| Projection | Matrix character | Use |
+|------------|-----------------|-----|
+| Perspective | Converging, `w = −z` | Games, film |
+| Orthographic | Parallel, no foreshortening | CAD, UI, shadow maps (directional) |
+| Oblique | Sheared ortho | Technical illustration |
+| Fisheye/curvilinear | Non-linear (custom shader) | VR, stylised |
+
+### Shadow Mapping in Two Passes
+
+1. Render depth from the light into a texture.
+2. In the main pass, transform fragments into light space; compare depth (with bias + PCF filtering).
+
+```glsl
+// Pass 2 fragment: PCF shadow lookup
+#version 330 core
+uniform sampler2DShadow uShadowMap;
+in vec4 vLightSpace;
+float shadowFactor() {
+    vec3 coord = vLightSpace.xyz / vLightSpace.w * 0.5 + 0.5;
+    float sum = 0.0;
+    vec2 texel = 1.0 / textureSize(uShadowMap, 0);
+    for (int x = -1; x <= 1; ++x)
+        for (int y = -1; y <= 1; ++y)
+            sum += texture(uShadowMap, vec3(coord.xy + vec2(x, y) * texel, coord.z - 0.001));
+    return sum / 9.0;
+}
+```
+
+### Shading Models Compared
+
+| Model | Cost | Strength |
+|-------|------|----------|
+| Flat | 1 normal/face | Faceted style |
+| Gouraud | Per-vertex lighting | Cheap, misses speculars |
+| Phong/Blinn-Phong | Per-fragment | Classic balanced |
+| PBR (metal/rough) | Textures + IBL | Physical plausibility |
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Add a 3×3 PCF shadow map (1024²) to your scene with a bias uniform. Demonstrate acne (bias too small) vs peter-panning (bias too large) with two screenshots, then pick the working value and justify it in two lines.
+
+</div>
+
+---
+
+## Week 13: Animation
+
+Animation = change over time done convincingly: interpolation for rigid motion, skinning for characters, simulation for secondaries.
+
+### Keyframes and Interpolation
+
+| Interpolant | Continuity | Use |
+|-------------|-----------|-----|
+| Lerp | C⁰ | Positions, colours |
+| Slerp (quats) | Constant angular velocity | Orientations |
+| Smoothstep/ease | Eased ends | UI, camera moves |
+| Cubic/Hermite splines | C¹–C² | Camera paths, trajectories |
+
+### Skeletal Skinning (Linear Blend)
+
+`v' = Σ w_i · B_i · v` — each vertex follows a weighted mix of bone matrices; normalise weights, keep ≤ 4 influences for GPUs.
+
+```glsl
+// GPU skinning vertex excerpt (max 4 bones)
+#version 330 core
+layout(location=0) in vec3 aPos;
+layout(location=3) in ivec4 aBones;
+layout(location=4) in vec4 aWeights;
+uniform mat4 uBones[64]; uniform mat4 uMVP;
+void main() {
+    mat4 skin = aWeights.x * uBones[aBones.x] + aWeights.y * uBones[aBones.y]
+              + aWeights.z * uBones[aBones.z] + aWeights.w * uBones[aBones.w];
+    gl_Position = uMVP * skin * vec4(aPos, 1.0);
+}
+```
+
+### Secondaries and Particles
+
+Cloth/hair: verlet integration + constraints. Particles: spawn → integrate → fade, all in a compute/vertex shader for thousands of sparks, smoke, rain.
+
+```c
+// CPU animation clock: loop, ping-pong, ease
+float t = fmod(time, duration) / duration;      // loop 0..1
+float e = t * t * (3.0f - 2.0f * t);            // smoothstep ease
+vec3 pos = mix(keyA, keyB, e);
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Animate a bouncing ball with squash-and-stretch (scale Y down on impact, ease-out on rise) plus a GPU particle puff on each bounce. Submit a short screen recording or 3-frame strip and the easing function used.
+
+</div>
+
+---
+
+## Assignment Requirements
+
+### Maya Task
+
+<div class="checklist">
+
+- [ ] Original model (primitives + extrusions, quads, clean history)
+- [ ] UV unwrap with checker proof, named materials
+- [ ] Turntable render (3 angles or short clip)
+- [ ] Scene file + 1-page workflow note
+
+</div>
+
+### OpenGL Mini-Project
+
+<div class="checklist">
+
+- [ ] Compiles from a README (libraries + commands listed)
+- [ ] MVP transforms + orbit/fly camera
+- [ ] Custom GLSL lighting (uniform-driven) + texture with mipmaps
+- [ ] Keyboard/mouse interaction + one animation
+- [ ] Live defence: explain vertex→fragment data flow
+
+</div>
+
+---
+
+## Code Review Guide
+
+### What to Look For
+
+1. **Space correctness** — lighting in linear, normals via normal matrix, MVP order.
+2. **Resource hygiene** — VAO/VBO/texture creation paired with deletion; no per-frame re-uploads.
+3. **Shader robustness** — precision, uniform locations checked, compile logs printed.
+4. **Topology/UV quality** — quads, no stretching, mips + anisotropy.
+5. **Determinism** — `dt`-based animation, aspect-correct projection on resize.
+
+<div class="review-note">
+
+<strong>🔍 Practice Review:</strong> Identify issues in this code:
+
+```glsl
+// fragment: "simple lighting"
+void main() {
+    vec3 N = vN; // not normalised, interpolated
+    float d = dot(N, uLightDir); // light dir not normalised, no max()
+    FragColor = vec4(uColor * d, 1.0); // texture ignored, negative light, no gamma
+}
+```
+
+**Issues:** unnormalised interpolated normal; negative diffuse (missing `max`); unnormalised light vector; albedo/texture ignored; linear output shown as sRGB. Fix with normalisation, `max(dot,0)`, texture multiply and gamma encode.
+
+</div>
+
+---
+
+## Exam Preparation
+
+### Key Topics to Review
+
+| Week | Topic | Key Concepts |
+|------|-------|--------------|
+| 1 | Intro | Pipeline, spaces, rasterisation |
+| 2 | Colour/light | sRGB vs linear, Phong/Blinn-Phong |
+| 3–4 | Maya/modeling | Nodes, quads, UVs |
+| 5 | MEL | Procedural generation |
+| 6–7 | OpenGL/shaders | VAO/VBO, GLSL stages, uniforms |
+| 8 | Curves | Bézier, continuity, NURBS |
+| 9 | Textures | Filtering, mipmaps, normal maps |
+| 10 | Transforms | MVP, quaternions |
+| 11 | Screening | Clipping, viewport, picking |
+| 12 | Projection/shadows | Shadow maps, shading models |
+| 13 | Animation | Keyframes, skinning, particles |
+
+<div class="exercise-box">
+
+<strong>📝 Sample Exam Questions:</strong>
+
+1. Trace a vertex through every space from model to screen, naming each matrix.
+2. Why must lighting happen in linear space? Where do conversions occur?
+3. Derive cubic Bézier from de Casteljau; explain C¹ vs G¹.
+4. Explain shadow-map acne and peter-panning; how do bias and PCF help?
+5. Write the linear-blend skinning equation and explain weight rules.
+
+</div>
+
+---
+
+## Quick Reference Cards
+
+### MVP / Lighting One-Liners
+
+```glsl
+gl_Position = uProj * uView * uModel * vec4(aPos, 1.0);
+vN = mat3(transpose(inverse(uModel))) * aNormal;
+float dif = max(dot(N, L), 0.0);
+float spec = pow(max(dot(N, H), 0.0), uShininess);
+```
+
+### OpenGL State Cheatsheet
+
+```c
+glEnable(GL_DEPTH_TEST); glEnable(GL_CULL_FACE);
+glCullFace(GL_BACK); glFrontFace(GL_CCW);
+glViewport(0, 0, w, h);
+glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); // or GL_LINE
+```
+
+### MEL / Transform Snippets
+
+```mel
+polyCube -w 2 -h 1 -d 1 -n myBox;
+move -r 0 2 0 myBox; scale -r 1 2 1 myBox;
+```
+
+---
+
+*End of Course Documentation*
+
+**Last Updated:** 2026-09-20
+**Course Code:** KST/NNPG3
+**Credits:** 5 | Completion: Zk+ | Elective B

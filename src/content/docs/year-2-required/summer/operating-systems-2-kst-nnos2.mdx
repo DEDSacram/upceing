@@ -1,0 +1,859 @@
+---
+title: Operating Systems 2 (KST/NNOS2)
+description: Complete course materials for Windows architecture, administration, and scripting
+template: doc
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+# Operating Systems 2 (KST/NNOS2)
+
+Welcome to the Operating Systems 2 course! This documentation covers the Windows operating system from theory to administration: architecture and editions, processes and threads, virtual memory, filesystems, user interfaces, registry, networking, WMI, IIS, Windows Server, security, scripting, and the UWP/API platform.
+
+---
+
+## 📑 Table of Contents
+
+### Course Overview
+
+- [Course Objectives](#course-objectives)
+- [Assessment & Credit Requirements](#assessment--credit-requirements)
+- [Examination Structure](#examination-structure)
+- [Schedule](#schedule)
+
+### Lecture Materials (Weeks 1-13)
+
+1. [Windows Architectures and Editions](#week-1-windows-architectures-and-editions)
+2. [Processes, Threads, IPC](#week-2-processes-threads-ipc)
+3. [Virtual Memory, LAP, FAP](#week-3-virtual-memory-lap-fap)
+4. [Filesystems and Storage](#week-4-filesystems-and-storage)
+5. [CLI, GUI, Alternative Interfaces](#week-5-cli-gui-alternative-interfaces)
+6. [Windows Registry](#week-6-windows-registry)
+7. [Network Management](#week-7-network-management)
+8. [WMI](#week-8-wmi)
+9. [IIS](#week-9-iis)
+10. [Windows Server Administration](#week-10-windows-server-administration)
+11. [Security and Malware](#week-11-security-and-malware)
+12. [Batch and PowerShell](#week-12-batch-and-powershell)
+13. [UWP and Windows API](#week-13-uwp-and-windows-api)
+
+### Assignments & Exam
+
+- [Assignment Requirements](#assignment-requirements)
+- [Code Review Guide](#code-review-guide)
+- [Exam Preparation](#exam-preparation)
+
+---
+
+## Course Overview
+
+### Course Objectives
+
+<span class="badge">Core</span> <span class="badge info">Profilujici</span>
+
+By the end of this course students will be able to:
+
+- **Describe Windows architecture** — kernel vs user mode, editions, key subsystems.
+- **Manage processes and threads** — multitasking, multithreading, IPC mechanisms.
+- **Explain virtual memory** — paging, LAP/FAP address spaces, pagefile sizing.
+- **Administer filesystems** — NTFS/ReFS features, quotas, BitLocker, Storage Spaces.
+- **Use CLI and GUI** — cmd, PowerShell, Task Manager,MMC snap-ins, accessibility options.
+- **Work with the registry** — hives, keys, value types, safe editing and backup.
+- **Configure networking** — Netsh, firewall, Remote Desktop, shares.
+- **Query WMI/CIM** — local and remote inventory and management.
+- **Deploy IIS and Windows Server** — sites, app pools, roles, Active Directory basics.
+- **Harden security** — accounts, UAC, Defender, malware response.
+- **Write batch and PowerShell scripts** — automation of routine admin tasks.
+- **Describe UWP/Win32 API** — app models and the Windows API surface.
+
+### Assessment & Credit Requirements
+
+<div class="exercise-box">
+
+<strong>📋 To receive credit, students must:</strong>
+
+1. Complete the **lab tasks** (Windows configuration, scripting, and service setup).
+2. Submit the **semester assignment** (scripted administration solution + documentation).
+3. Defend the assignment in a short review before the exam.
+
+</div>
+
+### Examination Structure
+
+#### In-Person Format
+
+1. **Written test** — theory (architecture, memory, filesystems, security) and short admin tasks.
+2. **Practical check** — PowerShell/CLI task on a lab machine or VM.
+
+#### Distance Format
+
+1. **Oral examination** — theoretical questions plus a live scripting/config task.
+
+#### Passing Criteria
+
+- **Minimum 60%** overall; assignment must be accepted before the exam.
+
+### Schedule
+
+| Week | Lecture Topic | Exercise Focus |
+|------|---------------|----------------|
+| 1 | Windows architectures, editions | Edition comparison |
+| 2 | Processes, threads, IPC | Task Manager, handles |
+| 3 | Virtual memory, LAP, FAP | Pagefile, mapping |
+| 4 | Filesystems, storages | NTFS permissions |
+| 5 | CLI/GUI, alternative UIs | Shortcuts, automation |
+| 6 | Registry | Keys, backup |
+| 7 | Network, Netsh, RDP | Firewall, shares |
+| 8 | WMI | Inventory queries |
+| 9 | IIS | Site deployment |
+| 10 | Windows Server admin | Roles, AD basics |
+| 11 | Security, malware | Hardening checklist |
+| 12 | Batch, PowerShell | Scripting lab |
+| 13 | UWP, Windows API | App model demo |
+
+---
+
+## Week 1: Windows Architectures and Editions
+
+Modern Windows is a hybrid-kernel, preemptively multitasked OS. User applications run in user mode; the kernel, executive, HAL, and drivers run in kernel mode. Win32/WinRT subsystems expose the API surface.
+
+### Key Concepts
+
+#### 1. Architecture Layers
+
+- **HAL** — abstracts hardware differences for the kernel.
+- **Kernel + Executive** — scheduling, memory management, I/O, object manager, security reference monitor.
+- **Drivers** — kernel-mode extensions for devices and filesystems.
+- **Subsystems** — Win32, WinRT/UWP APIs consumed by applications.
+
+#### 2. Editions and New Features
+
+| Edition | Target | Notes |
+|---------|--------|-------|
+| **Home** | Consumers | No domain join, BitLocker limits |
+| **Pro** | Power users, SMB | BitLocker, Hyper-V, RDP host |
+| **Enterprise/Education** | Organisations | AppLocker, DirectAccess-era features |
+| **Server** | Datacentre workloads | Roles, failover, no Store apps |
+
+#### 3. 32-bit vs 64-bit
+
+- x64 Windows runs native 64-bit plus 32-bit apps via WOW64.
+- Check with `systeminfo` or PowerShell `[Environment]::Is64BitOperatingSystem`.
+
+### Example: Identify the System
+
+```powershell
+# PowerShell: edition, build, architecture.
+Get-ComputerInfo | Select-Object WindowsProductName, WindowsVersion, OsArchitecture
+
+# Classic CLI equivalent.
+systeminfo | findstr /C:"OS Name" /C:"System Type"
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> On a lab VM run both commands above and record: edition, build, and architecture. Then state one feature your edition lacks compared to the next higher edition, and where you verified it.
+
+</div>
+
+---
+
+## Week 2: Processes, Threads, IPC
+
+A process is an isolated address space plus resources; threads are the schedulable units inside a process. Windows schedules threads preemptively with priorities 0–31. Processes communicate via pipes, mailslots, shared memory, sockets, COM/RPC, and window messages.
+
+### Key Concepts
+
+#### 1. Multitasking and Multithreading
+
+- **Preemptive multitasking** — scheduler interrupts threads; no voluntary yield needed.
+- **Thread states** — ready, running, waiting; context switches save registers and stack.
+- **Affinity and priority** — pin threads to CPUs or boost foreground responsiveness.
+
+#### 2. Handles and Job Objects
+
+- Processes access resources through **handles** (files, registry keys, events).
+- **Job objects** group processes to enforce CPU/memory limits together.
+
+#### 3. IPC Mechanisms
+
+| Mechanism | Scope | Typical use |
+|-----------|-------|-------------|
+| Named pipes | Local/remote | Service ↔ client channels |
+| Shared memory / mapped files | Local | High-throughput data |
+| Sockets | Network | Cross-machine services |
+| COM / RPC | Local/remote | Component calls |
+
+### Example: Inspect and Control Processes
+
+```powershell
+# Top CPU consumers, then stop a hung notepad (lab only!).
+Get-Process | Sort-Object CPU -Descending | Select-Object -First 5 Name, Id, CPU
+Stop-Process -Name notepad -WhatIf
+
+# Threads of a process.
+Get-Process -Name explorer | Select-Object -ExpandProperty Threads | Select-Object -First 3 Id, ThreadState, WaitReason
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Find a process with the most threads on your machine, note its handle count, and explain in two sentences why a browser or IDE legitimately has hundreds of threads and handles.
+
+</div>
+
+---
+
+## Week 3: Virtual Memory, LAP, FAP
+
+Each process gets a private virtual address space (LAP — logical address space view per process); the memory manager maps it onto physical frames (FAP — physical address space / frames). Paging moves fixed-size pages between RAM and the pagefile.
+
+### Key Concepts
+
+#### 1. Paging Essentials
+
+- **Page** (usually 4 KB) — unit of virtual memory; **frame** — the physical slot.
+- **Pagefault** — the page is not resident; the manager pages it in (hard fault = disk read).
+- **Working set** — pages a process actively touches; **thrashing** — excessive paging when RAM is overcommitted.
+
+#### 2. LAP vs FAP
+
+- **LAP** — per-process linear/logical address space (e.g. 128 TB user space on x64).
+- **FAP** — machine-wide physical frames plus pagefile extents backing them.
+- Page tables (PML4 → PDPT → PD → PT on x64) translate LAP addresses to FAP frames.
+
+#### 3. Sizing and Monitoring
+
+- Keep the pagefile system-managed unless you have a measured reason.
+- Watch committed bytes vs limit, hard faults/sec, and pool usage in Performance Monitor.
+
+### Example: Memory Counters
+
+```powershell
+# OS memory summary via CIM.
+Get-CimInstance Win32_OperatingSystem | Select-Object TotalVisibleMemorySize, FreePhysicalMemory
+
+# Pagefile configuration.
+Get-CimInstance Win32_PageFileSetting | Select-Object Name, InitialSize, MaximumSize
+
+# Top working sets.
+Get-Process | Sort-Object WorkingSet64 -Descending | Select-Object -First 5 Name, @{n='WS_MB';e={[math]::Round($_.WorkingSet64/1MB,1)}}
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Record total vs free RAM and current pagefile sizes on your VM. Then open a large application, re-measure its working set, and explain which numbers changed and why in terms of LAP/FAP mapping.
+
+</div>
+
+---
+
+## Week 4: Filesystems and Storage
+
+NTFS is the default Windows filesystem (journaling, ACLs, encryption, compression, quotas, hard/symbolic links, ADS). ReFS targets large data volumes with integrity streams; FAT32/exFAT remain for removable media. Storage Spaces and Disk Management pool physical disks.
+
+### Key Concepts
+
+#### 1. NTFS Features
+
+- **Permissions (ACLs)** — allow/deny per user/group, inherited unless blocked.
+- **EFS** — per-file encryption; **BitLocker** — full-volume encryption.
+- **Quotas, compression, ADS** (alternate data streams), shadow copies (VSS).
+
+#### 2. ReFS vs NTFS vs exFAT
+
+| FS | Strength | Weakness |
+|----|----------|----------|
+| NTFS | General purpose, mature | No block-level checksums |
+| ReFS | Integrity, huge volumes | Fewer features (no EFS/compression historically) |
+| exFAT | Interoperable, flash media | No journaling/ACLs |
+
+#### 3. Storage Management
+
+- **Basic vs dynamic disks**, GPT vs MBR partitioning.
+- **Storage Spaces** — mirror/parity pools; **Disk Management / diskpart** for provisioning.
+
+### Example: Permissions and Volume Info
+
+```powershell
+# ACL of a folder.
+Get-Acl C:\LabShare | Select-Object -ExpandProperty Access | Select-Object IdentityReference, FileSystemRights, AccessControlType
+
+# Volumes and filesystems.
+Get-Volume | Select-Object DriveLetter, FileSystem, SizeRemaining, Size
+
+# Classic CLI: show NTFS permissions.
+icacls C:\LabShare
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Create `C:\LabShare`, grant read-only access to one local user and modify to another using `icacls` or the Security tab. Show the resulting ACL and explain what inheritance does to a new file inside.
+
+</div>
+
+---
+
+## Week 5: CLI, GUI, Alternative Interfaces
+
+Admins live in both worlds: the GUI (Settings, Task Manager, MMC, File Explorer) for discovery and the CLI (`cmd`, PowerShell, Windows Terminal) for repeatability. Accessibility, Narrator, Magnifier, and keyboard-first operation count as alternative interfaces.
+
+### Key Concepts
+
+#### 1. CLI Choices
+
+- **cmd.exe** — legacy batch interpreter; still present for compatibility.
+- **PowerShell** — object pipeline, remoting, modules; the default automation shell.
+- **Windows Terminal** — tabs, panes, profiles for cmd/PowerShell/WSL.
+
+#### 2. GUI Admin Consoles
+
+- **MMC snap-ins** — `services.msc`, `eventvwr.msc`, `diskmgmt.msc`, `gpedit.msc`.
+- **Task Manager / Resource Monitor** — processes, performance, startup apps.
+
+#### 3. Alternative Access
+
+- Narrator, Magnifier, high-contrast, voice access, on-screen keyboard.
+- Remote options (RDP, Quick Assist) covered in Week 7.
+
+### Example: Same Task, GUI vs CLI
+
+```powershell
+# List services set to Automatic but not running (one-liner an auditor can re-run).
+Get-Service | Where-Object { $_.StartType -eq 'Automatic' -and $_.Status -ne 'Running' } | Select-Object Name, Status
+
+# Export the list for the ticket.
+Get-Service | Where-Object { $_.StartType -eq 'Automatic' -and $_.Status -ne 'Running' } | Export-Csv .\auto_stopped.csv -NoTypeInformation
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Perform one admin task both ways: disable a startup app in Task Manager, then do the equivalent service check above in PowerShell. State which approach is auditable/repeatable and why.
+
+</div>
+
+---
+
+## Week 6: Windows Registry
+
+The registry is a hierarchical configuration database: hives (HKLM, HKCU, HKCR, HKU, HKCC) contain keys, subkeys, and values with types (REG_SZ, REG_DWORD, REG_QWORD, REG_BINARY, REG_MULTI_SZ, REG_EXPAND_SZ). Tools: Registry Editor, `reg.exe`, PowerShell drives (`HKLM:`, `HKCU:`).
+
+### Key Concepts
+
+#### 1. Structure
+
+- **HKLM** — machine-wide settings; **HKCU** — current user profile.
+- **HKCR** — file associations / COM registration (merged view).
+- **HKU / HKCC** — loaded user hives and current hardware profile.
+
+#### 2. Value Types
+
+| Type | Holds | Example |
+|------|-------|---------|
+| REG_SZ | Fixed string | App path |
+| REG_EXPAND_SZ | String with %VAR% | `%SystemRoot%\sys` |
+| REG_DWORD | 32-bit number | Enabled = 1 |
+| REG_QWORD | 64-bit number | Large counters |
+| REG_MULTI_SZ | String array | Search paths |
+
+#### 3. Safe Management
+
+- Back up the key before editing (export `.reg`); prefer Group Policy over raw edits.
+- Document every manual change; test on a non-production VM first.
+
+> **Rule:** A wrong registry edit can make the system unbootable. Export first, change second.
+
+### Example: Read, Write, Back Up
+
+```powershell
+# Read a value via the registry drive.
+Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion' | Select-Object ProductName, CurrentBuild
+
+# Safe write to HKCU (lab key) + export backup.
+New-Item -Path HKCU:\Software\LabDemo -Force | Out-Null
+New-ItemProperty -Path HKCU:\Software\LabDemo -Name Greeting -Value 'Hello' -PropertyType String -Force
+reg export HKCU\Software\LabDemo C:\Temp\labdemo_backup.reg /y
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Create `HKCU:\Software\LabDemo`, add a `REG_DWORD` value `Level = 3`, export the key, delete it, then re-import the `.reg` backup. Show the commands and verify the value after restore.
+
+</div>
+
+---
+
+## Week 7: Network Management
+
+Windows networking is managed via Settings, `netsh`, `ipconfig`, PowerShell `NetTCPIP`/`NetSecurity` modules, Windows Firewall, network shares (SMB), and Remote Desktop. `netsh` remains the Swiss-army knife for interface, firewall, WLAN, and Winsock repairs.
+
+### Key Concepts
+
+#### 1. Everyday Tools
+
+- `ipconfig`, `ping`, `tracert`, `nslookup`/`Resolve-DnsName` for diagnostics.
+- `netsh interface ip show config` for interface dumps; `netsh winsock reset` for stack repair.
+- PowerShell: `Get-NetIPAddress`, `Get-NetRoute`, `Test-NetConnection`.
+
+#### 2. Firewall and Sharing
+
+- **Windows Defender Firewall** — inbound/outbound rules per profile (Domain/Private/Public).
+- **SMB shares** — `New-SmbShare`, NTFS + share permissions combine (most restrictive wins).
+
+#### 3. Remote Desktop
+
+- Enable per-machine; Network Level Authentication recommended; expose only through VPN/gateway.
+
+### Example: Netsh, Firewall, Share
+
+```powershell
+# Interface addresses + connectivity test.
+Get-NetIPAddress -AddressFamily IPv4 | Select-Object InterfaceAlias, IPAddress
+Test-NetConnection example.com -Port 443 | Select-Object ComputerName, TcpTestSucceeded
+
+# Classic netsh equivalents.
+netsh interface ip show config
+netsh advfirewall firewall show rule name=all | Select-String 'Rule Name'
+
+# Lab-only share creation.
+New-SmbShare -Name LabShare -Path C:\LabShare -ReadAccess 'Everyone'
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Use `netsh` to display your interface config, add a firewall rule allowing TCP 8080 for a lab app, verify it, then remove the rule. Record each command and its output.
+
+</div>
+
+---
+
+## Week 8: WMI
+
+Windows Management Instrumentation (WMI) — and its modern successor CIM — exposes management data as queryable classes (`Win32_*`) over local and remote machines. Use `Get-CimInstance` (preferred, WS-MAN) or legacy `Get-WmiObject`, plus CIM sessions for remoting.
+
+### Key Concepts
+
+#### 1. CIM vs WMI Cmdlets
+
+| Cmdlet family | Protocol | Notes |
+|---------------|----------|-------|
+| `Get-WmiObject` | DCOM | Legacy, kept for compatibility |
+| `Get-CimInstance` | WS-MAN/DCOM | Modern, remoting-friendly |
+
+#### 2. Useful Classes
+
+- `Win32_OperatingSystem` — version, memory, boot time.
+- `Win32_Process`, `Win32_Service` — runtime state.
+- `Win32_LogicalDisk`, `Win32_NetworkAdapterConfiguration` — storage and networking.
+
+#### 3. Remote Queries
+
+- Create a `CimSession` with credentials; query many machines in a loop; always handle access-denied and firewall blocks (WinRM).
+
+### Example: Local and Remote Inventory
+
+```powershell
+# OS + disks + services in one sweep.
+Get-CimInstance Win32_OperatingSystem | Select-Object Caption, Version, LastBootUpTime
+Get-CimInstance Win32_LogicalDisk -Filter "DriveType=3" | Select-Object DeviceID, Size, FreeSpace
+Get-CimInstance Win32_Service -Filter "StartMode='Auto' AND State!='Running'" | Select-Object Name, State
+
+# Remote query via CIM session (lab network).
+$session = New-CimSession -ComputerName LAB-PC01
+Get-CimInstance Win32_ComputerSystem -CimSession $session | Select-Object Name, Manufacturer, Model
+Remove-CimSession $session
+
+# WQL filtering (SQL-like).
+Get-CimInstance -Query "SELECT Name, State FROM Win32_Service WHERE State = 'Stopped'"
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Write a one-liner that lists all auto-start but stopped services with WQL, then extend it into a script that queries two machines via CIM sessions and exports the result to CSV.
+
+</div>
+
+---
+
+## Week 9: IIS
+
+Microsoft Internet Information Services (IIS) hosts static content and ASP.NET (Core via reverse proxy) apps. Units: server → application pools (worker processes, identity, recycling) → sites (bindings) → applications/virtual directories (content, handlers, auth).
+
+### Key Concepts
+
+#### 1. Install and Layout
+
+- Enable via Server Manager or `Enable-WindowsOptionalFeature` / `Install-WindowsFeature Web-Server`.
+- Config lives in `applicationHost.config`; content defaults under `C:\inetpub\wwwroot`.
+
+#### 2. Bindings, Pools, Identity
+
+- **Bindings** — IP:port:hostname per site (SNI for multiple TLS hosts).
+- **App pools** — isolation boundary; set .NET version, pipeline mode, and a least-privilege identity.
+
+#### 3. Hardening Basics
+
+- Disable directory browsing, remove unused modules/handlers, require HTTPS (HSTS), log to W3C and review `HTTPERR`.
+
+### Example: Deploy a Static Site
+
+```powershell
+# Install IIS with management console (client OS, admin shell).
+Enable-WindowsOptionalFeature -Online -FeatureName IIS-WebServerRole, IIS-WebServerManagementTools -All
+
+# Create site folder + binding on port 8080.
+New-Item C:\inetpub\labsite -ItemType Directory -Force
+'<!doctype html><title>Lab</title><h1>Lab site works</h1>' | Out-File C:\inetpub\labsite\index.html -Encoding utf8
+New-IISSite -Name LabSite -PhysicalPath C:\inetpub\labsite -BindingInformation '*:8080:'
+
+# Smoke test.
+Invoke-WebRequest http://localhost:8080/ | Select-Object StatusCode
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Deploy the lab site above, then add a second hostname binding and an app-pool identity change. Show how you verified each step and where the request log entry appears.
+
+</div>
+
+---
+
+## Week 10: Windows Server Administration
+
+Windows Server adds roles (AD DS, DNS, DHCP, File Services, Hyper-V), Server Manager/RSAT tooling, and PowerShell-first management. Active Directory organises identities into domains, OUs, users, groups, and Group Policy Objects.
+
+### Key Concepts
+
+#### 1. Roles and Features
+
+- Install only needed roles; use Server Core for smaller attack surface.
+- `Get-WindowsFeature` / `Install-WindowsFeature` on Server; RSAT for remote admin from a client.
+
+#### 2. Active Directory Basics
+
+| Object | Purpose |
+|--------|---------|
+| Domain | Security boundary, DNS name |
+| OU | Delegation + GPO scoping |
+| User / Group | Identity / access grouping |
+| GPO | Centralised settings (password, firewall, registry) |
+
+#### 3. Routine Admin
+
+- Patching windows, backup (Windows Server Backup), event-log monitoring, and documented runbooks.
+
+### Example: Server Admin Commands
+
+```powershell
+# Roles inventory.
+Get-WindowsFeature | Where-Object Installed | Select-Object Name, DisplayName
+
+# AD check (needs RSAT + domain join).
+Get-ADUser -Filter * -SearchBase 'OU=Students,DC=lab,DC=local' | Select-Object -First 5 Name, Enabled
+Get-ADGroupMember 'LabAdmins' | Select-Object name
+
+# Services + events triage.
+Get-Service | Where-Object Status -eq 'Running' | Measure-Object
+Get-EventLog -LogName System -Newest 20 | Where-Object EntryType -eq 'Error' | Select-Object TimeGenerated, Source, Message
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> On a lab Server VM list installed roles, create an OU with two users and one group, and link a GPO that sets one verifiable setting (e.g. desktop wallpaper or password policy). Document each step.
+
+</div>
+
+---
+
+## Week 11: Security and Malware
+
+Windows security rests on least privilege (standard users + UAC), patched systems, Defender AV/firewall, BitLocker, and auditable identities. Malware spans viruses, worms, trojans, ransomware, rootkits, and fileless attacks living in memory/macros.
+
+### Key Concepts
+
+#### 1. Account and UAC Hygiene
+
+- <span class="badge">Good</span> Standard account daily; separate admin account; UAC at default or higher.
+- <span class="badge danger">Bad</span> Everyone a local admin, disabled UAC, reused passwords.
+
+#### 2. Defender Stack
+
+- Real-time AV, cloud-delivered protection, firewall profiles, SmartScreen, exploit protection.
+- Centralised view via Event Viewer (`Microsoft-Windows-Windows Defender/Operational`) and Security baselines.
+
+#### 3. Incident Response Basics
+
+1. Isolate (network off), 2. identify (process, persistence, logs), 3. contain (kill, quarantine), 4. eradicate + patch, 5. recover from known-good backup, 6. lessons learned.
+
+### Example: Security Baseline Checks
+
+```powershell
+# UAC, Defender, firewall, BitLocker status.
+Get-ItemProperty HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System | Select-Object EnableLUA, ConsentPromptBehaviorAdmin
+Get-MpComputerStatus | Select-Object AntivirusEnabled, RealTimeProtectionEnabled, AntispywareEnabled
+Get-NetFirewallProfile | Select-Object Name, Enabled
+Get-BitLockerVolume | Select-Object MountPoint, ProtectionStatus
+
+# Autoruns-style persistence review (common malware footholds).
+Get-CimInstance Win32_StartupCommand | Select-Object Name, Command, Location
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Run the baseline checks above on your VM and fill a hardening table (item, status, fix). Then describe the first 3 actions you would take if Defender flags a trojan in Downloads.
+
+</div>
+
+---
+
+## Week 12: Batch and PowerShell
+
+Batch (`.bat`/`.cmd`) covers legacy linear scripting; PowerShell is the strategic shell: verb-noun cmdlets, object pipeline, providers, modules, remoting, and execution policies. Prefer PowerShell for anything new.
+
+### Key Concepts
+
+#### 1. Batch Essentials
+
+- `%1` args, `%ERRORLEVEL%`, `IF`, `FOR /F`, `call`, redirection `>`, `>>`, `2>&1`.
+- Quoting paths with spaces and `setlocal` hygiene.
+
+#### 2. PowerShell Essentials
+
+- **Cmdlets** — `Get-Verb` list; `Get-Help`, `Get-Member`, `Select-Object`, `Where-Object`.
+- **Pipeline of objects** — filter/format/measure/export without text parsing.
+- **Execution policy** — `RemoteSigned` typical; sign or scope-bypass consciously.
+
+#### 3. Script Anatomy
+
+- `param()` block, `try/catch`, `-WhatIf` support, transcript/log output, exit codes.
+
+### Example: Batch vs PowerShell Backup
+
+```batch
+@echo off
+REM backup.bat — legacy xcopy backup with date stamp.
+set DST=D:\Backup\%DATE%
+mkdir "%DST%" 2>nul
+xcopy C:\LabData "%DST%" /E /Y /C
+echo Exit code: %ERRORLEVEL%
+```
+
+```powershell
+# Backup.ps1 — the same job, idempotent and logged.
+param([string]$Source = 'C:\LabData', [string]$TargetRoot = 'D:\Backup')
+$dst = Join-Path $TargetRoot (Get-Date -Format 'yyyy-MM-dd')
+New-Item $dst -ItemType Directory -Force | Out-Null
+try {
+    Copy-Item "$Source\*" $dst -Recurse -Force -ErrorAction Stop
+    "OK $(Get-Date) -> $dst" | Out-File D:\Backup\backup.log -Append
+} catch {
+    "FAIL $(Get-Date): $_" | Out-File D:\Backup\backup.log -Append
+    exit 1
+}
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Write a PowerShell script that: (1) takes a service name as `param`, (2) restarts it if running, (3) writes timestamped lines to a log, (4) supports `-WhatIf`. Test it against the Spooler on a lab VM.
+
+</div>
+
+---
+
+## Week 13: UWP and Windows API
+
+Windows exposes several app models: classic **Win32** (HWND/message loop, broadest API), **.NET/WPF/WinForms** (managed wrappers), and **UWP/WinUI** (sandboxed Store-style apps with capabilities, live tiles, contracts). Underneath is the **Windows API**: kernel32/user32/gdi32 plus WinRT namespaces.
+
+### Key Concepts
+
+#### 1. App Model Comparison
+
+| Model | Distribution | Isolation | UI |
+|-------|--------------|-----------|----|
+| Win32 | Any installer | None by default | HWND, any framework |
+| .NET WPF/WinForms | Any installer | None by default | XAML / controls |
+| UWP/WinUI | Store/MSIX | AppContainer + capabilities | XAML/WinUI |
+
+#### 2. API Surface
+
+- **Win32 API** — processes, threads, files, registry, windows (`CreateFile`, `RegOpenKeyEx`).
+- **WinRT API** — modern contracts (notifications, sensors, sharing) consumed from many languages.
+- **P/Invoke / CsWin32** — how managed code calls native functions.
+
+#### 3. Capabilities and Lifecycle
+
+- UWP declares capabilities (microphone, location) in its manifest; suspended/resumed lifecycle with background tasks.
+
+### Example: Calling the Windows API
+
+```powershell
+# MessageBox via P/Invoke-style Add-Type (Win32 API demo).
+Add-Type -TypeDefinition @'
+using System;
+using System.Runtime.InteropServices;
+public static class Win32 {
+    [DllImport("user32.dll", CharSet=CharSet.Unicode)]
+    public static extern int MessageBox(IntPtr hWnd, string text, string caption, uint type);
+}
+'@
+[Win32]::MessageBox(0, 'Hello from the Windows API', 'NNOS2 Lab', 0)
+```
+
+```csharp
+// UWP-style toast sketch (conceptual; needs app identity + manifest capability).
+// new ToastContentBuilder().AddText("Backup finished").Show();
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Run the MessageBox snippet and explain which DLL/API is called and what each argument means. Then compare in 4 rows when you would choose Win32 vs UWP/WinUI for a new faculty tool.
+
+</div>
+
+---
+
+## Assignment Requirements
+
+### Semester Assignment
+
+<div class="exercise-box">
+
+<strong>📋 Assignment deliverables:</strong>
+
+| Part | Content |
+|------|---------|
+| **Scripts** | Batch + PowerShell solution for an assigned admin scenario |
+| **Documentation** | Goal, commands used, error handling, test log |
+| **Review** | Live run + Q&A on the lab machine |
+
+</div>
+
+### Submission Checklist
+
+<div class="checklist">
+
+- [ ] Scripts run on a clean lab VM without manual fixes
+- [ ] Parameters, logging, and `-WhatIf` where applicable
+- [ ] Registry/firewall changes documented and reversible
+- [ ] README with prerequisites and rollback steps
+
+</div>
+
+---
+
+## Code Review Guide
+
+### What to Look For
+
+1. **Safety** — no destructive defaults; backups before registry/disk changes.
+2. **Idempotence** — re-running produces the same result.
+3. **Least privilege** — admin only where needed; no hardcoded passwords.
+4. **Diagnostics** — clear output, logs, and exit codes.
+
+<div class="review-note">
+
+<strong>🔍 Practice Review:</strong> A script disables the firewall, edits HKLM, and deletes logs "to save space". Flag: firewall change without scope/justification, registry edit without export, and log deletion destroying audit trail. Propose constrained firewall rules, `.reg` backups, and log rotation instead.
+
+</div>
+
+---
+
+## Exam Preparation
+
+### Key Topics to Review
+
+| Week | Topic | Key Concepts |
+|------|-------|--------------|
+| 1 | Architectures | Kernel/user, editions |
+| 2 | Processes | Threads, IPC, handles |
+| 3 | Memory | Paging, LAP/FAP, pagefile |
+| 4 | Filesystems | NTFS, ReFS, ACLs |
+| 5 | CLI/GUI | PowerShell vs MMC |
+| 6 | Registry | Hives, types, backup |
+| 7 | Network | Netsh, firewall, RDP |
+| 8 | WMI | CIM, WQL, remoting |
+| 9 | IIS | Sites, pools, bindings |
+| 10 | Server | Roles, AD, GPO |
+| 11 | Security | UAC, Defender, IR |
+| 12 | Scripting | Batch, PowerShell |
+| 13 | UWP/API | Models, Win32/WinRT |
+
+### Practice Questions
+
+<div class="exercise-box">
+
+<strong>📝 Sample Exam Questions:</strong>
+
+1. User mode vs kernel mode: what runs where?
+2. Process vs thread; name two IPC mechanisms.
+3. Explain LAP vs FAP and what a pagefault is.
+4. NTFS vs ReFS vs exFAT trade-offs?
+5. Read and back up a registry key safely.
+6. Allow a port with netsh/firewall and verify it.
+7. Write a CIM query for stopped auto-services.
+8. IIS: site vs application pool vs binding.
+
+</div>
+
+### Resources
+
+- Lecture slides and lab VM images (MS Teams).
+- Microsoft Learn: Windows Server, PowerShell, IIS docs.
+- Built-in help: `Get-Help`, `netsh /?`, `reg /?`.
+
+---
+
+## Quick Reference Cards
+
+### PowerShell One-liners
+
+```powershell
+Get-Process | Sort-Object CPU -Descending | Select-Object -First 5
+Get-Service | Where-Object Status -eq 'Running'
+Get-CimInstance Win32_OperatingSystem | Select-Object Caption, Version
+Get-NetIPAddress -AddressFamily IPv4
+Get-Volume | Select-Object DriveLetter, FileSystem
+```
+
+### cmd / netsh Essentials
+
+```batch
+systeminfo | findstr /C:"OS Name"
+ipconfig /all
+netsh interface ip show config
+netsh advfirewall firewall show rule name=all
+reg export HKCU\Software\LabDemo C:\Temp\backup.reg /y
+icacls C:\LabShare
+```
+
+---
+
+*End of Course Documentation*
+
+**Last Updated:** 2026-09-20
+**Course Code:** KST/NNOS2

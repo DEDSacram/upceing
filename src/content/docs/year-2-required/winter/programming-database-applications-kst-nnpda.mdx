@@ -1,0 +1,914 @@
+---
+title: "Programming Database Applications (KST/NNPDA)"
+description: "Complete course materials for JDBC, REST, SOAP, Elasticsearch, Hibernate, JPA, Spring Boot and Docker"
+template: doc
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+# Programming Database Applications (KST/NNPDA)
+
+Welcome to Programming Database Applications! This guide covers JDBC, REST/SOAP services, Elasticsearch/Kibana/Logstash, Hibernate/JPA, Spring Boot, application servers, full-text search, Docker, and Oracle Spatial — with Java examples and references to the `upce/NNPDA/` lab projects.
+
+---
+
+## 📑 Table of Contents
+
+### Course Overview
+- [Course Objectives](#course-objectives)
+- [Assessment & Credit Requirements](#assessment--credit-requirements)
+- [Examination Structure](#examination-structure)
+- [Schedule](#schedule)
+
+### Lecture Materials (Weeks 1-13)
+1. [Week 1: JDBC Database Connections](#week-1-jdbc-database-connections)
+2. [Week 2: REST Web Services](#week-2-rest-web-services)
+3. [Week 3: SOAP Web Services](#week-3-soap-web-services)
+4. [Week 4: Elasticsearch](#week-4-elasticsearch)
+5. [Week 5: Kibana](#week-5-kibana)
+6. [Week 6: Database Synchronization with Logstash](#week-6-database-synchronization-with-logstash)
+7. [Week 7: Hibernate](#week-7-hibernate)
+8. [Week 8: Java Persistence API (JPA)](#week-8-java-persistence-api-jpa)
+9. [Week 9: Spring and Spring Boot](#week-9-spring-and-spring-boot)
+10. [Week 10: Application Servers](#week-10-application-servers)
+11. [Week 11: Full-Text Databases - Elasticsearch](#week-11-full-text-databases--elasticsearch)
+12. [Week 12: Docker Virtualization](#week-12-docker-virtualization)
+13. [Week 13: Oracle Spatial - MapBuilder and MapViewer](#week-13-oracle-spatial--mapbuilder-and-mapviewer)
+
+### Assignments & Exam
+- [Assignment Requirements](#assignment-requirements)
+- [Code Review Guide](#code-review-guide)
+- [Exam Preparation](#exam-preparation)
+- [Quick Reference Cards](#quick-reference-cards)
+
+---
+
+## Course Overview
+
+### Course Objectives
+
+<span class="badge">Core</span> <span class="badge info">Zk+</span>
+
+Students will design and implement database-backed Java applications:
+
+- **JDBC** - connections, prepared statements, transactions
+- **REST & SOAP** - resource design, JAX-RS/Spring MVC, JAX-WS contracts
+- **Elasticsearch stack** - indexing, Kibana visualisation, Logstash sync
+- **Hibernate & JPA** - ORM mapping, EntityManager, relationships, caching
+- **Spring Boot** - DI, data repositories, validation, security basics
+- **App servers & Docker** - deployment, virtualization of DB/app
+- **Oracle Spatial** - geometry types, MapBuilder/MapViewer
+
+Lab sources live in `upce/NNPDA/lab-01-jdbc` through `lab-13-oracle-spatial` — each week references its lab.
+
+### Assessment & Credit Requirements
+
+<div class="exercise-box">
+
+<strong>📋 To receive credit (Zk+), students must:</strong>
+
+1. Complete semester works **A, B, C** (UML concept + implementation + individual defence):
+   - A: JDBC/REST data layer, B: Hibernate/JPA + Spring Boot, C: Elasticsearch/full-text or spatial
+   - Optional D for bonus
+2. Pass continuous iteration reviews (weeks 3-4, 7-8, 11)
+3. Pass **final exam** (theory + code reading, 60%+)
+
+</div>
+
+### Examination Structure
+
+1. **Theory** - JDBC vs JPA, REST constraints, SOAP vs REST, ES mapping/analysis, Docker images vs containers
+2. **Code task** - read/fix Java snippets (repository, entity mapping, REST controller, Logstash config)
+3. **Design question** - choose stack for a scenario and justify
+
+### Schedule
+
+| Week | Lecture Topic | Lab (`upce/NNPDA/`) | Exercise Focus |
+|------|---------------|---------------------|----------------|
+| 1 | JDBC | `lab-01-jdbc` | CRUD + transactions |
+| 2 | REST | `lab-02-rest` | Resource + controller |
+| 3 | SOAP | `lab-03-soap` | WSDL contract |
+| 4 | Elasticsearch | `lab-04-elasticsearch` | Index + query |
+| 5 | Kibana | `lab-05-kibana` | Dashboard |
+| 6 | Logstash sync | `lab-06-logstash-sync` | JDBC→ES pipeline |
+| 7 | Hibernate | `lab-07-hibernate` | Session + mappings |
+| 8 | JPA | `lab-08-jpa` | Entities + JPQL |
+| 9 | Spring Boot | `lab-09-springboot` | REST + Data JPA |
+| 10 | App servers | `lab-10-appservers` | WAR deploy, JNDI |
+| 11 | Full-text ES | `lab-11-fulltext-es` | Analyzers, relevance |
+| 12 | Docker | `lab-12-docker` | Compose DB+app |
+| 13 | Oracle Spatial | `lab-13-oracle-spatial` | Geometry + map |
+
+---
+
+## Week 1: JDBC Database Connections
+
+JDBC is the foundational Java→SQL bridge: `DriverManager/DataSource → Connection → PreparedStatement → ResultSet`. See `upce/NNPDA/lab-01-jdbc/`.
+
+### Key Concepts
+
+- **DataSource + try-with-resources** - pooled connections, leak-free close. <span class="badge">Good</span> `HikariCP`; <span class="badge danger">Bad</span> string-concatenated SQL
+- **PreparedStatement** - bind parameters, prevent injection, reuse plans
+- **Transactions** - `setAutoCommit(false)`, commit/rollback, isolation levels
+
+| Isolation | Prevents |
+|-----------|----------|
+| READ_COMMITTED | Dirty reads |
+| REPEATABLE_READ | + non-repeatable reads |
+| SERIALIZABLE | + phantoms (slowest) |
+
+```java
+// lab-01-jdbc: safe transfer with transaction
+import javax.sql.DataSource;
+import java.sql.*;
+
+public class TransferDao {
+    private final DataSource ds;
+    public TransferDao(DataSource ds) { this.ds = ds; }
+
+    public void transfer(long from, long to, long amount) throws SQLException {
+        String sql = "UPDATE accounts SET balance = balance + ? WHERE id = ?";
+        try (Connection c = ds.getConnection()) {
+            c.setAutoCommit(false);
+            try (PreparedStatement ps = c.prepareStatement(sql)) {
+                ps.setLong(1, -amount); ps.setLong(2, from); ps.executeUpdate();
+                ps.setLong(1, amount);  ps.setLong(2, to);   ps.executeUpdate();
+                c.commit();
+            } catch (SQLException e) { c.rollback(); throw e; }
+        }
+    }
+}
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task (`lab-01-jdbc`):</strong> Implement `StudentDao.findByName(String)` with `PreparedStatement` + `LIKE`.
+
+1. Use `HikariDataSource`, try-with-resources for all JDBC objects.
+2. Demonstrate an injection attempt (`' OR '1'='1`) safely neutralised; explain why.
+3. Wrap two inserts in one transaction; force a failure and verify rollback.
+
+</div>
+
+---
+
+## Week 2: REST Web Services
+
+REST exposes resources over HTTP verbs with stateless JSON exchange. See `upce/NNPDA/lab-02-rest/`.
+
+### Key Concepts
+
+- **Constraints** - client-server, stateless, cacheable, uniform interface, layered
+- **Resource naming** - nouns plural: `GET /students`, `GET /students/{id}`, `POST /students`, `PUT /students/{id}`, `DELETE /students/{id}`
+- **Status codes** - `200/201/204/400/404/409/422`; versioning, pagination, ETag
+
+```java
+// lab-02-rest: Spring MVC controller
+import org.springframework.http.*;
+import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
+import java.util.*;
+
+@RestController
+@RequestMapping("/api/v1/students")
+public class StudentController {
+    private final StudentService service;
+    public StudentController(StudentService service) { this.service = service; }
+
+    @GetMapping
+    public List<StudentDto> list(@RequestParam(defaultValue = "0") int page,
+                                 @RequestParam(defaultValue = "20") int size) {
+        return service.list(page, size);
+    }
+
+    @PostMapping
+    public ResponseEntity<StudentDto> create(@Valid @RequestBody StudentDto dto) {
+        StudentDto saved = service.create(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+    }
+
+    @GetMapping("/{id}")
+    public StudentDto get(@PathVariable long id) { return service.get(id); }
+}
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task (`lab-02-rest`):</strong> Extend the API:
+
+1. Add `PUT /{id}` (full update, 404 if missing) and `DELETE /{id}` (204).
+2. Add Bean Validation (`@NotBlank`, `@Email`) + a `@RestControllerAdvice` mapping violations to 422 with field errors.
+3. Test with curl: show 201 + Location behaviour, 404, and 422 payloads.
+
+</div>
+
+---
+
+## Week 3: SOAP Web Services
+
+SOAP = contract-first XML messaging over HTTP with WSDL/XSD, WS-Security, and strict validation — still common in banking/government. See `upce/NNPDA/lab-03-soap/`.
+
+### Key Concepts
+
+- **WSDL + XSD** - operations, messages, faults; generate stubs (`wsimport`/`cxf-codegen`)
+- **JAX-WS** - `@WebService/@WebMethod/@SOAPBinding`; SOAP fault ↔ Java exception
+- **REST vs SOAP** - REST: lightweight JSON, caching; SOAP: contracts, ACID-ish WS-*, tooling
+
+| Aspect | REST | SOAP |
+|--------|------|------|
+| Payload | JSON | XML envelope |
+| Contract | OpenAPI (optional) | WSDL (mandatory) |
+| State | Stateless | WS-* state possible |
+| Errors | HTTP codes | SOAP faults |
+
+```java
+// lab-03-soap: JAX-WS endpoint
+import jakarta.jws.*;
+
+@WebService(serviceName = "StudentService")
+public class StudentEndpoint {
+    @WebMethod
+    public Student findStudent(@WebParam(name = "id") long id) throws StudentFault {
+        return StudentRepo.find(id)
+            .orElseThrow(() -> new StudentFault("Unknown id: " + id));
+    }
+}
+```
+
+```xml
+<!-- SOAP envelope sketch -->
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Body>
+    <findStudent xmlns="http://nnpda.upce/">
+      <id>42</id>
+    </findStudent>
+  </soap:Body>
+</soap:Envelope>
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task (`lab-03-soap`):</strong> Publish and consume the endpoint:
+
+1. Publish with `Endpoint.publish(...)`, inspect generated WSDL in a browser.
+2. Generate a client stub and call `findStudent`; trigger and catch `StudentFault`.
+3. Write a paragraph: when would you choose SOAP over REST for a new integration?
+
+</div>
+
+---
+
+## Week 4: Elasticsearch
+
+Elasticsearch is a distributed JSON document store + search engine (Lucene). See `upce/NNPDA/lab-04-elasticsearch/`.
+
+### Key Concepts
+
+- **Index → type-less docs** - `_index/_id/_source`; mappings (text vs keyword, numeric, date)
+- **CRUD API** - `PUT /students/_doc/1`, `GET`, `POST _update`, `DELETE`
+- **Query DSL** - `match` (analyzed) vs `term` (exact), `bool` combinators, filters (cached)
+
+```json
+// lab-04-elasticsearch: mapping + query
+PUT /students
+{
+  "mappings": {
+    "properties": {
+      "name":  { "type": "text" },
+      "login": { "type": "keyword" },
+      "year":  { "type": "integer" },
+      "bio":   { "type": "text" }
+    }
+  }
+}
+
+GET /students/_search
+{
+  "query": {
+    "bool": {
+      "must":   [{ "match": { "bio": "database systems" } }],
+      "filter": [{ "term":  { "year": 2 } }]
+    }
+  }
+}
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task (`lab-04-elasticsearch`):</strong> Index 20 student docs:
+
+1. Show `match` vs `term` behaviour on `name` (text) vs `login` (keyword).
+2. Write a `bool` query combining full-text + year filter; explain scoring vs filtering.
+3. Break the mapping on purpose (index a string into `year`); read the error and fix with correct mapping.
+
+</div>
+
+---
+
+## Week 5: Kibana
+
+Kibana visualises Elasticsearch: Discover, Lens charts, dashboards, index patterns. See `upce/NNPDA/lab-05-kibana/`.
+
+### Key Concepts
+
+- **Index patterns / data views** - `students*` + `@timestamp` time field
+- **Discover + KQL** - `year : 2 and bio : database`; saved searches
+- **Lens + dashboards** - bar/line/pie, filters, drilldowns, export
+
+```kql
+// lab-05-kibana: KQL snippets for Discover
+year : 2 and bio : "database"
+login : "novak*" and not year : 1
+```
+
+```json
+// Vega-lite style aggregation ES runs behind a Lens chart
+GET /students/_search
+{
+  "size": 0,
+  "aggs": { "per_year": { "terms": { "field": "year" } } }
+}
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task (`lab-05-kibana`):</strong> Build a dashboard:
+
+1. Create data view `students*`, bar chart of students per year + pie of logins prefix.
+2. Add a KQL filter control; save a dashboard with two visualisations + one saved search.
+3. Export (NDJSON) and describe how to re-import on the examiner's machine.
+
+</div>
+
+---
+
+## Week 6: Database Synchronization with Logstash
+
+Logstash keeps SQL and Elasticsearch in sync: `jdbc` input → `filter` → `elasticsearch` output. See `upce/NNPDA/lab-06-logstash-sync/`.
+
+### Pipeline
+
+```
+Relational DB --(jdbc input, tracking_column)--> filter (mutate/date)
+   --> elasticsearch output (upsert by document_id) --> Kibana
+```
+
+- **Incremental sync** - `:sql_last_value` + `tracking_column => updated_at`
+- **Idempotent writes** - `document_id => "%{id}"`, `action => "update"`, `doc_as_upsert`
+
+```ruby
+# lab-06-logstash-sync: logstash.conf
+input {
+  jdbc {
+    jdbc_driver_library => "/drivers/postgresql.jar"
+    jdbc_driver_class => "org.postgresql.Driver"
+    jdbc_connection_string => "jdbc:postgresql://db:5432/nnpda"
+    jdbc_user => "nnpda"
+    schedule => "*/5 * * * *"
+    statement => "SELECT id, name, year, updated_at FROM students WHERE updated_at > :sql_last_value"
+    use_column_value => true
+    tracking_column => "updated_at"
+  }
+}
+filter {
+  mutate { convert => { "year" => "integer" } }
+}
+output {
+  elasticsearch {
+    hosts => ["http://es:9200"]
+    index => "students"
+    document_id => "%{id}"
+    action => "update"
+    doc_as_upsert => true
+  }
+}
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task (`lab-06-logstash-sync`):</strong> Wire the sync:
+
+1. Update 3 rows in Postgres; run Logstash; verify docs appear in ES with matching `updated_at`.
+2. Delete a row in SQL — observe it lingers in ES; implement a soft-delete (`deleted` flag) fix.
+3. Explain at-least-once semantics: why is `document_id` + upsert required?
+
+</div>
+
+---
+
+## Week 7: Hibernate
+
+Hibernate implements ORM: entities ↔ tables via `Session`, HQL, lazy loading, caching. See `upce/NNPDA/lab-07-hibernate/`.
+
+### Key Concepts
+
+- **Session/SessionFactory** - unit of work; `get` (eager hit) vs `load` (proxy)
+- **Mappings** - `@Entity`, `@Id @GeneratedValue`, `@ManyToOne/@OneToMany`, fetch types
+- **N+1 problem** - lazy collections in loops; fix with `JOIN FETCH` / `@EntityGraph`
+
+| Fetch | Behaviour |
+|-------|-----------|
+| LAZY | Proxy, loads on access (needs open session) |
+| EAGER | Immediate join/select (careful: cartesian) |
+
+```java
+// lab-07-hibernate: entity + fetch join
+import jakarta.persistence.*;
+import java.util.*;
+
+@Entity @Table(name = "students")
+public class Student {
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private String name;
+    @OneToMany(mappedBy = "student", fetch = FetchType.LAZY)
+    private List<Enrollment> enrollments = new ArrayList<>();
+    // getters/setters...
+}
+
+// HQL avoiding N+1
+// "SELECT DISTINCT s FROM Student s LEFT JOIN FETCH s.enrollments WHERE s.year = :y"
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task (`lab-07-hibernate`):</strong> Reproduce and fix N+1:
+
+1. Load 50 students and touch `enrollments` in a loop with SQL logging on — count queries.
+2. Fix with `JOIN FETCH`; show query count drops.
+3. Trigger `LazyInitializationException` (access outside session) and fix properly (fetch join or DTO, not Open-Session-in-View).
+
+</div>
+
+---
+
+## Week 8: Java Persistence API (JPA)
+
+JPA is the standard API (`EntityManager`, JPQL, Criteria); Hibernate is one provider. See `upce/NNPDA/lab-08-jpa/`.
+
+### Key Concepts
+
+- **Entity lifecycle** - transient → managed → detached → removed; `persist/merge/remove`
+- **Relationships + cascade** - `PERSIST/MERGE/REMOVE/ALL`, `orphanRemoval`, owning side (`mappedBy`)
+- **JPQL/Criteria** - object queries, typed params, pagination; second-level cache
+
+```java
+// lab-08-jpa: repository with EntityManager
+import jakarta.persistence.*;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+import java.util.List;
+
+@Repository
+public class StudentRepository {
+    @PersistenceContext private EntityManager em;
+
+    @Transactional
+    public Student save(Student s) { em.persist(s); return s; }
+
+    public List<Student> byYear(int year, int page, int size) {
+        return em.createQuery(
+            "SELECT s FROM Student s LEFT JOIN FETCH s.enrollments WHERE s.year = :y", Student.class)
+            .setParameter("y", year)
+            .setFirstResult(page * size)
+            .setMaxResults(size)
+            .getResultList();
+    }
+}
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task (`lab-08-jpa`):</strong> Model a `@ManyToMany` (Student↔Course via Enrollment with grade):
+
+1. Choose `@OneToMany`+join entity vs direct `@ManyToMany`; justify (extra columns?).
+2. Demonstrate `merge` on a detached entity; show what happens without cascade.
+3. Write a paginated JPQL query with `JOIN FETCH` + `DISTINCT`; explain why count queries need a separate query.
+
+</div>
+
+---
+
+## Week 9: Spring and Spring Boot
+
+Spring Boot wires everything: IoC/DI, Spring Data repositories, validation, security. See `upce/NNPDA/lab-09-springboot/`.
+
+### Key Concepts
+
+- **DI/IoC** - constructor injection, `@Service/@Repository`, profiles
+- **Spring Data JPA** - derived queries (`findByYearOrderByName`), `@Query`, specifications
+- **Web + validation + security** - `@RestController`, Bean Validation, JWT filter chain
+
+```java
+// lab-09-springboot: repository + service
+import org.springframework.data.jpa.repository.*;
+import java.util.List;
+
+public interface StudentRepo extends JpaRepository<Student, Long> {
+    List<Student> findByYearOrderByNameAsc(int year);
+
+    @Query("SELECT s FROM Student s WHERE lower(s.name) LIKE lower(concat('%', :q, '%'))")
+    List<Student> search(String q);
+}
+```
+
+```java
+// Service with constructor injection + transaction
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+public class StudentService {
+    private final StudentRepo repo;
+    public StudentService(StudentRepo repo) { this.repo = repo; }
+
+    @Transactional
+    public Student create(Student s) { return repo.save(s); }
+}
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task (`lab-09-springboot`):</strong> Ship a vertical slice:
+
+1. Entity → `JpaRepository` → `@Service` → `@RestController` with validation.
+2. Add an integration test with `@DataJpaTest` or Testcontainers; show a failing-then-passing cycle.
+3. Secure `POST/PUT/DELETE` with a JWT filter (permit `GET`); demonstrate 401/403 with curl.
+
+</div>
+
+---
+
+## Week 10: Application Servers
+
+App servers (Tomcat/Jetty, WildFly, GlassFish) host WARs, manage pools, JNDI, JTA, and clustering. See `upce/NNPDA/lab-10-appservers/`.
+
+### Key Concepts
+
+- **Embedded vs standalone** - Boot JAR (embedded Tomcat) vs WAR to WildFly/Tomcat
+- **JNDI DataSource** - container-managed pool injected via `@Resource`
+- **JTA/XA** - distributed transactions across two resources; clustering/sessions
+
+| Server | Type | Notes |
+|--------|------|-------|
+| Tomcat/Jetty | Servlet container | Lightweight, most Boot apps |
+| WildFly | Full Jakarta EE | JMS, EJB-lite, clustering |
+| GlassFish | Reference EE | Admin console, asadmin |
+
+```xml
+<!-- lab-10-appservers: context.xml JNDI pool (Tomcat) -->
+<Context>
+  <Resource name="jdbc/nnpda" auth="Container"
+            type="javax.sql.DataSource"
+            maxTotal="20" maxIdle="5"
+            driverClassName="org.postgresql.Driver"
+            url="jdbc:postgresql://db:5432/nnpda"
+            username="nnpda" password="secret"/>
+</Context>
+```
+
+```java
+// Lookup
+import javax.naming.InitialContext;
+import javax.sql.DataSource;
+DataSource ds = (DataSource) new InitialContext().lookup("java:comp/env/jdbc/nnpda");
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task (`lab-10-appservers`):</strong> Deploy both ways:
+
+1. Build the Boot JAR (embedded) and run with an external `application-prod.properties`.
+2. Repackage as WAR (`SpringBootServletInitializer`), deploy to standalone Tomcat, verify JNDI pool.
+3. Compare logs/startup/config: when is standalone worth the extra ops cost?
+
+</div>
+
+---
+
+## Week 11: Full-Text Databases - Elasticsearch
+
+Go deeper: analyzers, relevance scoring (BM25), suggestions, highlighting. See `upce/NNPDA/lab-11-fulltext-es/`.
+
+### Key Concepts
+
+- **Analysis chain** - character filter → tokenizer → token filters (lowercase, asciifolding, stemmer, stop, synonym)
+- **BM25 scoring** - tf/idf + field length norms; `multi_match` types (best_fields/most_fields/cross_fields)
+- **UX features** - highlight, suggesters (`term/completion`), aggregations for facets
+
+```json
+// lab-11-fulltext-es: Czech-aware analyzer + search
+PUT /articles
+{
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "cs_fold": {
+          "tokenizer": "standard",
+          "filter": ["lowercase", "asciifolding", "czech_stop", "czech_stemmer"]
+        }
+      },
+      "filter": {
+        "czech_stop": { "type": "stop", "stopwords": "_czech_" },
+        "czech_stemmer": { "type": "stemmer", "language": "czech" }
+      }
+    }
+  },
+  "mappings": {
+    "properties": {
+      "title": { "type": "text", "analyzer": "cs_fold" },
+      "tags":  { "type": "keyword" }
+    }
+  }
+}
+
+GET /articles/_search
+{
+  "query": { "multi_match": { "query": "databázové systémy", "fields": ["title^2", "body"] } },
+  "highlight": { "fields": { "title": {}, "body": {} } }
+}
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task (`lab-11-fulltext-es`):</strong> Tune relevance:
+
+1. Compare `standard` vs `cs_fold` analyzer on "databázové/databazove" queries; record hits.
+2. Boost `title^3` vs plain `multi_match`; judge top-5 quality on 3 queries.
+3. Add a `completion` suggester for titles and demo as-you-type suggestions.
+
+</div>
+
+---
+
+## Week 12: Docker Virtualization
+
+Docker virtualizes the app environment: images (layered) vs containers (running), Compose for DB+app+ES. See `upce/NNPDA/lab-12-docker/`.
+
+### Key Concepts
+
+- **Dockerfile layering** - order by change frequency; multi-stage builds for small Java images
+- **Compose** - services, volumes (data!), networks, healthchecks, env files
+- **Ops** - tags, registries, `.dockerignore`, non-root user, read-only FS where possible
+
+```dockerfile
+# lab-12-docker: multi-stage Java build
+FROM maven:3.9-eclipse-temurin-21 AS build
+WORKDIR /app
+COPY pom.xml .
+RUN mvn -q -DskipTests dependency:go-offline
+COPY src ./src
+RUN mvn -q -DskipTests package
+
+FROM eclipse-temurin:21-jre
+RUN useradd -r app && mkdir /app && chown app /app
+USER app
+WORKDIR /app
+COPY --from=build /app/target/*.jar app.jar
+EXPOSE 8080
+ENTRYPOINT ["java", "-jar", "app.jar"]
+```
+
+```yaml
+# compose: app + postgres + elasticsearch
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: nnpda
+      POSTGRES_USER: nnpda
+      POSTGRES_PASSWORD: secret
+    volumes: ["pgdata:/var/lib/postgresql/data"]
+  app:
+    build: .
+    ports: ["8080:8080"]
+    depends_on: [db]
+volumes:
+  pgdata: {}
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task (`lab-12-docker`):</strong> Containerize the stack:
+
+1. Multi-stage-build the Boot app; compare image size vs single-stage.
+2. `docker compose up` with volume-backed Postgres; kill + restart and prove data persists.
+3. Add a healthcheck and `depends_on: condition: service_healthy` for correct startup order.
+
+</div>
+
+---
+
+## Week 13: Oracle Spatial - MapBuilder and MapViewer
+
+Oracle Spatial stores/query geometry (`SDO_GEOMETRY`); MapBuilder styles themes, MapViewer renders maps. See `upce/NNPDA/lab-13-oracle-spatial/`.
+
+### Key Concepts
+
+- **SDO_GEOMETRY** - `GTYPE` (point/line/polygon), `SRID` (e.g. 4326 WGS84), ordinates; spatial index (`MDSYS.SPATIAL_INDEX`)
+- **Operators** - `SDO_WITHIN_DISTANCE`, `SDO_RELATE (ANYINTERACT)`, `SDO_NN` (nearest neighbour)
+- **MapBuilder/MapViewer** - connection, theme (SQL + style), basemap, FOI/map tile requests
+
+```sql
+-- lab-13-oracle-spatial: nearest faculties within 5 km
+SELECT f.name,
+       SDO_GEOM.SDO_DISTANCE(f.geom, SDO_GEOMETRY(2001, 4326,
+         SDO_POINT_TYPE(15.76, 50.03, NULL), NULL, NULL), 0.005) AS dist_m
+FROM faculties f
+WHERE SDO_WITHIN_DISTANCE(f.geom,
+        SDO_GEOMETRY(2001, 4326, SDO_POINT_TYPE(15.76, 50.03, NULL), NULL, NULL),
+        'distance=5000 unit=m') = 'TRUE'
+ORDER BY dist_m;
+```
+
+```java
+// JDBC read of ordinates (simplified; use JGeometry in real code)
+try (PreparedStatement ps = conn.prepareStatement(
+        "SELECT SDO_UTIL.GETVERTICES(geom) FROM faculties WHERE id = ?")) {
+    ps.setLong(1, 1);
+    // parse STRUCT -> ordinates array
+}
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task (`lab-13-oracle-spatial`):</strong> Build a campus map:
+
+1. Insert 5 faculty points (SRID 4326) + create a spatial index; verify with `USER_SDO_GEOM_METADATA`.
+2. Query: 3 nearest to a given GPS point with distances; show SQL + results.
+3. Define a MapBuilder theme + style and render via MapViewer URL; screenshot the result into your report.
+
+</div>
+
+---
+
+## Assignment Requirements
+
+### Semester Works A / B / C (+ optional D)
+
+<div class="exercise-box">
+
+<strong>📋 Semester work pipeline (each of A, B, C):</strong>
+
+| Phase | Deliverable |
+|-------|-------------|
+| Analysis | Implementation options, stack choice |
+| Concept | UML (class + sequence for key flow) |
+| Iterations | 2+ reviewed partial iterations |
+| Defence | Individual defence, live demo + code walk |
+
+Suggested mapping: **A** → JDBC/REST (`lab-01/02`), **B** → Hibernate/JPA + Boot (`lab-07/08/09`), **C** → ES/full-text or Logstash or Spatial (`lab-06/11/13`).
+
+</div>
+
+### Submission Checklist
+
+<div class="checklist">
+
+- [ ] UML concept (class + sequence) committed before code
+- [ ] README: stack, build (`mvn`/`compose`), seed data, ports
+- [ ] REST documented (OpenAPI/curl examples), SOAP WSDL attached if used
+- [ ] Tests pass (`mvn verify`), Docker images build clean
+- [ ] Defence demo script (3 min happy path + 1 failure case)
+
+</div>
+
+---
+
+## Code Review Guide
+
+### What to Look For
+
+#### 1. Data Access
+- `PreparedStatement`/binds everywhere? No string-built SQL?
+- Transactions scoped correctly? Lazy loading inside session or via DTO?
+
+#### 2. API Design
+- Nouns, plural, correct status codes? Validation + error envelope?
+- Pagination on collections? No entity graph leaks (passwords, internals)?
+
+#### 3. Search/Sync
+- `text` vs `keyword` correct? Analyzer matches language? `document_id` upserts?
+
+### Code Review Example
+
+<div class="review-note">
+
+<strong>🔍 Practice Review:</strong> Identify issues:
+
+```java
+@GetMapping("/students")
+public List<Student> all(@RequestParam String name) throws Exception {
+    Statement st = conn.createStatement();
+    // BUG: SQL injection + leaking entities + missing pagination
+    ResultSet rs = st.executeQuery("SELECT * FROM students WHERE name='" + name + "'");
+    ...
+}
+```
+
+**Issues:** injection (use `PreparedStatement`/JPA); returns entities (use DTOs); no pagination; connection never closed; throws raw `Exception` (map to 4xx/5xx).
+
+</div>
+
+---
+
+## Exam Preparation
+
+### Exam Structure
+
+1. **Theory:** JDBC lifecycle, REST constraints, SOAP envelope, JPA states, ES analysis, Docker layers
+2. **Code reading:** entity/DTO/controller/repository snippets — find mapping, N+1, status-code bugs
+3. **Design:** pick JDBC vs JPA vs ES for a use case; sketch Logstash or Compose topology
+
+### Key Topics to Review
+
+| Week | Topic | Key Concepts |
+|------|-------|--------------|
+| 1 | JDBC | Pool, binds, transactions |
+| 2 | REST | Resources, codes, validation |
+| 3 | SOAP | WSDL, faults, vs REST |
+| 4 | ES | Mapping, query DSL |
+| 5 | Kibana | KQL, Lens, dashboards |
+| 6 | Logstash | JDBC input, upsert |
+| 7 | Hibernate | Session, N+1, fetch |
+| 8 | JPA | Lifecycle, JPQL, cascade |
+| 9 | Boot | Data repos, security |
+| 10 | Servers | WAR, JNDI, JTA |
+| 11 | Full-text | Analyzers, BM25 |
+| 12 | Docker | Multi-stage, Compose |
+| 13 | Spatial | SDO, index, MapViewer |
+
+### Practice Questions
+
+<div class="exercise-box">
+
+<strong>📝 Sample Exam Questions:</strong>
+
+1. `text` vs `keyword` — when does `term` fail on a `text` field?
+2. Explain N+1 and two fixes with trade-offs.
+3. Design `GET /courses/{id}/students` with pagination + filtering; choose status codes.
+4. Sketch a Logstash pipeline keeping Postgres and ES consistent; handle deletes.
+5. Dockerfile for a Boot app: why multi-stage, non-root, and volume for DB?
+
+</div>
+
+---
+
+## Quick Reference Cards
+
+### JDBC / JPA / REST
+
+```bash
+# Postgres quickstart
+docker run -e POSTGRES_PASSWORD=secret -p 5432:5432 postgres:16
+mvn spring-boot:run
+curl localhost:8080/api/v1/students | jq
+```
+
+```java
+// JPA states: new -> persist() -> managed -> detach() -> detached (-> merge())
+// REST: GET list/one, POST 201, PUT 200/404, DELETE 204
+```
+
+### Elasticsearch / Logstash / Docker
+
+```bash
+curl localhost:9200/_cat/indices
+curl -X PUT localhost:9200/students/_doc/1 -H 'Content-Type: application/json' -d '{"name":"Novak"}'
+docker compose up --build; docker compose down -v  # careful: -v wipes volumes
+```
+
+---
+
+*End of Course Documentation*
+
+**Last Updated:** 2026-09-20
+**Course Code:** KST/NNPDA
+**Credits:** 4 Zk+
+**Labs:** `upce/NNPDA/lab-01-jdbc` … `lab-13-oracle-spatial`

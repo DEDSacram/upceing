@@ -1,0 +1,353 @@
+﻿
+ITN 1nd YEAR Curriculum & Coursework Skeleton
+
+Theoretical Informatics KAM/NNTEI LS
+1. Introduction to language theory and grammar, history, basic concepts.
+2. Regular expressions and regular sets.
+3. Use of regular expressions, practical work with regular expressions.
+4. Regular language (according to Chomsky's classification - type 3 language), use of regular expressions in defining the rules of a regular language.
+5. Finite automaton as a tool for creating a lexical analyzer - scanner.
+6. Context-free language (according to Chomsky's classification - type 2 language). Properties of context-free languages.
+7. Derivation tree as a means for graphically expressing the structure of a sentence. Chomsky and Greibach's normal form.
+8. Stack automaton and its relationship to context-free grammar. Use of a stack automaton in creating a parser.
+9. Turing machines (TS).
+10. Graphical representation of TS, modular construction, basic building blocks of TS.
+11. Using TS as a language acceptor. Language accepted by TS. Modification of TS. Turing machines and type 0 languages.
+12. Various problems and decidability bounds related to TS.
+13. Algorithm complexity, polynomial commutability and intractable problems.
+
+
+Architecture and Design of Inf. Systems KST/NAPIS LS
+
+1. Enterprise architektura - základní pojmy, cíle, metody, techniky
+2. Základy jazyka Archimate
+3. Druhy architektonických pohledů
+4. Kvalitativní požadavky na software a měření kvality softwaru
+5. Analýza aplikačního portfolia organizace
+6. Architecture Building blocks a Solution Building Blocks
+7. Modelování a implementace obchodních procesů v jazyku BPMN v prostředí Camunda
+8. Tvorba aplikací pomocí Solution Building Blocks
+9. Agilní metodiky pro projektování informačních systémů v enterprise kontextu
+10. Architektura a projektová příprava
+11. Definice a popis změny aplikačního ekosystému
+12. Typické problémy transformací aplikačních ekosystémů a jejich řešení
+13. Servisně orientované architektury
+
+
+Data Structures and Algorithms  KST/NNDSA LS
+. String encoding (Huffman encoding trees, Lempel-Ziv encodings)
+2. Data type String and searching algorithms (Knuth-Morris-Pratt algorithm, Karp-Rabin algorithm, string-matching automaton)
+3. Prefix trees (trie) and their implementations (de la Briandais tree)
+4. Advanced heaps (Binomial heap, Fibonacci heap, Pairing heap) and their implementations
+5. Table implementations using binary search trees (AVL-tree, Treap, Splay-tree)
+6. Table implementations using k-way search trees (2-3 tree, a-b trees, B-tree)
+7. Complexity analysis of algorithms and appliactions of heuristics within data structures (amortized analysis, worst-case analysis, move-to front and transpositions heuristics)
+8. Data structures stored within external memory (block transfers, buffers)
+9. Sequential files and random access files
+10. Heap-files and hash-files
+11. Ordered files and indexed sequential files
+12. Hierarchical organization of indexed files (B+-tree)
+13. Dense multi-indexed files
+Programming of Internet Applications KST/NNPIA LS
+1. Úvod do Spring Boot, DI, IoC, system anotací
+2. Spring Boot - controller, Lombok, Spring Web, Spring DevTools, vlastnosti projektu
+3. Spring Boot - docker, Spring data, JPA, repository, DTO
+4. Spring Boot - REST API, validace, úvod do security (JWT, autentizace a autorizace)
+5. Spring Boot - jednotkové, integrační testování
+6. JavaScript, TypeScript - opakování zásadních témat, asynchronní zpracování
+7. React - úvod, základní concept
+8. React - tvorba component, JSX, props, state
+9. React - fetch API, zabezpečení, AXIOS
+10. React - testování
+11. React - pokročilé techniky (React Query, React Hook Form apod.)
+12. Nasazení řešení na server - služby, možnosti
+
+
+ITN 2nd Year — Curriculum & Coursework Skeleton
+
+Queueing Theory (KAM/NNTEF) — ZS — Compulsory
+Credits: 6 | Completion: Zk+ | Type/Note: Teoretický
+Curriculum / Topics
+    • 1. Introduction to Front Theory - History, Basic Elements of Mass Management Systems
+2. Simulation models (physical x mathematical), Monte Carlo method
+3. Markov chains
+4. Kendall classification
+5. M / M / 1 system
+6. M / M / n system with the unfinished queue and proper queue mode
+7. M / M / n system with finite queue length and proper front mode
+8. M / M / n system with losses
+9. Closed system
+10.M / D / 1 system with unbounded queue
+11.M / G / 1 system with unbounded queue
+12.M / EK / 1 system with unbounded queue
+13. Comparison of individual systems
+Coursework / Assessment
+    • ☐ 
+    • ☐ 
+    • ☐ 
+Notes / Resources
+    • 
+
+Operating Systems 1 (KIT/NNOS1) — ZS — Compulsory
+Credits: 6 | Completion: Zk+ | Type/Note: Profilující
+Curriculum / Topics
+    •  1. OS conceptions, kernel architecture, HW prerequisities.
+  2. Process implementation, POSIX signals, system calls.
+  3. Thread implementation, problem of global variables and reentrant functions, POSIX calls.
+  4. Scheduling algorithms, scheduling in Linux: scheduling classes and priorities -- deadline, real-time (FIFO, RR, static priority) and normal (dynamic priority).
+  5. Race conditions, multiprocessor systems (SMP), critical section, SW a HW solutions.
+  6. Solution of the critical section access control using OS tools, implementation of a semaphore and a mutex, system calls.
+  7. Synchronization using a barrier, a condition variable and their implementation, semaphore, system calls.
+  8. System calls for IPC (inter-process communication): pipes, sockets, message queues and their usage for solving synchronization and critical section access control.
+  9. Programming languages tools: concept of the monitor (Java, C#).
+10. Deadlock, livelock and starvation. Prevention and solutions.
+11. Virtual memory: paging and related algorithms (fetch, replacement and cleaning policies), multilevel page tables, segmentation. Intel architecture: IA-32, PAE, IA-32e (x86_64).
+12. Virtualization: native, paravirtualization, containers.
+13. OS development principles, security (data conzistency, user permissions, process permissions, encryption, firewall), attack types.
+Coursework / Assessment
+    • ☐ 
+    • ☐ 
+    • ☐ 
+Notes / Resources
+    • 
+
+Programming Database Applications (KST/NNPDA) — ZS — Compulsory
+Credits: 4 | Completion: Zk+
+Curriculum / Topics
+    • Lecture program:
+1. Basic DB connections (Java Database Connectivity JDBC)
+2. REST web services,
+3. SOAP web services
+4. Elasticsearch
+5. Kibana
+6. Database synchronization using Logstash
+7. Using Hibernate
+8. Java Persisten API (JPA)
+9. Spring/Spring Boot
+10. Application servers
+11. Full-text databases - Elasticsearch
+12. Application virtualization using Docker
+13. Oracle Spatial extensions - MapBilder and MapViewer
+
+Exercise program:
+1. Assignment of semester work A, analysis of implementation options.
+2. Development of the concept of semester work A using UML, independent work of students on the implementation of semester work A.
+3. Continuous individual control of partial iterations of the development of semester work A.
+4. Continuous individual control of partial iterations of the development of semester work A.
+5. Assignment of semester work B, analysis of implementation options, individual defense of semester work A.
+6. Development of the concept of semester work B using UML, independent work of students on the implementation of semester work B, individual
+defense of semester work A.
+7. Continuous individual control of partial iterations of the development of semester work B.
+8. Continuous individual control of partial iterations of the development of semester work B.
+9. Assignment of semester work C, analysis of implementation options, individual defense of semester work B.
+10. Development of the concept of semester work C using UML, independent work of students on the implementation of semester work B. thesis C,
+individual defenses of semester thesis B.
+11. Continuous individual control of partial iteration of development of semester thesis C.
+12. Potential assignment of optional semester thesis D, analysis of implementation options, individual defenses of semester thesis C.
+13. Individual defenses of semester thesis C and potentially also D.
+Coursework / Assessment
+    • ☐ 
+    • ☐ 
+    • ☐ 
+Notes / Resources
+    • 
+
+Year's Project (KST/NNPRO) — ZS — Compulsory
+Credits: 4 | Completion: Zk+
+Project Milestones
+    • ☐ Requirement analysis and initial proposal
+    • ☐ System architecture and database design
+    • ☐ Implementation phase
+    • ☐ Testing, documentation, and final presentation
+Curriculum / Topics
+    • Zadaný projekt je zpracováván v následujících fázích:
+1. Zadání projektu vývoje softwaru, ustavení řešících týmů studentů, rozdělení úkolů
+2. Specifikace zásad řízení projektu s aplikací iterativního životního cyklu
+3. Specifikace požadavků a USE CASE diagramy
+4. Zpětná vazba od zadavatele projektu
+5. Analýza a návrh statické struktury systému - diagramy tříd
+6. Analýza a návrh dynamiky systému - kolaborace
+7. Specifikace sekvenčních diagramů a diagramů spolupráce
+8. Konstrukce stavového modelu - chování objektu
+9. Modelování procesů - diagramy aktivit
+10. Zpětná vazba od zadavatele projektu
+11. Fyzické nasazení systému - diagram komponent a nasazení
+12. Dokumentace systému
+13. Prezentace výsledků projektu
+Coursework / Assessment
+    • ☐ 
+    • ☐ 
+    • ☐ 
+Notes / Resources
+    • 
+
+Data Warehousing (KIT/NNDSK) — LS — Compulsory
+Credits: 4 | Completion: Zk+
+Curriculum / Topics
+    • 1. Introduction to data warehouses (DWH) - introduction to the basic concepts of DWH.
+2. Introduction to OLTP vs OLAP, DataMining, ETL, ELT, Business Intelligence.
+3. Data warehouse architectures - multidimensional databases
+4. Data warehouse models (star, snowflake), reporting, data warehouse layers and their responsibilities.
+5. DWH development methodology - business requirements, methods of building and operating data warehouses, source data/systems analysis, design.
+6. Data preparation, extraction, transformation, deployment (ETL, ELT)
+7. OLAP analysis
+8. SQL analysis options - CUBE and ROLLUP clauses
+9. Integration tools I - ODI, topology design and creation.
+10. Integration tools II, reporting - reporting tools, ODV architecture, basic principles
+11. Visualization tools and dashboard creation options
+12. Business Intelligence in practice
+13. Data Mining in practice
+
+Coursework / Assessment
+    • ☐ 
+    • ☐ 
+    • ☐ 
+Notes / Resources
+    • 
+
+Diploma Thesis (KST/NNDIP) — LS — Compulsory
+Credits: 18 | Completion: Zp
+Thesis Details
+    • Title:
+    • Supervisor:
+Key Tasks & Objectives
+    1. Literature review and state of the art
+    2. Practical design and implementation
+    3. Experimental testing and evaluation
+    4. Defense presentation preparation
+Curriculum / Topics
+    • 
+Coursework / Deliverables
+    • SKIP
+Notes / Resources
+    • 
+
+Diploma Seminar (KST/NNDIS) — LS — Compulsory
+Credits: 2 | Completion: Zp
+Seminar Requirements
+    • 
+Coursework / Deliverables
+    • SKIP
+Notes / Resources
+    • 
+
+Operating Systems 2 (KST/NNOS2) — LS — Compulsory
+Credits: 6 | Completion: Zk+ | Type/Note: Profilující
+Curriculum / Topics
+    • Windows operating system - theory and administration:
+1. Windows architectures and editions, new features.
+2. Processes, threads, multitasking, multithreading, inter-process communications.
+3. Virtual memory, LAP, FAP.
+4. File systems and their properties, data storages.
+5. CLI / GUI and alternative user interfaces.
+6. Windows registry, its keys, subkeys, values, and their data types. Registry management.
+7. Network management in Windows, available tools (Netsh, Remote Desktop, etc.)
+8. WMI interface for data and functionality management on both local and remote Windows operating systems.
+9. Configure and use Microsoft Internet Information Services.
+10. Windows Server - System administration and usage of its tools.
+11. Security of Windows, malware, and fraudulent operating systems.
+12. Scripting batch files, Powershell scripts.
+13. Universal Windows Application (UWP) application, Windows operating system API.
+
+Coursework / Assessment
+    • ☐ 
+    • ☐ 
+    • ☐ 
+Notes / Resources
+    • 
+
+Software Safety and Reliability (KST/NNBSW) — ZS — Elective A
+Credits: 5 | Completion: Zk+ | Type/Note: Profilující
+Curriculum / Topics
+    • Introduction into the subject
+Errors and their consequences
+System complexity and its cosequences
+How people solve constructive tasks?
+Processing capacity and consequences of cognitive limitations of the programmer
+Testing and its limits
+Development process
+Programming language safety
+OS, COTS, generic systems
+Verification, validation, assessment, ISO
+Spark I.
+Sark II.
+IEC 61508, EN50128 standards
+SW development for avionics and nuclear systems
+
+Coursework / Assessment
+    • ☐ 
+    • ☐ 
+    • ☐ 
+Notes / Resources
+    • 
+
+
+13. Distributed simulations - optimistic synchronising methodsModeling and Simulation (KST/NNTMS) — ZS — Elective A
+Credits: 5 | Completion: Zk+ | Type/Note: Profilující
+Curriculum / Topics
+    • 1. On-line simulation and its comparison with off-line simulation, concepts of training simulators
+2. Applications of simulation techniques for supporting different kinds of planning (reactive versus pro-active approach)
+3. Paradigm of autonomous agents - agent-based architectures of simulating systems (ABAsim architecture)
+4. Agent decomposition into internal components, agent-based simulators versus event-driven and process-driven simulators
+5. Complex case study - agent-based traffic simulator reflecting the operation within transportation nodes
+6. Flexible message-passing paradigm within hierarchical agent-based systems (address messages, partially addressed messages, non-addressed messages)
+7. Synchronizations of discrete -continuous simulations within the frame of agent-based architectures
+8. Methods of artificial intelligence and soft computing supporting making decisions within simulators
+9. Petri nets - definition, transition enabling/firing rules, reachability graph, evolution steps
+10. Petri nets - formal description of technological processes and simulator's components, application examples
+11. Concept of distributed and parallel simulations, agent-based distributed simulators
+12. Distributed simulations - synchronisations applying conservative methods
+13. Distributed simulations - optimistic synchronising methods
+
+Coursework / Assessment
+    • ☐ 
+    • ☐ 
+    • ☐ 
+Notes / Resources
+    • 
+
+3D Computer Graphics and the Graphic API (KST/NNPG3) — ZS — Elective B
+Credits: 5 | Completion: Zk+
+Curriculum / Topics
+    • 1. Introduction to the 3D graphics, basic concepts and fundamental terms
+2. Colors and light
+3. Modeling tools, Autodesk Maya
+4. Modeling of the 3D objects
+5. Advanced techniques of the scripting (MEL)
+6. Introduction to the OpenGL, pipeline, graphic primitives and structures
+7. OpenGL shaders
+8. Curves
+9. Textures
+10. Transformation
+11. Screening
+12. 3D projection methods, shadows, shading
+13. Animation
+Coursework / Assessment
+    • ☐ 
+    • ☐ 
+    • ☐ 
+Notes / Resources
+    • 
+
+Modern Trends of Computer Networks (KST/NNTPS) — ZS — Elective B
+Credits: 5 | Completion: Zk+
+Curriculum / Topics
+    • 
+Coursework / Assessment
+    • ☐ 
+    • ☐ 
+    • ☐ 
+Notes / Resources
+    • 
+
+State Final Exam (ITN_S_19) — Final Exam
+Exam Topics
+    • ☐ Povinné předměty — Compulsory Exam Topics
+    • ☐ Povinně volitelné předměty — Elective Exam Topics
+Preparation Checklist
+    • ☐ 
+    • ☐ 
+    • ☐ 
+Notes / Resources
+    • 
+

@@ -1,3 +1,859 @@
 ---
-title: Programming of Internet Applications (KST/NNPIA)
+title: "Programming of Internet Applications (KST/NNPIA)"
+description: "Complete course materials for Spring Boot backends, React frontends and deployment"
+template: doc
 ---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+# Programming of Internet Applications (KST/NNPIA)
+
+Welcome to the Programming of Internet Applications course! This documentation contains all lecture materials, exercises, assignment guidelines, and exam preparation resources in one comprehensive file.
+
+---
+
+## 📑 Table of Contents
+
+### Course Overview
+- [Course Objectives](#course-objectives)
+- [Assessment & Credit Requirements](#assessment--credit-requirements)
+- [Examination Structure](#examination-structure)
+- [Schedule](#schedule)
+
+### Lecture Materials (Weeks 1-13)
+1. [Week 1: Spring Boot Intro — DI, IoC, Annotations](#week-1-spring-boot-intro--di-ioc-annotations)
+2. [Week 2: Controllers, Lombok, Spring Web, DevTools](#week-2-controllers-lombok-spring-web-devtools)
+3. [Week 3: Docker, Spring Data, JPA, Repository, DTO](#week-3-docker-spring-data-jpa-repository-dto)
+4. [Week 4: REST API, Validation, JWT Security](#week-4-rest-api-validation-jwt-security)
+5. [Week 5: Unit and Integration Testing](#week-5-unit-and-integration-testing)
+6. [Week 6: JavaScript/TypeScript and Async](#week-6-javascripttypescript-and-async)
+7. [Week 7: React Intro — Basic Concepts](#week-7-react-intro--basic-concepts)
+8. [Week 8: Components, JSX, Props, State](#week-8-components-jsx-props-state)
+9. [Week 9: Fetch API, Axios, Security](#week-9-fetch-api-axios-security)
+10. [Week 10: React Testing](#week-10-react-testing)
+11. [Week 11: Advanced React — Query and Hook Form](#week-11-advanced-react--query-and-hook-form)
+12. [Week 12: Deployment — Services and Options](#week-12-deployment--services-and-options)
+13. [Week 13: Final Project Workshop and Review](#week-13-final-project-workshop-and-review)
+
+### Assignments & Exam
+- [Assignment Requirements](#assignment-requirements)
+- [Code Review Guide](#code-review-guide)
+- [Exam Preparation](#exam-preparation)
+- [Quick Reference Cards](#quick-reference-cards)
+
+---
+
+## Course Overview
+
+### Course Objectives
+
+<span class="badge">Core</span> <span class="badge info">Full-stack</span> <span class="badge warn">Project</span>
+
+Build a production-like internet application end to end, including:
+
+- **Spring Boot** - DI/IoC, annotations, controllers, configuration
+- **Persistence** - Dockerized DB, Spring Data JPA, repositories, DTO mapping
+- **REST + security** - Resource design, Bean Validation, JWT auth/authz
+- **Testing** - JUnit/Mockito unit tests, MockMvc/Testcontainers integration
+- **JS/TS** - Modern syntax, promises, async/await, fetch/Axios
+- **React** - Components, JSX, props/state, hooks, routing, data fetching
+- **Quality** - React Testing Library/Vitest, React Query, Hook Form
+- **Deployment** - Docker Compose, profiles, reverse proxy, CI deploy
+
+### Assessment & Credit Requirements
+
+<div class="exercise-box">
+
+<strong>📋 To receive credit, students must:</strong>
+
+1. Deliver a **full-stack semester project** (Spring Boot REST + JWT + React frontend)
+2. Backend must use **JPA + DTO + validation + tests**; frontend must use **hooks + data fetching + form**
+3. Project runs via **Docker Compose** and passes a **live demo + code review**
+
+</div>
+
+### Examination Structure
+
+#### In-Person Format
+1. **Project defense** - Demo + architecture walkthrough + live fix task
+2. **Theory questions** - DI, REST, JPA, JWT, React hooks, deployment
+
+#### Distance Format
+1. **Online defense** over Teams: screen-shared demo + theory + coding question
+
+#### Passing Criteria
+- **Working demo** (all core flows) + **60%+** theory answers
+
+### Schedule
+
+| Week | Lecture Topic | Exercise Focus |
+|------|---------------|----------------|
+| 1 | Spring Boot, DI, IoC, annotations | Project skeleton |
+| 2 | Controller, Lombok, Web, DevTools | First endpoints |
+| 3 | Docker, Data, JPA, repository, DTO | Persistence layer |
+| 4 | REST, validation, JWT security | Secured API |
+| 5 | Unit + integration testing | Test suite |
+| 6 | JS/TS, async | TS drills |
+| 7 | React intro | Vite app |
+| 8 | Components, JSX, props, state | Component tree |
+| 9 | Fetch, Axios, security | Auth client |
+| 10 | React testing | RTL tests |
+| 11 | React Query, Hook Form | Server state + forms |
+| 12 | Deployment | Compose + deploy |
+| 13 | Workshop, review | Defense prep |
+
+---
+
+## Week 1: Spring Boot Intro — DI, IoC, Annotations
+
+Spring Boot wires applications via Inversion of Control: the container creates beans and injects dependencies. Starter dependencies, auto-configuration, and layered annotations turn a `main` method into a web app.
+
+### Core Annotations
+
+| Annotation | Role |
+|------------|------|
+| `@SpringBootApplication` | Config + component scan + auto-config |
+| `@Component / @Service / @Repository` | Stereotype beans |
+| `@Autowired` | Injection point (prefer constructor) |
+| `@Value / @ConfigurationProperties` | Externalized config |
+
+```java
+// Constructor injection — preferred: explicit, testable, immutable.
+@Service
+public class OrderService {
+    private final OrderRepository orders;
+    public OrderService(OrderRepository orders) { this.orders = orders; }
+    public Order place(Order o) { return orders.save(o); }
+}
+```
+
+> **Rule:** Prefer constructor injection — field injection hides dependencies and complicates tests.
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Scaffold a Spring Boot 3 project (Web, Validation, Data JPA, Postgres driver), define `GreetingService` + `GreetingController`, externalize the greeting prefix via `application.yml`, and verify with a `@SpringBootTest` context load.
+
+```java
+// stub
+@RestController
+class GreetingController {
+    // GET /api/greet?name=X → "<prefix>, X!"
+}
+```
+
+</div>
+
+---
+
+## Week 2: Controllers, Lombok, Spring Web, DevTools
+
+Controllers map HTTP to methods (`@GetMapping`, `@PostMapping`, ...); Lombok removes boilerplate (`@Getter`, `@Builder`); DevTools gives hot reload. Clean controllers delegate to services and return proper status codes.
+
+### Mapping Cheat Sheet
+
+| Annotation | Example |
+|------------|---------|
+| `@GetMapping("/api/users/{id}")` | Read one (`@PathVariable`) |
+| `@GetMapping("/api/users")` | List (`@RequestParam` filters) |
+| `@PostMapping` + `@RequestBody` | Create → `201 Created` |
+| `@PutMapping / @PatchMapping` | Replace / partial update |
+| `@DeleteMapping` | Remove → `204 No Content` |
+
+```java
+@RestController
+@RequestMapping("/api/products")
+@RequiredArgsConstructor
+public class ProductController {
+    private final ProductService service;
+
+    @GetMapping("/{id}")
+    public ProductDto get(@PathVariable Long id) { return service.get(id); }
+
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public ProductDto create(@Valid @RequestBody ProductDto dto) {
+        return service.create(dto);
+    }
+}
+```
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Build a `Product` CRUD controller with Lombok DTOs (`@Data @Builder`), `201/204` statuses, and a `GET` list with `?q=` filtering. Test all routes with `curl` or HTTP file and paste 5 request/response pairs.
+
+```java
+// stub
+@Data @Builder @NoArgsConstructor @AllArgsConstructor
+class ProductDto { private Long id; private String name; private double price; }
+```
+
+</div>
+
+---
+
+## Week 3: Docker, Spring Data, JPA, Repository, DTO
+
+Postgres runs in Docker; JPA maps entities; Spring Data repositories provide queries; DTOs decouple API contracts from persistence. MapStruct or manual mappers sit at the boundary.
+
+### Layering
+
+| Layer | Contains |
+|-------|----------|
+| Entity | `@Entity`, relations, no JSON leaks |
+| Repository | `JpaRepository`, derived/explicit queries |
+| Mapper | Entity ⟷ DTO conversion |
+| Service | Transactions (`@Transactional`), rules |
+
+```java
+@Entity
+@Getter @Setter @NoArgsConstructor
+public class Product {
+    @Id @GeneratedValue private Long id;
+    private String name;
+    private double price;
+}
+
+public interface ProductRepository extends JpaRepository<Product, Long> {
+    List<Product> findByNameContainingIgnoreCase(String q);
+    @Query("SELECT p FROM Product p WHERE p.price BETWEEN :lo AND :hi")
+    List<Product> inRange(@Param("lo") double lo, @Param("hi") double hi);
+}
+```
+
+```yaml
+# compose.yml — database for development
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: shop
+      POSTGRES_USER: shop
+      POSTGRES_PASSWORD: shop
+    ports: ["5432:5432"]
+    volumes: [pgdata:/var/lib/postgresql/data]
+volumes: {pgdata: {}}
+```
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Containerize Postgres via Compose, map `Product` + `Category (@ManyToOne)` entities, add a paged repository method (`Pageable`), and implement Entity→DTO mapping tested with 3 round-trip asserts.
+
+```java
+// stub
+Page<ProductDto> search(String q, Pageable p);
+```
+
+</div>
+
+---
+
+## Week 4: REST API, Validation, JWT Security
+
+Good REST uses nouns, plural collections, and status codes; Bean Validation rejects bad input early; JWT (access + refresh) statelessly carries identity and roles behind a filter chain with password hashing.
+
+### Status & Validation
+
+| Situation | Status |
+|-----------|--------|
+| Created | `201 + Location` |
+| Bad input | `400 + field errors` |
+| Unauthorized | `401` |
+| Forbidden | `403` |
+| Not found | `404` |
+
+```java
+public record RegisterDto(
+    @NotBlank String username,
+    @Email String email,
+    @Size(min = 8) String password) {}
+
+@RestControllerAdvice
+public class ApiErrors {
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String, String> invalid(MethodArgumentNotValidException ex) {
+        Map<String, String> m = new HashMap<>();
+        ex.getBindingResult().getFieldErrors()
+          .forEach(e -> m.put(e.getField(), e.getDefaultMessage()));
+        return m;
+    }
+}
+```
+
+```java
+// JWT login sketch (filter validates Bearer, sets SecurityContext)
+@PostMapping("/auth/login")
+public TokenDto login(@Valid @RequestBody LoginDto dto) {
+    authenticationManager.authenticate(
+        new UsernamePasswordAuthenticationToken(dto.username(), dto.password()));
+    return tokens.issue(dto.username());
+}
+```
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Secure your API: BCrypt registration, `/auth/login` issuing JWT, role `ADMIN` guarding `DELETE /api/products/{id}`, and a `@RestControllerAdvice` error shape `{message, fields}`. Demonstrate 401/403/400 with curl transcripts.
+
+```bash
+# stub
+curl -i -X POST localhost:8080/api/products -H "Content-Type: application/json" -d '{}'
+# → expect 400 with field errors
+```
+
+</div>
+
+---
+
+## Week 5: Unit and Integration Testing
+
+Test pyramid: fast unit tests (Mockito) for services, slice tests (`@WebMvcTest`) for controllers, and full integration (`@SpringBootTest` + Testcontainers) for repositories and security flows.
+
+### Test Stack
+
+| Scope | Tooling |
+|-------|---------|
+| Unit | JUnit 5 + Mockito + AssertJ |
+| Web slice | `@WebMvcTest` + MockMvc |
+| Data | `@DataJpaTest` / Testcontainers Postgres |
+| Full API | `@SpringBootTest` + MockMvc + JWT helper |
+
+```java
+@ExtendWith(MockitoExtension.class)
+class OrderServiceTest {
+    @Mock OrderRepository repo;
+    @InjectMocks OrderService service;
+
+    @Test
+    void placesOrder() {
+        when(repo.save(any())).thenAnswer(i -> i.getArgument(0));
+        assertNotNull(service.place(new Order()));
+        verify(repo).save(any());
+    }
+}
+```
+
+```java
+@SpringBootTest
+@AutoConfigureMockMvc
+class ProductApiIT {
+    @Autowired MockMvc mvc;
+    @Test
+    void rejectsAnonymousDelete() throws Exception {
+        mvc.perform(delete("/api/products/1"))
+           .andExpect(status().isUnauthorized());
+    }
+}
+```
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Add 5 unit tests (service + mapper), 3 MockMvc controller tests (201/400/404), and 2 integration tests (repository query + secured happy path). Enforce 70%+ line coverage on the service package via JaCoCo.
+
+```bash
+# stub
+./mvnw test jacoco:report
+# open target/site/jacoco/index.html
+```
+
+</div>
+
+---
+
+## Week 6: JavaScript/TypeScript and Async
+
+Modern frontends are TypeScript: strict types, narrowing, generics, plus promise-based async (`async/await`, `Promise.all`, AbortController). This week rebuilds JS fundamentals before React.
+
+### Async Patterns
+
+| Pattern | Use |
+|---------|-----|
+| `await fetch(...)` | Sequential I/O |
+| `Promise.all([...])` | Parallel independent calls |
+| `AbortController` | Cancel stale requests |
+| `try/catch + Result` | Typed error paths |
+
+```typescript
+export interface Product { id: number; name: string; price: number; }
+
+export async function getProducts(signal?: AbortSignal): Promise<Product[]> {
+  const res = await fetch("/api/products", { signal });
+  if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
+  return (await res.json()) as Product[];
+}
+
+// Parallel load with graceful partial failure
+const [products, cats] = await Promise.all([
+  getProducts().catch(() => []),
+  getCategories().catch(() => []),
+]);
+```
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> In TypeScript: type 3 API DTOs, implement `api<T>(path)` with timeout abort + typed errors, and load two resources in parallel with `Promise.allSettled`. Cover with 4 Vitest tests (ok/404/timeout/abort).
+
+```typescript
+// stub
+export async function api<T>(path: string, ms = 5000): Promise<T> { /* ... */ }
+```
+
+</div>
+
+---
+
+## Week 7: React Intro — Basic Concepts
+
+React renders UI from state via components; Vite + strict TypeScript is the course baseline. JSX, props-down/events-up, and the `useState`/`useEffect` pair carry the first apps before routers and servers enter.
+
+### Mental Model
+
+| Concept | Rule |
+|---------|------|
+| Components | Pure functions of props + state |
+| JSX | One root, `{}` for expressions |
+| State | `useState` for local; lift when shared |
+| Effects | `useEffect` for sync with outside (fetch, timers) |
+
+```tsx
+import { useEffect, useState } from "react";
+import { getProducts, type Product } from "./api";
+
+export function ProductList() {
+  const [items, setItems] = useState<Product[]>([]);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const ac = new AbortController();
+    getProducts(ac.signal).then(setItems, (e) => setError(String(e)));
+    return () => ac.abort();
+  }, []);
+
+  if (error) return <p role="alert">Failed: {error}</p>;
+  return <ul>{items.map((p) => <li key={p.id}>{p.name} — {p.price} Kč</li>)}</ul>;
+}
+```
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Scaffold a Vite React-TS app with ESLint + Prettier, implement `ProductList` with loading/error/empty states, and add React Router routes `/` and `/products/:id` (detail fetches by id).
+
+```bash
+# stub
+npm create vite@latest shop-ui -- --template react-ts
+npm i react-router-dom
+```
+
+</div>
+
+---
+
+## Week 8: Components, JSX, Props, State
+
+Reusable components need typed props, composition (`children`), controlled inputs, and custom hooks. State lives as low as possible; shared state lifts to the nearest common ancestor or context.
+
+### Patterns
+
+| Pattern | Example |
+|---------|---------|
+| Controlled input | `value + onChange`, single source |
+| Composition | `<Card><ProductForm/></Card>` |
+| Custom hook | `useProducts()` hides fetch logic |
+| Lifting | Filter state in parent, list dumb |
+
+```tsx
+interface Props { value: string; onChange: (v: string) => void; }
+
+export function SearchBox({ value, onChange }: Props) {
+  return (
+    <label>Search{" "}
+      <input value={value} onChange={(e) => onChange(e.target.value)} placeholder="laptop…" />
+    </label>
+  );
+}
+
+export function useDebounced<T>(value: T, ms = 300): T {
+  const [v, setV] = useState(value);
+  useEffect(() => {
+    const t = setTimeout(() => setV(value), ms);
+    return () => clearTimeout(t);
+  }, [value, ms]);
+  return v;
+}
+```
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Build `SearchBox + ProductList + Pagination` wired through a debounced query in the parent. Extract `useProducts(q, page)` hook with abort + loading flag, and keep every component under 80 lines.
+
+```tsx
+// stub
+// function ShopPage() { const [q, setQ] = useState(""); ... }
+```
+
+</div>
+
+---
+
+## Week 9: Fetch API, Axios, Security
+
+Browsers call secured APIs with `Authorization: Bearer <jwt>`; Axios instances centralize base URL, token attach, and 401 refresh-and-retry. Tokens live in memory (or httpOnly cookies) — never in `localStorage` for XSS-exposed apps.
+
+### Client Security Checklist
+
+```typescript
+import axios from "axios";
+
+export const http = axios.create({ baseURL: "/api", timeout: 8000 });
+
+let access = ""; // memory only
+http.interceptors.request.use((c) => {
+  if (access) c.headers.Authorization = `Bearer ${access}`;
+  return c;
+});
+http.interceptors.response.use(
+  (r) => r,
+  async (err) => {
+    if (err.response?.status === 401 && !err.config._retry) {
+      err.config._retry = true;
+      access = await refreshAccess(); // POST /auth/refresh (cookie)
+      return http(err.config);
+    }
+    throw err;
+  }
+);
+```
+
+| Storage | XSS risk | CSRF risk | Verdict |
+|---------|----------|-----------|---------|
+| localStorage | <span class="badge danger">High</span> | Low | Avoid for tokens |
+| Memory | Low | Low | <span class="badge">Preferred</span> |
+| httpOnly cookie | Low | Needs SameSite+CSRF | Good alternative |
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Implement login/logout, Axios token attach + refresh retry, and a `RequireAuth` route guard redirecting to `/login`. Show DevTools transcripts for login → 200 list → expired token → silent refresh → retry.
+
+```tsx
+// stub
+// <Route element={<RequireAuth />}> <Route path="/admin" ... /> </Route>
+```
+
+</div>
+
+---
+
+## Week 10: React Testing
+
+React Testing Library tests behavior ("user sees/filters/buys"), not internals: render, interact with `userEvent`, assert visible outcomes, mock network with MSW. Vitest runs it fast in CI.
+
+### Query Priority
+
+| Priority | Query | Why |
+|----------|-------|-----|
+| 1 | `getByRole` | Accessible = testable |
+| 2 | `getByLabelText` | Form-friendly |
+| 3 | `getByText` | Content checks |
+| Avoid | `testId` | Last resort |
+
+```tsx
+import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { ProductList } from "./ProductList";
+
+test("filters products", async () => {
+  render(<ProductList />);
+  await userEvent.type(screen.getByLabelText(/search/i), "phone");
+  expect(await screen.findByText(/phone/i)).toBeInTheDocument();
+  expect(screen.queryByText(/laptop/i)).not.toBeInTheDocument();
+});
+```
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Cover `SearchBox` (typing), `ProductList` (loading→data→empty→error via MSW), and login form (validation messages). Reach 5+ tests, all role/label-based, running in `npm test` under 30 s.
+
+```bash
+# stub
+npm i -D vitest @testing-library/react @testing-library/user-event msw
+npm test -- --run
+```
+
+</div>
+
+---
+
+## Week 11: Advanced React — Query and Hook Form
+
+Server state (cache, refetch, pagination) belongs to React Query; form state (values, errors, submit) to Hook Form + Zod. Together they remove most `useEffect` fetching and hand-rolled validation.
+
+### Stack
+
+| Concern | Tool |
+|---------|------|
+| Fetch/cache | `@tanstack/react-query` |
+| Forms | `react-hook-form` + `zod` + resolvers |
+| Mutations | `useMutation` + query invalidation |
+
+```tsx
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+const Schema = z.object({
+  name: z.string().min(2),
+  price: z.coerce.number().positive(),
+});
+type Form = z.infer<typeof Schema>;
+
+export function ProductForm() {
+  const qc = useQueryClient();
+  const { register, handleSubmit, formState: { errors } } =
+    useForm<Form>({ resolver: zodResolver(Schema) });
+  const save = useMutation({
+    mutationFn: (v: Form) => http.post("/products", v),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["products"] }),
+  });
+  return (
+    <form onSubmit={handleSubmit((v) => save.mutate(v))}>
+      <input {...register("name")} />
+      {errors.name && <small>{errors.name.message}</small>}
+      <input {...register("price")} type="number" />
+      <button disabled={save.isPending}>Save</button>
+    </form>
+  );
+}
+```
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Migrate product list to `useQuery(["products", q, page])` with `keepPreviousData` pagination and the create form to Hook Form + Zod. Add optimistic delete with rollback on error.
+
+```tsx
+// stub
+// useMutation({ onMutate: snapshot, onError: restore, onSettled: invalidate })
+```
+
+</div>
+
+---
+
+## Week 12: Deployment — Services and Options
+
+Ship with Docker Compose: frontend (Nginx static), backend (JVM), Postgres, and Caddy/Nginx TLS proxy. Spring profiles (`dev/prod`), health checks, and env-only secrets separate code from environment.
+
+### Compose Topology
+
+```yaml
+services:
+  db: {image: postgres:16, volumes: [pgdata:/var/lib/postgresql/data]}
+  api:
+    build: ./backend
+    environment: {SPRING_PROFILES_ACTIVE: prod, DB_URL: jdbc:postgresql://db:5432/shop}
+    depends_on: {db: {condition: service_healthy}}
+  web:
+    build: ./frontend
+    ports: ["80:80", "443:443"]
+    depends_on: [api]
+```
+
+```bash
+# backend Dockerfile (layered)
+FROM eclipse-temurin:21-jre AS run
+COPY target/app.jar /app.jar
+HEALTHCHECK CMD wget -qO- http://localhost:8080/actuator/health | grep UP
+ENTRYPOINT ["java", "-jar", "/app.jar"]
+```
+
+| Target | Option |
+|--------|--------|
+| University VM | Compose + Caddy, systemd unit |
+| Cloud PaaS | Render/Fly.io, managed Postgres |
+| Kubernetes | Beyond scope — manifest sketch only |
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Dockerize backend + frontend, add `/actuator/health`, wire Compose with healthy `depends_on`, and deploy to one target with HTTPS. Paste `docker compose ps`, health JSON, and the public URL checklist (200 on `/`, 401 on admin API).
+
+```bash
+# stub
+docker compose up -d --build
+curl -s localhost:8080/actuator/health
+```
+
+</div>
+
+---
+
+## Week 13: Final Project Workshop and Review
+
+Polish week: threat-model pass, performance pass (N+1, pagination, bundle size), accessibility audit, and defense rehearsal. Every team leaves with a demo script and a risk register.
+
+### Hardening Checklist
+
+| Area | Check |
+|------|-------|
+| Security | No secrets in git, CORS locked, rate-limit login |
+| Data | Migrations (Flyway), backups tested |
+| Perf | `spring.jpa.open-in-view=false`, DTO projections, image lazy-load |
+| A11y | Labels, focus order, contrast, keyboard flows |
+
+```bash
+# pre-defense smoke script
+./mvnw -q test && npm --prefix frontend test -- --run
+docker compose up -d --build && sleep 8
+curl -sf localhost:8080/actuator/health && echo DEFENSE-READY
+```
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Run the full smoke script, record a 3-minute demo video, and prepare 5 likely examiner questions with one-slide answers each. Fix every P0 finding before the defense slot.
+
+```text
+// stub demo script:
+// 0:00 login → 0:40 browse+filter → 1:20 create → 2:00 validation error → 2:30 admin delete
+```
+
+</div>
+
+---
+
+## Assignment Requirements
+
+### Semester Project Scope
+
+<div class="exercise-box">
+
+<strong>📋 Minimum viable project (must demo):</strong>
+
+| Slice | Must have |
+|-------|-----------|
+| **Auth** | Register, login (JWT), role guard |
+| **Domain** | 2+ related entities, paged list + detail |
+| **Forms** | Validated create/edit (Hook Form + Bean Validation) |
+| **Ops** | Compose boot, health endpoint, seeded demo data |
+
+</div>
+
+### Submission Checklist
+
+<div class="checklist">
+
+- [ ] README: run (`docker compose up`), accounts, API map
+- [ ] Backend tests green (`./mvnw test`), frontend tests green
+- [ ] No hardcoded secrets; `.env.example` provided
+- [ ] OpenAPI or endpoint table documents every route
+- [ ] Demo video link + live URL/VM access for examiner
+- [ ] Defense slides (arch diagram + 2 ADRs + lessons learned)
+
+</div>
+
+---
+
+## Code Review Guide
+
+### What to Look For
+
+#### 1. Backend layering
+- Controllers thin? Business in `@Transactional` services? DTOs at boundary?
+
+#### 2. Security
+- Passwords hashed? JWT expiry + refresh? Authz by role, not just authn?
+
+#### 3. Frontend hygiene
+- No `useEffect` fetch soup (Query used)? Forms validated both sides?
+
+<div class="review-note">
+
+<strong>🔍 Practice Review:</strong> A controller calls `repository.save(entity)` directly with the `@RequestBody` entity and stores passwords in plain text. Issues: mass-assignment, no validation, no hashing, no DTO. Fix: introduce `RegisterDto` + `@Valid`, map to entity, `passwordEncoder.encode()`, return `201 + Location` without the hash.
+
+```java
+// fixed sketch:
+var e = new User(dto.username(), encoder.encode(dto.password()), Set.of(Role.USER));
+repo.save(e);
+return ResponseEntity.created(URI.create("/api/users/" + e.getId())).build();
+```
+
+</div>
+
+---
+
+## Exam Preparation
+
+### Exam Structure
+
+1. **Defense (15 min):** live demo → architecture → examiner's change request implemented or sketched.
+2. **Theory (10 min):** 3 drawn questions across backend/frontend/ops.
+
+### Key Topics to Review
+
+| Week | Topic | Key Concepts |
+|------|-------|--------------|
+| 1–2 | Boot, DI, controllers | Beans, injection, mappings |
+| 3–4 | JPA/DTO, REST/JWT | Repositories, validation, filters |
+| 5 | Testing | Pyramid, slices, containers |
+| 6–9 | TS, React, HTTP, auth | Hooks, Axios, guards |
+| 10–11 | Testing, Query/Forms | RTL, cache, mutations |
+| 12–13 | Deploy, hardening | Compose, profiles, TLS |
+
+<div class="exercise-box">
+
+<strong>📝 Sample Exam Questions:</strong>
+
+1. Constructor vs field injection — which and why?
+2. Entity vs DTO — where does each belong and why?
+3. How does refresh-token rotation limit theft impact?
+4. `useEffect` vs React Query for server data — compare.
+5. What breaks when `open-in-view` is left enabled in production?
+
+</div>
+
+### Resources
+
+- Lecture demos + starter repos (STAG / GitLab)
+- Spring Boot, React Query, Hook Form official docs
+- Team repo + demo video as primary evidence
+
+---
+
+## Quick Reference Cards
+
+### Spring Boot Annotations
+
+```java
+@SpringBootApplication @RestController @RequestMapping("/api/x")
+@GetMapping @PostMapping @PutMapping @DeleteMapping
+@PathVariable @RequestParam @RequestBody @Valid
+@Service @Repository @Entity @Transactional @RestControllerAdvice
+```
+
+### HTTP & JWT
+
+```text
+201 + Location (create) · 204 (delete) · 400 (validation) · 401/403 (auth)
+Bearer <access:5-15min> + refresh cookie (rotating, reuse-detected).
+Axios: attach → 401 → refresh once → retry → else logout.
+```
+
+### React + Query
+
+```tsx
+// list with server state
+const { data, isPending, error } = useQuery({
+  queryKey: ["products", q, page],
+  queryFn: () => http.get("/products", { params: { q, page } }).then((r) => r.data),
+});
+// mutate then refresh
+const qc = useQueryClient();
+const del = useMutation({
+  mutationFn: (id: number) => http.delete(`/products/${id}`),
+  onSuccess: () => qc.invalidateQueries({ queryKey: ["products"] }),
+});
+```
+
+---
+
+*End of Course Documentation*
+
+**Last Updated:** 2026-09-20
+**Course Code:** KST/NNPIA

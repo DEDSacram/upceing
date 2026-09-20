@@ -49,7 +49,18 @@ Immediately after the frontmatter, include a **manual Table of Contents** using 
 - **Assignments & Exam** – assignment requirements, code review, exam prep
 
 All links must point to corresponding `#week-1-...` anchors (generated from heading text). Use lower‑case with hyphens.
-
+1. Úvod do Spring Boot, DI, IoC, system anotací
+2. Spring Boot - controller, Lombok, Spring Web, Spring DevTools, vlastnosti projektu
+3. Spring Boot - docker, Spring data, JPA, repository, DTO
+4. Spring Boot - REST API, validace, úvod do security (JWT, autentizace a autorizace)
+5. Spring Boot - jednotkové, integrační testování
+6. JavaScript, TypeScript - opakování zásadních témat, asynchronní zpracování
+7. React - úvod, základní concept
+8. React - tvorba component, JSX, props, state
+9. React - fetch API, zabezpečení, AXIOS
+10. React - testování
+11. React - pokročilé techniky (React Query, React Hook Form apod.)
+12. Nasazení řešení na server - služby, možnosti
 ---
 
 ## 4. Section Structure

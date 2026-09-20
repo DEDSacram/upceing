@@ -1,3 +1,754 @@
 ---
-title: Data Structures and Algorithms (KST/NNDSA)
+title: "Data Structures and Algorithms (KST/NNDSA)"
+description: "Complete course materials for advanced data structures, file organizations and analysis"
+template: doc
 ---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+# Data Structures and Algorithms (KST/NNDSA)
+
+Welcome to the Data Structures and Algorithms course! This documentation contains all lecture materials, exercises, assignment guidelines, and exam preparation resources in one comprehensive file.
+
+---
+
+## 📑 Table of Contents
+
+### Course Overview
+- [Course Objectives](#course-objectives)
+- [Assessment & Credit Requirements](#assessment--credit-requirements)
+- [Examination Structure](#examination-structure)
+- [Schedule](#schedule)
+
+### Lecture Materials (Weeks 1-13)
+1. [Week 1: String Encoding — Huffman and Lempel-Ziv](#week-1-string-encoding--huffman-and-lempel-ziv)
+2. [Week 2: String Searching — KMP, Karp-Rabin, Automaton](#week-2-string-searching--kmp-karp-rabin-automaton)
+3. [Week 3: Prefix Trees — Trie and de la Briandais](#week-3-prefix-trees--trie-and-de-la-briandais)
+4. [Week 4: Advanced Heaps — Binomial, Fibonacci, Pairing](#week-4-advanced-heaps--binomial-fibonacci-pairing)
+5. [Week 5: BST Tables — AVL, Treap, Splay](#week-5-bst-tables--avl-treap-splay)
+6. [Week 6: K-Way Search Trees — 2-3, a-b, B-Tree](#week-6-k-way-search-trees--2-3-a-b-b-tree)
+7. [Week 7: Amortized and Worst-Case Analysis, Heuristics](#week-7-amortized-and-worst-case-analysis-heuristics)
+8. [Week 8: External Memory — Blocks and Buffers](#week-8-external-memory--blocks-and-buffers)
+9. [Week 9: Sequential and Random-Access Files](#week-9-sequential-and-random-access-files)
+10. [Week 10: Heap Files and Hash Files](#week-10-heap-files-and-hash-files)
+11. [Week 11: Ordered and Indexed Sequential Files](#week-11-ordered-and-indexed-sequential-files)
+12. [Week 12: B+ Trees for Indexed Files](#week-12-b-trees-for-indexed-files)
+13. [Week 13: Dense Multi-Indexed Files](#week-13-dense-multi-indexed-files)
+
+### Assignments & Exam
+- [Assignment Requirements](#assignment-requirements)
+- [Code Review Guide](#code-review-guide)
+- [Exam Preparation](#exam-preparation)
+- [Quick Reference Cards](#quick-reference-cards)
+
+---
+
+## Course Overview
+
+### Course Objectives
+
+<span class="badge">Core</span> <span class="badge info">Algorithms</span> <span class="badge warn">Advanced</span>
+
+Familiarize students with advanced in-memory and external data structures, including:
+
+- **Encoding** - Huffman trees, LZ77/LZ78/LZW compression
+- **String matching** - KMP prefix function, Karp-Rabin hashing, automaton
+- **Tries** - Classic trie, de la Briandais (sibling-child) representation
+- **Heaps** - Binomial, Fibonacci, pairing heaps and amortized bounds
+- **Balanced BST** - AVL rotations, treap priorities, splay moves
+- **K-way trees** - 2-3 trees, (a,b)-trees, B-trees
+- **Analysis** - Aggregate, accounting, potential methods; MTF heuristics
+- **External memory** - Block model, buffering, I/O complexity
+- **File organizations** - Sequential, heap, hash, indexed sequential, B+ tree, multi-index
+
+### Assessment & Credit Requirements
+
+<div class="exercise-box">
+
+<strong>📋 To receive credit, students must:</strong>
+
+1. Implement **2 semester tasks** (e.g. Huffman codec + B-tree/B+ tree index)
+2. Pass the **credit test** (string algorithms + balanced trees, min. 50%)
+3. Each implementation must include **correctness tests + complexity report**
+
+</div>
+
+### Examination Structure
+
+#### In-Person Format
+1. **Written part** - Traces (KMP table, AVL rotations, B-tree ops) + analysis
+2. **Oral part** - Proofs, comparisons, file-organization design trade-offs
+
+#### Distance Format
+1. **Oral examination**: live traces + theory + code walkthrough of semester tasks
+
+#### Passing Criteria
+- **Minimum 60%** written to reach the oral; E requires one full trace + one proof sketch
+
+### Schedule
+
+| Week | Lecture Topic | Exercise Focus |
+|------|---------------|----------------|
+| 1 | Huffman, LZ encodings | Codec implementation |
+| 2 | KMP, Karp-Rabin, automaton | Matcher traces |
+| 3 | Trie, de la Briandais | Prefix-tree ops |
+| 4 | Binomial/Fibonacci/pairing heaps | Heap traces |
+| 5 | AVL, treap, splay | Rotations, priorities |
+| 6 | 2-3, (a,b), B-tree | Multiway traces |
+| 7 | Amortized analysis, heuristics | Potential method |
+| 8 | External memory model | I/O counting |
+| 9 | Sequential/random files | Record layouts |
+| 10 | Heap/hash files | Collision handling |
+| 11 | Ordered/indexed sequential | ISAM levels |
+| 12 | B+ tree | Leaf-linked ops |
+| 13 | Dense multi-index | Multi-key design |
+
+---
+
+## Week 1: String Encoding — Huffman and Lempel-Ziv
+
+Compression removes redundancy: Huffman assigns short codes to frequent symbols (optimal prefix code); LZ methods replace repeats with back-references. Both illustrate greedy correctness and dictionary trade-offs.
+
+### Huffman Essentials
+
+| Step | Action |
+|------|--------|
+| Count | Frequency table of symbols |
+| Build | Repeatedly merge two lowest nodes (min-heap) |
+| Code | Left 0 / right 1; prefix-free by construction |
+| Bound | Average length within 1 bit of entropy |
+
+### LZ Family
+
+| Variant | Idea |
+|---------|------|
+| LZ77 | Sliding window `(offset, length, next)` triples |
+| LZ78 | Explicit dictionary, `code + char` pairs |
+| LZW | Pre-seeded dict (GIF), code-only stream |
+
+```python
+import heapq
+def huffman(freq):
+    heap = [[w, [s, ""]] for s, w in freq.items()]
+    heapq.heapify(heap)
+    while len(heap) > 1:
+        lo = heapq.heappop(heap); hi = heapq.heappop(heap)
+        for pair in lo[1:]: pair[1] = "0" + pair[1]
+        for pair in hi[1:]: pair[1] = "1" + pair[1]
+        heapq.heappush(heap, [lo[0] + hi[0]] + lo[1:] + hi[1:])
+    return dict((s, c) for s, c in heap[0][1:])
+
+print(huffman({"a": 45, "b": 13, "c": 12, "d": 16, "e": 9, "f": 5}))
+```
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Build a Huffman codec for a sample text: compute frequencies, construct the tree, encode + decode, and report compression ratio vs fixed 8-bit. Then hand-simulate LZ77 on `ababa$baba` with window 6 and list the triples.
+
+```python
+# stub
+def encode(text, table): return "".join(table[ch] for ch in text)
+def decode(bits, tree): ...
+```
+
+</div>
+
+---
+
+## Week 2: String Searching — KMP, Karp-Rabin, Automaton
+
+Naive matching rescans; KMP skips via the prefix function `π`; Karp-Rabin filters via rolling hash; a full string-matching automaton precomputes transitions. All achieve linear or expected-linear time.
+
+### Comparison
+
+| Algorithm | Preprocessing | Search | Idea |
+|-----------|---------------|--------|------|
+| Naive | — | `O(nm)` | Rescan everything |
+| KMP | `O(m)` | `O(n)` | `π` = longest proper prefix-suffix |
+| Karp-Rabin | `O(m)` | `O(n+m)` expected | Rolling hash, verify hits |
+| Automaton | `O(m·σ)` | `O(n)` | DFA over alphabet |
+
+### KMP Prefix Function
+
+```python
+def prefix_function(p: str):
+    pi = [0] * len(p)
+    for i in range(1, len(p)):
+        j = pi[i - 1]
+        while j > 0 and p[i] != p[j]:
+            j = pi[j - 1]
+        if p[i] == p[j]:
+            j += 1
+        pi[i] = j
+    return pi
+
+def kmp_search(text, pat):
+    pi = prefix_function(pat)
+    j = 0; hits = []
+    for i, ch in enumerate(text):
+        while j > 0 and ch != pat[j]:
+            j = pi[j - 1]
+        if ch == pat[j]: j += 1
+        if j == len(pat):
+            hits.append(i - j + 1); j = pi[j - 1]
+    return hits
+
+print(prefix_function("ababaca"))  # [0,0,1,2,3,0,1]
+print(kmp_search("ababaababaca", "ababaca"))
+```
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Compute `π` for `aabaabaaa` by hand (table per position), trace KMP on text `aabaabaabaaa`, then implement Karp-Rabin with mod `q=101`, base `d=256`, and count spurious hits on the same input.
+
+```python
+# stub
+def rolling_hash(s, d=256, q=101): ...
+```
+
+</div>
+
+---
+
+## Week 3: Prefix Trees — Trie and de la Briandais
+
+Tries share prefixes for fast `O(|key|)` lookup, autocomplete, and sorting. The de la Briandais (left-child / right-sibling) representation stores sparse children without wide arrays — ideal for large alphabets.
+
+### Representations
+
+| Variant | Children storage | Memory |
+|---------|------------------|--------|
+| Array trie | `σ` pointers/node | Fast, wasteful |
+| Map trie | Hash/ordered map | Balanced default |
+| de la Briandais | First-child + next-sibling | Compact, pointer chase |
+
+```python
+class DLBNode:
+    __slots__ = ("ch", "child", "sibling", "value")
+    def __init__(self, ch=""):
+        self.ch = ch; self.child = None; self.sibling = None; self.value = None
+
+def dlb_insert(root, key, value):
+    node = root
+    for ch in key:
+        prev, cur = None, node.child
+        while cur and cur.ch != ch:
+            prev, cur = cur, cur.sibling
+        if cur is None:
+            cur = DLBNode(ch)
+            cur.sibling = node.child; node.child = cur
+        node = cur
+    node.value = value
+```
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Insert `he, her, hers, his, she` into (a) a classic trie diagram and (b) a de la Briandais structure. Implement search + prefix enumeration, then compare node counts of both representations.
+
+```python
+# stub
+def dlb_search(root, key): ...
+def collect(node, prefix, out): ...
+```
+
+</div>
+
+---
+
+## Week 4: Advanced Heaps — Binomial, Fibonacci, Pairing
+
+Beyond binary heaps: binomial heaps merge in `O(log n)`; Fibonacci heaps give `O(1)` amortized insert/decrease-key (Dijkstra's friend); pairing heaps are simpler with excellent practice performance and conjectured near-optimal bounds.
+
+### Operation Bounds (Amortized)
+
+| Operation | Binomial | Fibonacci | Pairing |
+|-----------|----------|-----------|---------|
+| Insert | `O(log n)` | `O(1)` | `O(1)`* |
+| Find-min | `O(log n)` | `O(1)` | `O(1)` |
+| Extract-min | `O(log n)` | `O(log n)` | `O(log n)`* |
+| Decrease-key | `O(log n)` | `O(1)` | `O(log n)`* |
+| Merge | `O(log n)` | `O(1)` | `O(1)` |
+
+```python
+# Binomial-tree sketch: order-k tree has 2^k nodes; heap = forest, like binary counter.
+# Merge = binary addition of trees by order, linking equal orders.
+def binomial_merge(h1, h2):
+    """Carry-propagate trees of equal order (pseudo)."""
+    carry = None; out = []
+    # ... link trees with same order, keep min-root as parent ...
+    return out
+```
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Trace binomial-heap insert of `5,3,8,1,7` (draw forest after each), then extract-min once. Implement a pairing heap with insert/merge/extract-min and benchmark vs `heapq` on 50k ops.
+
+```python
+# stub
+class PairingHeap:
+    def meld(self, a, b): ...
+    def push(self, x): ...
+    def pop_min(self): ...
+```
+
+</div>
+
+---
+
+## Week 5: BST Tables — AVL, Treap, Splay
+
+Balanced BSTs keep `O(log n)` height differently: AVL enforces `|balance| ≤ 1` with rotations; treaps combine BST order with heap priorities; splay trees move accessed nodes to root (amortized log, adaptive to locality).
+
+### Rotations and Fixes
+
+| Tree | Invariant | Fix |
+|-----|-----------|-----|
+| AVL | Height diff ≤ 1 | Single/double rotations |
+| Treap | BST + heap on random priority | Rotate up on insert |
+| Splay | None explicit | Zig / zig-zig / zig-zag |
+
+```python
+class Node:
+    __slots__ = ("k", "l", "r", "h")
+    def __init__(self, k): self.k = k; self.l = self.r = None; self.h = 1
+
+def height(n): return n.h if n else 0
+def rot_right(y):
+    x = y.l; y.l = x.r; x.r = y
+    y.h = 1 + max(height(y.l), height(y.r))
+    x.h = 1 + max(height(x.l), height(x.r))
+    return x
+```
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Insert `10,20,30,40,50,25` into an empty AVL (draw tree + balance factors after each insert, marking rotations). Then insert the same keys with fixed priorities into a treap and splay key `25` showing zig-zig steps.
+
+```python
+# stub
+def avl_insert(root, k): ...  # return new root, update heights, rotate
+```
+
+</div>
+
+---
+
+## Week 6: K-Way Search Trees — 2-3, a-b, B-Tree
+
+Multiway trees reduce height for disk: 2-3 trees (all leaves same depth, 2- or 3-children), general `(a,b)`-trees, and B-trees (node = page, `t` = minimum degree). Splits propagate upward; all leaves stay level.
+
+### Parameters
+
+| Tree | Node occupancy | Height |
+|------|---------------|--------|
+| 2-3 | 1–2 keys, 2–3 children | `O(log n)` |
+| (a,b) | `a-1..b-1` keys | `O(log n)` |
+| B-tree `t` | `t-1..2t-1` keys | `O(log_{t} n)` |
+
+```text
+B-tree (t=2) insert 10,20,5,6,12,30,7,17 — split full child first:
+  [10,20] + insert 5,6 → split → root [10], children [5,6],[20] ...
+  Overflow of [20,30] on insert 30 → split, promote 20 ...
+```
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Hand-trace B-tree `t=2` insert sequence `10,20,5,6,12,30,7,17` and delete `6` then `13` (borrow/merge cases). Implement search + insert and verify height stays ≤ 3 for 40 keys.
+
+```python
+# stub
+class BTreeNode:
+    def __init__(self, t, leaf=True): self.keys=[]; self.c=[]; self.leaf=leaf
+```
+
+</div>
+
+---
+
+## Week 7: Amortized and Worst-Case Analysis, Heuristics
+
+Amortized analysis averages cost over sequences: aggregate, accounting (credits), and potential (`Φ`) methods. Self-organizing lists use move-to-front (MTF) with 2-competitiveness vs optimal offline order.
+
+### Methods
+
+| Method | Formula | Use |
+|--------|---------|-----|
+| Aggregate | `total/n` | Stack with multipop |
+| Accounting | Charge `ĉᵢ`, keep credit ≥ 0 | Incrementing counter |
+| Potential | `ĉᵢ = cᵢ + Φᵢ − Φᵢ₋₁` | Dynamic table, splay |
+
+```python
+# Dynamic table doubling: potential Phi = 2*num - size keeps amortized insert O(1).
+def amortized_demo():
+    size, num, total = 1, 0, 0
+    for _ in range(16):
+        if num == size: total += size; size *= 2
+        num += 1; total += 1
+    return total  # ~ 16 + 1+2+4+8 = 31 → ~2 per op
+```
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Prove binary-counter increment is `O(1)` amortized via accounting (charge 2 per increment). Then simulate MTF vs Transpose on access sequence `a b c a b` starting from `[a,b,c]` and count comparisons.
+
+```python
+# stub
+def mtf_cost(order, seq): ...
+```
+
+</div>
+
+---
+
+## Week 8: External Memory — Blocks and Buffers
+
+RAM is fast but small; disks move whole blocks (`B` items). I/O complexity counts block transfers, not CPU steps. Buffer pools (LRU/CLOCK) and blocking layouts decide real performance.
+
+### I/O Model
+
+| Operation | I/O cost |
+|-----------|----------|
+| Scan N items | `O(N/B)` |
+| Binary search, unblocked | `O(log₂ N)` I/Os |
+| B-tree search | `O(log_B N)` I/Os |
+| Sort (2-way merge) | `O((N/B) log₂(N/B))` |
+
+```python
+# Simulate block reads: count transfers for linear scan vs indexed access.
+B = 64
+def scan_ios(n): return (n + B - 1) // B
+def btree_ios(n, fanout=64):
+    import math; return math.ceil(math.log(n, fanout)) if n > 1 else 1
+print(scan_ios(1_000_000), btree_ios(1_000_000))  # 15625 vs 4
+```
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> For `N = 10⁶` records, `B = 100`/block, compute scan vs B-tree (fanout 100) I/Os, then simulate an LRU buffer of 10 blocks on a given trace and report hit rate. Explain when bigger blocks hurt.
+
+```python
+# stub
+def lru_hits(trace, cap): ...
+```
+
+</div>
+
+---
+
+## Week 9: Sequential and Random-Access Files
+
+Files persist records: sequential files (ordered arrival or sorted) suit batch scans; random-access files compute offsets (`base + i·R`) for `O(1)` positional reads. Fixed vs variable records trade simplicity for space.
+
+### Layouts
+
+| Organization | Access | Insert |
+|--------------|--------|--------|
+| Unordered sequential | Scan | Append `O(1)` |
+| Sorted sequential | Scan + binary-ish | Rewrite/shift |
+| Random (relative) | `seek(i)` direct | Slot reuse via free list |
+
+```python
+import struct
+REC = struct.Struct("<i20s")  # id + name
+def write_records(path, rows):
+    with open(path, "wb") as f:
+        for _id, name in rows:
+            f.write(REC.pack(_id, name.encode()[:20].ljust(20, b"\x00")))
+def read_record(path, i):
+    with open(path, "rb") as f:
+        f.seek(i * REC.size)
+        _id, raw = REC.unpack(f.read(REC.size))
+        return _id, raw.rstrip(b"\x00").decode()
+```
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Implement fixed-length record file with `write/append/read(i)/update(i)` plus a free-slot list for deleted records. Measure random-read latency for 10k records and compare with a text (variable-length) scan.
+
+```python
+# stub
+FREE = -1
+def delete_slot(path, i): ...
+```
+
+</div>
+
+---
+
+## Week 10: Heap Files and Hash Files
+
+Heap files store records in arrival order with a page directory; hash files map keys to buckets (`h(k)`) with overflow chains or dynamic schemes (extendible/linear hashing). Load factor and bucket size govern performance.
+
+### Hash File Anatomy
+
+| Piece | Role |
+|-------|------|
+| Hash `h(k)` | Bucket number |
+| Primary pages | First `b` slots per bucket |
+| Overflow chain | Extra pages on collision |
+| Directory (extendible) | Doubles on split, global/local depth |
+
+```python
+class HashFile:
+    def __init__(self, m=8):
+        self.m = m; self.buckets = [[] for _ in range(m)]
+    def h(self, k): return hash(k) % self.m
+    def insert(self, k, v): self.buckets[self.h(k)].append((k, v))
+    def find(self, k):
+        b = self.buckets[self.h(k)]
+        return [v for kk, v in b if kk == k]
+```
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Insert 20 keys into a 7-bucket hash file, list chain lengths, compute average search length, then rehash with `m=13` and compare. Implement extendible-hash split for one overflowing bucket (depths before/after).
+
+```python
+# stub
+def avg_search_len(buckets): ...
+```
+
+</div>
+
+---
+
+## Week 11: Ordered and Indexed Sequential Files
+
+Sorted + sparse index = indexed sequential (ISAM): cylinder/track levels route to data pages with overflow areas. Great for range scans and mostly-static data; heavy inserts degrade into overflow chains needing reorganization.
+
+### ISAM Levels
+
+| Level | Content |
+|-------|---------|
+| Master index | Cylinder ranges |
+| Cylinder index | Track starts per cylinder |
+| Track index | Page offsets + high keys |
+| Data + overflow | Sorted pages + chain |
+
+```text
+Search  K=48210:
+  master → cylinder 3 (40000–59999)
+  cylinder → track 7 (47000–48999)
+  track → page 12 (48000–48399) → binary search + overflow follow
+```
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Build a 2-level sparse index over 24 sorted keys (page = 4 keys). Answer 4 point + 2 range queries listing pages touched, then insert 5 keys into overflow and show when reorganization pays off.
+
+```python
+# stub
+def build_sparse(sorted_keys, page=4): ...
+def isam_search(index, key): ...
+```
+
+</div>
+
+---
+
+## Week 12: B+ Trees for Indexed Files
+
+B+ trees separate routing (internal keys) from data (leaf pages linked for scans). High fanout → 3–4 levels for millions of rows; inserts/deletes split/merge with redistribution. The workhorse of real DBMS indexes.
+
+### B+ vs B-Tree
+
+| Aspect | B-tree | B+ tree |
+|--------|--------|---------|
+| Data | Every node | Leaves only |
+| Scan | Tree walk | Leaf linked list |
+| Fanout | Lower | Higher (keys only) |
+| Range | Slower | <span class="badge">Fast sequential</span> |
+
+```python
+# Leaf-level sketch: doubly linked leaves enable [lo, hi] scans.
+class Leaf:
+    def __init__(self): self.keys = []; self.vals = []; self.next = None
+def range_scan(first_leaf, lo, hi):
+    out, leaf = [], first_leaf
+    while leaf:
+        out += [(k, v) for k, v in zip(leaf.keys, leaf.vals) if lo <= k <= hi]
+        if leaf.keys and leaf.keys[-1] > hi: break
+        leaf = leaf.next
+    return out
+```
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Trace B+ tree (order `d=2`) inserts `5,15,25,35,...,95` showing leaf splits + separator promotions, then delete `25` and `35` (redistribute vs merge). Implement leaf range scan and count pages for `[20,70]`.
+
+```python
+# stub
+def bplus_range(pages, lo, hi): ...
+```
+
+</div>
+
+---
+
+## Week 13: Dense Multi-Indexed Files
+
+One ordering is never enough: secondary (often dense) indexes map each key value to record pointer(s) — inverted lists for duplicates. Multi-index queries intersect posting lists; selectivity decides the plan.
+
+### Secondary Index Design
+
+| Choice | Effect |
+|--------|--------|
+| Dense | Entry per record; bigger, precise |
+| Sparse | Entry per block; smaller, scans |
+| Clustered | Data ordered by key (one only) |
+| Unclustered | Any order; pointer hops |
+
+```python
+# Inverted index: surname → sorted posting list; AND = two-pointer intersect.
+def intersect(a, b):
+    i = j = 0; out = []
+    while i < len(a) and j < len(b):
+        if a[i] == b[j]: out.append(a[i]); i += 1; j += 1
+        elif a[i] < b[j]: i += 1
+        else: j += 1
+    return out
+
+post = {"novak": [1, 5, 9], "brno": [5, 9, 12]}
+print(intersect(post["novak"], post["brno"]))  # [5, 9]
+```
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Design indexes for `Employee(id, surname, city, salary)`: clustered on `id`, dense secondary on `surname` + `city`. Write posting lists for 10 rows, answer `surname=X AND city=Y` and `salary BETWEEN` via index + filter, and estimate I/Os.
+
+```python
+# stub
+def query(index_surname, index_city, s, c): ...
+```
+
+</div>
+
+---
+
+## Assignment Requirements
+
+### Semester Tasks
+
+<div class="exercise-box">
+
+<strong>📋 Required implementations (both):</strong>
+
+| Task | Requirement | Deliverable |
+|------|-------------|-------------|
+| **T1 — Codec** | Huffman encode/decode + LZ77 variant | CLI tool + ratio report |
+| **T2 — Index** | B-tree or B+ tree with insert/delete/search/scan | Library + test suite |
+
+</div>
+
+### Submission Checklist
+
+<div class="checklist">
+
+- [ ] Code compiles/runs without extra setup beyond README
+- [ ] Unit tests cover edge cases (empty input, duplicates, splits/merges)
+- [ ] Complexity report (theoretical + measured timings)
+- [ ] README with build, run, and example commands
+- [ ] Independent work statement included
+
+</div>
+
+---
+
+## Code Review Guide
+
+### What to Look For
+
+#### 1. Correctness
+- Prefix function off-by-one? Rotations update heights? Splits promote correct separator?
+
+#### 2. Complexity honesty
+- Claimed `O(log n)` backed by height/fanout argument + measurement?
+
+#### 3. Persistence realism
+- Block sizes explicit? Overflow handled, not ignored?
+
+<div class="review-note">
+
+<strong>🔍 Practice Review:</strong> A B-tree insert splits the child after descending (instead of before). Issues: full child may cascade incorrectly on duplicate path, separator choice unclear, no test for root split. Fix: split-full-child on the way down, assert occupancy invariants after every op, add root-split test.
+
+```python
+# invariant check to add after each mutation:
+def check(node, t):
+    assert (len(node.keys) <= 2 * t - 1)
+    # ... recurse, verify separators route correctly ...
+```
+
+</div>
+
+---
+
+## Exam Preparation
+
+### Exam Structure
+
+1. **Written:** KMP table + matcher trace, one balanced-tree trace (AVL/B-tree), one file/I-O computation, one proof sketch.
+2. **Oral:** definitions, amortized arguments, organization trade-offs, codec/heap comparisons.
+
+### Key Topics to Review
+
+| Week | Topic | Key Concepts |
+|------|-------|--------------|
+| 1–2 | Encoding, matching | Huffman, LZ, KMP, KR |
+| 3–6 | In-memory structures | Trie/DLB, heaps, AVL/treap/splay, B-tree |
+| 7 | Analysis | Aggregate/accounting/potential, MTF |
+| 8–13 | Files | Blocks, sequential, heap/hash, ISAM, B+, multi-index |
+
+<div class="exercise-box">
+
+<strong>📝 Sample Exam Questions:</strong>
+
+1. Compute `π` for `abcabda` and trace KMP on a given text.
+2. Insert keys into AVL with rotations marked; state height bound.
+3. Simulate B-tree `t=2` inserts/deletes with borrow/merge justification.
+4. Prove dynamic-table doubling is `O(1)` amortized via potential.
+5. Compare heap file vs hash file vs B+ tree for point + range workloads.
+
+</div>
+
+### Resources
+
+- Lecture slides + exercise sheets (STAG / Moodle)
+- Cormen et al., *Introduction to Algorithms* (heaps, BST, B-trees, amortized)
+- Sedgewick string-algorithm notes; project repos as study artifacts
+
+---
+
+## Quick Reference Cards
+
+### String Algorithms
+
+```text
+KMP:   pi[i] from pi[i-1] fallback; search O(n+m).
+KR:    H = (d*H + ord(c)) % q; verify hits (spurious possible).
+Automaton: delta(q, a) = longest prefix of P that is suffix of (matched + a).
+```
+
+### Balanced Trees
+
+| Tree | Fix on insert | Height |
+|------|---------------|--------|
+| AVL | Rotate (LL/RR/LR/RL) | ≤ 1.44 log n |
+| Treap | Rotate by priority | Expected O(log n) |
+| Splay | Zig/zig-zig/zig-zag | Amortized O(log n) |
+| B-tree t | Split full child | O(log_t n) |
+| B+ tree | Split leaf, promote copy | O(log_B n) I/Os |
+
+### File Organizations
+
+```text
+Scan N/B pages. Point query: hash O(1) avg, B+ O(log_B N), ISAM O(levels).
+Range: B+ leaf chain wins; hash files cannot scan in order.
+Multi-key: intersect posting lists, most selective first.
+```
+
+---
+
+*End of Course Documentation*
+
+**Last Updated:** 2026-09-20
+**Course Code:** KST/NNDSA

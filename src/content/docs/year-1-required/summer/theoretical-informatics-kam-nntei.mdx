@@ -1,3 +1,793 @@
 ---
-title: Theoretical Informatics (KAM/NNTEI)
+title: "Theoretical Informatics (KAM/NNTEI)"
+description: "Complete course materials for formal languages, automata, Turing machines and complexity"
+template: doc
 ---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+# Theoretical Informatics (KAM/NNTEI)
+
+Welcome to the Theoretical Informatics course! This documentation contains all lecture materials, exercises, assignment guidelines, and exam preparation resources in one comprehensive file.
+
+---
+
+## 📑 Table of Contents
+
+### Course Overview
+- [Course Objectives](#course-objectives)
+- [Assessment & Credit Requirements](#assessment--credit-requirements)
+- [Examination Structure](#examination-structure)
+- [Schedule](#schedule)
+
+### Lecture Materials (Weeks 1-13)
+1. [Week 1: Introduction to Language Theory and Grammar](#week-1-introduction-to-language-theory-and-grammar)
+2. [Week 2: Regular Expressions and Regular Sets](#week-2-regular-expressions-and-regular-sets)
+3. [Week 3: Practical Work with Regular Expressions](#week-3-practical-work-with-regular-expressions)
+4. [Week 4: Regular Languages — Chomsky Type 3](#week-4-regular-languages--chomsky-type-3)
+5. [Week 5: Finite Automata and Scanners](#week-5-finite-automata-and-scanners)
+6. [Week 6: Context-Free Languages — Chomsky Type 2](#week-6-context-free-languages--chomsky-type-2)
+7. [Week 7: Derivation Trees, Chomsky and Greibach Normal Forms](#week-7-derivation-trees-chomsky-and-greibach-normal-forms)
+8. [Week 8: Pushdown Automata and Parsers](#week-8-pushdown-automata-and-parsers)
+9. [Week 9: Turing Machines](#week-9-turing-machines)
+10. [Week 10: Graphical Turing Machines and Modular Construction](#week-10-graphical-turing-machines-and-modular-construction)
+11. [Week 11: Turing Machines as Acceptors — Type 0 Languages](#week-11-turing-machines-as-acceptors--type-0-languages)
+12. [Week 12: Decidability and Its Limits](#week-12-decidability-and-its-limits)
+13. [Week 13: Complexity, P/NP and Intractable Problems](#week-13-complexity-pnp-and-intractable-problems)
+
+### Assignments & Exam
+- [Assignment Requirements](#assignment-requirements)
+- [Code Review Guide](#code-review-guide)
+- [Exam Preparation](#exam-preparation)
+- [Quick Reference Cards](#quick-reference-cards)
+
+---
+
+## Course Overview
+
+### Course Objectives
+
+<span class="badge">Core</span> <span class="badge info">Theory</span> <span class="badge warn">Math</span>
+
+Familiarize students with the mathematical foundations of computation, including:
+
+- **Language theory** - Alphabets, words, grammars, Chomsky hierarchy
+- **Regular expressions** - Syntax, semantics, practical use
+- **Regular languages** - Type 3 grammars, closure properties, pumping lemma
+- **Finite automata** - DFA, NFA, minimization, scanners
+- **Context-free languages** - Type 2 grammars, PDA, parsing
+- **Normal forms** - Chomsky (CNF) and Greibach (GNF) conversions
+- **Turing machines** - Definition, variants, modular construction
+- **Decidability** - Halting problem, Rice theorem, reductions
+- **Complexity** - P, NP, NP-completeness, intractability
+
+### Assessment & Credit Requirements
+
+<div class="exercise-box">
+
+<strong>📋 To receive credit, students must:</strong>
+
+1. Complete **at least 2 written homework sets** (formal proofs + constructions)
+2. Pass the **mid-term test** on regular and context-free languages (min. 50%)
+3. Active participation in **practical regex/automaton exercises**
+4. Each submission must show **correct formal notation** and justified steps
+
+</div>
+
+### Examination Structure
+
+#### In-Person Format
+1. **Written part** - Formal constructions (regex → NFA, grammar → CNF, TM design)
+2. **Oral part** - Theory: proofs, theorems, decidability and complexity arguments
+
+#### Distance Format
+1. **Oral examination** including theoretical questions and live constructions on a shared board
+
+#### Passing Criteria
+- **Minimum 60%** of the written part to proceed to the oral part
+- Grade E requires correct definitions plus at least one full constructive proof
+
+### Schedule
+
+| Week | Lecture Topic | Exercise Focus |
+|------|---------------|----------------|
+| 1 | Language theory, grammar, history | Alphabets, words, operations |
+| 2 | Regular expressions and regular sets | Regex algebra |
+| 3 | Practical regex | Regex in code tools |
+| 4 | Regular language — type 3 | Right-linear grammars |
+| 5 | Finite automaton, scanner | DFA/NFA construction |
+| 6 | Context-free language — type 2 | CFG design |
+| 7 | Derivation trees, CNF, GNF | Normal-form conversion |
+| 8 | Pushdown automaton, parser | PDA construction |
+| 9 | Turing machines | TM definition, traces |
+| 10 | Graphical TM, modular blocks | Composed machines |
+| 11 | TM as acceptor, type 0 | Enumerable languages |
+| 12 | Decidability bounds | Reductions, halting |
+| 13 | Complexity P/NP, intractability | Reductions, SAT |
+
+---
+
+## Week 1: Introduction to Language Theory and Grammar
+
+Formal language theory studies sets of strings over finite alphabets. Grammars generate languages; automata recognize them. This week sets notation and historical context from Thue and Post to Chomsky.
+
+### Basic Concepts
+
+- **Alphabet Σ** - Finite non-empty set of symbols, e.g. `Σ = {0, 1}`.
+- **Word** - Finite sequence over Σ; empty word denoted `ε`. Length `|w|`.
+- **Language** - Any subset `L ⊆ Σ*`, where `Σ*` is the set of all words.
+
+| Operation | Notation | Example |
+|-----------|----------|---------|
+| Concatenation | `u · v` | `ab · cd = abcd` |
+| Power | `Σⁿ` | `Σ² = {aa,ab,ba,bb}` |
+| Kleene star | `L*` | `{a}* = {ε,a,aa,...}` |
+| Union | `L₁ ∪ L₂` | `{a} ∪ {b} = {a,b}` |
+
+### Grammars
+
+A grammar is `G = (N, T, P, S)` where `N` are nonterminals, `T` terminals, `P` productions, `S` start symbol.
+
+```text
+Example grammar G:
+  S → aSb | ε
+  L(G) = { aⁿbⁿ | n ≥ 0 }
+Derivation: S ⇒ aSb ⇒ aaSbb ⇒ aabb
+```
+
+> **Rule:** Always distinguish `ε` (empty word) from `∅` (empty language). `∅* = {ε}`.
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Let `Σ = {a, b}`. List all words of `Σ*` up to length 2, then define `L = {w | w starts with a}`. Give 4 members and 2 non-members, and write a one-line set description of the complement.
+
+```text
+// stub:
+// Σ⁰ = ...
+// Σ¹ = ...
+// Σ² = ...
+// L = ...
+```
+
+</div>
+
+---
+
+## Week 2: Regular Expressions and Regular Sets
+
+Regular expressions (RE) are a compact algebra for describing regular sets. This week covers syntax, semantics, and algebraic laws used to simplify patterns.
+
+### Syntax and Semantics
+
+- **Atoms:** `∅`, `ε`, `a` for each `a ∈ Σ`.
+- **Operators:** union `+` (or `|`), concatenation, star `*`.
+- Precedence: `*` > concatenation > `+`.
+
+| Expression | Language | Note |
+|------------|----------|------|
+| `a*` | `{ε,a,aa,...}` | Zero or more |
+| `a⁺` | `{a,aa,...}` | One or more, sugar for `aa*` |
+| `(a+b)*abb` | Words ending in `abb` | Classic example |
+| `(0+1)*0` | Words ending in `0` | Suffix pattern |
+
+### Algebraic Laws
+
+```text
+r + s = s + r            (commutativity of union)
+(r + s) + t = r + (s + t)
+rε = εr = r
+r∅ = ∅r = ∅
+(r*)* = r*
+(r + s)* = (r*s*)*
+```
+
+> **Rule:** `+` inside regex means union, not arithmetic addition. Use parentheses to override precedence.
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Write regular expressions over `{0,1}` for: (a) words containing substring `101`, (b) words of even length, (c) words that do not start with `0`. Simplify using algebraic laws and test each against 3 positive and 2 negative examples.
+
+```python
+# stub: test your regexes with the re module
+import re
+patterns = {"a": r"", "b": r"", "c": r""}
+tests = ["101", "0101", "00", "010", "1"]
+for name, p in patterns.items():
+    print(name, [t for t in tests if re.fullmatch(p, t)])
+```
+
+</div>
+
+---
+
+## Week 3: Practical Work with Regular Expressions
+
+Theory meets practice: regex engines in editors, grep, and programming languages. This week focuses on character classes, anchors, groups, and common pitfalls like greedy matching.
+
+### Practical Toolkit
+
+| Construct | Meaning | Example |
+|-----------|---------|---------|
+| `[a-z]` | Character class | `[0-9]+` matches numbers |
+| `[^...]` | Negated class | `[^0-9]` non-digit |
+| `^`, `$` | Anchors | `^ab.*` starts with ab |
+| `(...)` , `\1` | Group, backreference | `(ab)+\1` |
+| `.*?` | Lazy match | `<.*?>` tag-safe |
+
+<span class="badge">Good</span> Anchored, specific patterns with escaped metacharacters.
+
+<span class="badge danger">Bad</span> `.*` everywhere — catastrophic backtracking risk.
+
+### Code Example
+
+```python
+import re
+
+# Validate identifier: letter followed by letters/digits/underscore
+ident = re.compile(r'^[A-Za-z_][A-Za-z0-9_]*$')
+print(bool(ident.match("var_1")))   # True
+print(bool(ident.match("1var")))    # False
+
+# Extract all integers from a log line
+line = "error 404 at block 12, retry 3"
+print(re.findall(r'\d+', line))     # ['404', '12', '3']
+```
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Write a single Python script using `re` that (1) validates ISO dates `YYYY-MM-DD`, (2) extracts all e-mail-like tokens from a text file, (3) replaces every run of whitespace with a single space. Include 5 unit asserts per subtask.
+
+```python
+# stub
+import re
+def normalize(s: str) -> str:
+    return re.sub(r'\s+', ' ', s)
+assert normalize("a   b\tc") == "a b c"
+```
+
+</div>
+
+---
+
+## Week 4: Regular Languages — Chomsky Type 3
+
+Regular languages sit at level 3 of the Chomsky hierarchy, generated by right-linear (or left-linear) grammars. They are closed under Boolean operations and characterized by the pumping lemma and Myhill–Nerode.
+
+### Right-Linear Grammars
+
+Productions have form `A → wB` or `A → w` where `w ∈ T*`.
+
+```text
+Grammar for (a+b)*abb:
+  S → aS | bS | aA
+  A → bB
+  B → b
+```
+
+### Closure and Decision Properties
+
+| Property | Regular languages |
+|----------|-------------------|
+| Union, intersection, complement | <span class="badge">Closed</span> |
+| Concatenation, star | <span class="badge">Closed</span> |
+| Emptiness, finiteness, membership | <span class="badge">Decidable</span> |
+| Inclusion, equivalence | <span class="badge">Decidable</span> |
+
+> **Rule:** To prove non-regularity, use the pumping lemma or Myhill–Nerode — never just intuition.
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Prove `L = {aⁿbⁿ | n ≥ 0}` is not regular using the pumping lemma. State the constant `p`, choose `w = aᵖbᵖ`, and show every split `w = xyz` with `|xy| ≤ p`, `|y| > 0` leads to `xy²z ∉ L`. Write the full argument in 8–12 lines.
+
+```text
+// stub proof outline:
+// 1. Assume L regular, let p be pumping length.
+// 2. Take w = ...
+// 3. For any split ... y = aᵏ, k>0 ...
+// 4. Pump: xy²z = a^(p+k)b^p ∉ L. Contradiction.
+```
+
+</div>
+
+---
+
+## Week 5: Finite Automata and Scanners
+
+A finite automaton (FA) is the machine counterpart of regular languages. Deterministic (DFA) and nondeterministic (NFA) variants are equivalent in power; ε-transitions and subset construction connect them. Scanners are built directly from FA.
+
+### DFA vs NFA
+
+| Feature | DFA | NFA |
+|---------|-----|-----|
+| Transitions | Total function `δ: Q×Σ → Q` | Relation into `P(Q)` |
+| ε-moves | No | Allowed in ε-NFA |
+| Equivalence | Reachable subset construction | Same power as DFA |
+| Minimization | <span class="badge">Unique minimal DFA</span> | PSPACE-hard in general |
+
+### Scanner Example
+
+```python
+# Minimal DFA for language (a+b)*abb, states = longest matched suffix
+def accepts(w: str) -> bool:
+    state = 0
+    for c in w:
+        if state == 0:
+            state = 1 if c == 'a' else 0
+        elif state == 1:
+            state = 1 if c == 'a' else 2
+        elif state == 2:
+            state = 1 if c == 'a' else 3
+        else:  # state 3 (accepting)
+            state = 1 if c == 'a' else 0 if c == 'b' and False else (2 if c == 'b' else 0)
+            # simplified: recompute suffix of w ending in prefix of 'abb'
+            state = 3 if w[:0] == '' else state
+    return state == 3
+
+# Cleaner table-driven version:
+TRANS = {(0,'a'):1,(0,'b'):0,(1,'a'):1,(1,'b'):2,(2,'a'):1,(2,'b'):3,(3,'a'):1,(3,'b'):0}
+def accepts_table(w):
+    s = 0
+    for c in w: s = TRANS[(s,c)]
+    return s == 3
+```
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Convert regex `(0+1)*0` to an ε-NFA (Thompson construction), then determinize via subset construction and minimize. Implement the resulting DFA as a transition table in Python and test on 10 strings.
+
+```python
+# stub
+TRANS = {}  # fill (state, symbol) -> state
+START, ACCEPT = 0, {1}
+def run(w):
+    s = START
+    for c in w: s = TRANS[(s, c)]
+    return s in ACCEPT
+```
+
+</div>
+
+---
+
+## Week 6: Context-Free Languages — Chomsky Type 2
+
+Context-free grammars (CFG) allow productions `A → α` with a single nonterminal on the left. They describe nested structure (parentheses, expressions) beyond regular power, with Chomsky type 2 strictly above type 3.
+
+### Core Ideas
+
+- **Derivation:** leftmost vs rightmost; ambiguity when two parse trees exist.
+- **Inherently ambiguous** languages exist (e.g. `{aⁿbⁿcᵐdᵐ} ∪ {aⁿbᵐcᵐdⁿ}`).
+- Closure: union, concatenation, star <span class="badge">closed</span>; intersection, complement <span class="badge danger">not closed</span>.
+
+| Language | Regular? | Context-free? |
+|----------|----------|---------------|
+| `{aⁿbⁿ}` | No | Yes |
+| `{aⁿbⁿcⁿ}` | No | No |
+| Palindromes | No | Yes |
+| `{ww}` | No | No |
+
+### CFG Example
+
+```text
+Balanced parentheses:
+  S → SS | (S) | ε
+
+Arithmetic expressions:
+  E → E + T | T
+  T → T * F | F
+  F → (E) | id
+```
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Write an unambiguous CFG for arithmetic with `+`, `*`, parentheses and identifiers, then derive `id + id * id` showing the unique parse tree in ASCII. Explain why a naive `E → E + E | E * E` grammar is ambiguous with a counterexample.
+
+```text
+// stub:
+// E → ...
+// Show: E ⇒ ... ⇒ id + id * id
+// Ambiguity demo: two trees for id + id * id
+```
+
+</div>
+
+---
+
+## Week 7: Derivation Trees, Chomsky and Greibach Normal Forms
+
+Derivation trees make sentence structure explicit. Normal forms restrict productions to enable algorithms (CYK parsing, PDA conversion). Every ε-free CFG converts to Chomsky Normal Form (CNF); every language without ε converts to Greibach Normal Form (GNF).
+
+### Normal Forms
+
+| Form | Allowed productions |
+|------|---------------------|
+| CNF | `A → BC` or `A → a` (plus `S → ε` optionally) |
+| GNF | `A → aα` where `a ∈ T`, `α ∈ N*` |
+| 2NF-ish | No unit `A → B` or ε-rules (after cleanup) |
+
+### CNF Conversion Steps
+
+```text
+1. Eliminate ε-productions (except S → ε if ε ∈ L).
+2. Eliminate unit productions A → B.
+3. Remove useless symbols (non-generating, unreachable).
+4. Binarize long right-hand sides: A → BCD becomes A → BX, X → CD.
+5. Split terminals in binary rules: A → BC stays; A → aB becomes A → XA, X → a.
+```
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Convert `S → ASA | aB, A → B | S, B → b | ε` to CNF. Show each step (ε-elimination, unit-elimination, binarization) and verify `L(G)` is preserved on 4 sample words by brute-force derivation search.
+
+```python
+# stub: enumerate derivations up to depth k and check membership
+def derives(grammar, word, depth): return True  # implement BFS
+```
+
+</div>
+
+---
+
+## Week 8: Pushdown Automata and Parsers
+
+Pushdown automata (PDA = finite control + stack) recognize exactly the context-free languages. Deterministic PDA (DPDA) model real parsers (LL/LR); nondeterminism is strictly stronger here, unlike finite automata.
+
+### PDA Essentials
+
+| Component | Role |
+|-----------|------|
+| Finite control | Like DFA states |
+| Stack alphabet Γ | Memory for nesting |
+| Transitions | `δ(q, a, Z)` reads input `a`, pops `Z`, pushes string |
+| Acceptance | Final state or empty stack (equivalent) |
+
+### PDA for aⁿbⁿ
+
+```text
+States: q0 (push), q1 (pop), q2 (accept)
+  δ(q0, a, Z0) = (q0, AZ0);  δ(q0, a, A) = (q0, AA)
+  δ(q0, ε, Z)  = (q1, Z)      (guess switch point)
+  δ(q1, b, A)  = (q1, ε)
+  δ(q1, ε, Z0) = (q2, Z0)     (accept)
+```
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Design a PDA for well-formed parentheses over `{(,)}` (empty-stack acceptance) and simulate it in Python on 6 inputs. Then extend it to two bracket kinds `()`, `[]` and explain what changes in the stack alphabet.
+
+```python
+# stub
+def accepts_parens(w: str) -> bool:
+    stack = []
+    for c in w:
+        if c == '(': stack.append(c)
+        else:
+            if not stack: return False
+            stack.pop()
+    return not stack
+```
+
+</div>
+
+---
+
+## Week 9: Turing Machines
+
+Turing machines (TM) formalize algorithms: finite control plus an unbounded tape with read/write/move. Variants (multi-tape, nondeterministic) do not add power but simplify design. This week covers the 7-tuple definition and execution traces.
+
+### Definition
+
+`M = (Q, Σ, Γ, δ, q₀, q_accept, q_reject)` where `Γ ⊇ Σ ∪ {␣}` and `δ: Q × Γ → Q × Γ × {L, R}`.
+
+| Concept | Meaning |
+|---------|---------|
+| Configuration | `u q v` — tape `uv`, head on first symbol of `v` |
+| Step | One `δ` application |
+| Halting | Entering `q_accept` or `q_reject` |
+| Looping | Never halting — distinct from rejecting |
+
+### Trace Example
+
+```text
+TM flipping all bits, then halting on blank:
+  q0, 0 → q0, 1, R
+  q0, 1 → q0, 0, R
+  q0, ␣ → qA, ␣, R
+
+Trace on 101:
+  q0 101 ⊢ 0 q0 01 ⊢ 01 q0 1 ⊢ 010 q0 ␣ ⊢ 010 qA ␣
+```
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Design a TM that decides `{0²ⁿ | n ≥ 0}` (even-length zero strings) by repeatedly crossing off every second `0`. Give the transition table and full traces on `0000` (accept) and `000` (reject).
+
+```text
+// stub table:
+// q0: cross first unmarked 0, go right marking alternates...
+// q_even / q_odd sweep, q_reset rewind, accept iff single 0 remains
+```
+
+</div>
+
+---
+
+## Week 10: Graphical Turing Machines and Modular Construction
+
+Large TMs are built from subroutines with clean entry/exit contracts. State diagrams and macros (shift, copy, compare, add) keep designs readable. This week practices modular composition.
+
+### Building Blocks
+
+| Block | Function |
+|-------|----------|
+| `R_to_␣` / `L_to_␣` | Move to first blank |
+| `Copy` | Duplicate `w#` to `w#w` |
+| `Shift-L/R` | Make room on tape |
+| `Compare` | Check `w₁ == w₂` across `#` |
+| `Add-1` | Binary increment |
+
+### Diagram Notation
+
+```text
+(q) --a→b,R--> (p)     : in q reading a, write b, move R, go p
+(q) --a→R--> (p)       : shorthand when symbol unchanged
+(q) ==> [Subroutine] ==> (p)  : macro call with return to p
+```
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Compose a TM for `{ww | w ∈ {0,1}*}` from blocks: copy input with `#` separator, then a compare loop crossing off matching pairs. Draw the block diagram in ASCII and implement a simulator in Python (functions per block).
+
+```python
+# stub
+def copy_block(tape, head): ...
+def compare_block(tape): ...
+def decides_ww(w: str) -> bool: ...
+assert decides_ww("1010") or True  # refine
+```
+
+</div>
+
+---
+
+## Week 11: Turing Machines as Acceptors — Type 0 Languages
+
+Type 0 (recursively enumerable, RE) languages are exactly those accepted by some TM. Decidable (recursive) languages are a strict subset where the TM always halts. Unrestricted grammars generate precisely type 0.
+
+### Landscape
+
+| Class | Machine | Grammar |
+|-------|---------|---------|
+| Type 3 regular | DFA | Right-linear |
+| Type 2 CFL | PDA | Context-free |
+| Type 1 CSL | LBA | Context-sensitive |
+| Type 0 RE | TM (may loop) | Unrestricted |
+| Decidable | TM (always halts) | — |
+
+```text
+Unrestricted production example (aⁿbⁿcⁿ generator sketch):
+  S → ABC | ... with swapping rules AB → BA etc.
+  (Full grammar is long; key point: left side may have context.)
+```
+
+> **Rule:** Accepting ≠ deciding. A recognizer may loop on words outside the language; a decider never loops.
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Show `{⟨M,w⟩ | M accepts w}` is RE but its complement is not (statement + intuition, no full diagonalization required). Then give an enumerator-style argument that every RE language has some TM enumerating it.
+
+```text
+// stub answer outline:
+// 1. Universal TM U accepts iff M accepts w → RE.
+// 2. Diagonal language D differs from every RE language → complement not RE.
+// 3. Enumerator: dovetail all (M,w) pairs...
+```
+
+</div>
+
+---
+
+## Week 12: Decidability and Its Limits
+
+Which problems can TMs solve at all? The halting problem is undecidable; reductions transfer undecidability; Rice's theorem kills all nontrivial semantic properties of programs. This week is the conceptual peak of the course.
+
+### Key Results
+
+| Result | Statement |
+|--------|-----------|
+| Halting undecidable | No TM decides `{⟨M,w⟩ | M halts on w}` |
+| `A_TM` undecidable | Acceptance is undecidable but RE |
+| Rice theorem | Any nontrivial semantic property of RE languages is undecidable |
+| Reduction | `A ≤ₘ B`: decidability of B implies decidability of A |
+
+### Diagonal Proof Sketch
+
+```text
+Assume H decides halting. Build D:
+  D(⟨M⟩): run H(⟨M,⟨M⟩⟩); if H accepts → loop; else halt.
+Then D(⟨D⟩) halts iff D(⟨D⟩) loops. Contradiction. ∎
+```
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Reduce `A_TM` to `EMPTY_TM = {⟨M⟩ | L(M) = ∅}`: given `⟨M,w⟩`, build `M'` that on input `x` ignores `x`, runs `M` on `w`, accepts iff `M` accepts. Prove `⟨M,w⟩ ∈ A_TM ⟺ ⟨M'⟩ ∉ EMPTY_TM`. Write the 6-line reduction plus correctness both directions.
+
+```python
+# stub: implement reduction as a code transformer
+def reduce_ATM_to_complement_EMPTY(M_src: str, w: str) -> str:
+    return f"def M_prime(x):\n  run({M_src!r}, {w!r})\n  return accepts"
+```
+
+</div>
+
+---
+
+## Week 13: Complexity, P/NP and Intractable Problems
+
+Decidable is not feasible. Complexity classifies decidable problems by resource bounds: `P` (poly time), `NP` (poly verifier / nondet poly time), NP-complete (hardest in NP), plus space classes. Cook–Levin (SAT) anchors all NP-completeness proofs.
+
+### Map
+
+| Class | Intuition | Example |
+|-------|-----------|---------|
+| `P` | Solvable fast | Sorting, shortest path |
+| `NP` | Checkable fast | SAT, Hamiltonian path, TSP-decision |
+| `NP-complete` | Hardest in NP | 3-SAT, CLIQUE, Vertex Cover |
+| `NP-hard` | At least as hard | Halting (undecidable + hard) |
+| `EXP` | Exponential time | Generalized chess |
+
+```python
+# Poly verifier for VERTEX-COVER (G, k, certificate C):
+def verifies(G, k, C):
+    if len(C) > k: return False
+    edges = G["edges"]
+    return all(u in C or v in C for u, v in edges)
+# Runs in O(|E|) → VERTEX-COVER ∈ NP.
+```
+
+> **Rule:** To show NP-completeness: (1) prove membership in NP via verifier, (2) reduce a known NP-complete problem in polynomial time.
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Prove `CLIQUE` is NP-complete by reduction from `3-SAT` (give construction: one node per literal occurrence, edges except same-clause and complementary pairs, `k` = clauses). Argue both directions in ≤ 15 lines and state why the construction is polynomial.
+
+```text
+// stub:
+// φ with m clauses → G with 3m nodes, k = m.
+// φ satisfiable ⟺ G has m-clique. (|V|² edges, polytime.)
+```
+
+</div>
+
+---
+
+## Assignment Requirements
+
+### Homework Sets
+
+<div class="exercise-box">
+
+<strong>📋 Credit tasks (submit both):</strong>
+
+| Set | Content | Deadline |
+|-----|---------|----------|
+| **Set 1** | Regex, right-linear grammars, DFA/NFA + minimization | Week 6 |
+| **Set 2** | CFG, CNF/GNF, PDA, TM design, reductions | Week 12 |
+
+</div>
+
+### Submission Checklist
+
+<div class="checklist">
+
+- [ ] Formal notation correct (`ε`, `⊢`, `⇒`, `δ` used properly)
+- [ ] Each construction includes input → steps → result
+- [ ] Proofs state assumption, construction, contradiction/conclusion
+- [ ] Automata/grammars tested on 3+ examples each
+- [ ] PDF generated from LaTeX/Markdown, readable diagrams
+- [ ] Plagiarism-free independent work declared
+
+</div>
+
+---
+
+## Code Review Guide
+
+### What to Look For
+
+#### 1. Notation
+- Correct quantifiers, alphabets declared, start symbols marked?
+
+#### 2. Completeness
+- DFA total? PDA stack cases covered? TM halting on all branches?
+
+#### 3. Minimality & Clarity
+- Fewest states/productions? Named blocks for TMs?
+
+<div class="review-note">
+
+<strong>🔍 Practice Review:</strong> A student submits DFA for "words ending in abb" with 3 states and no dead state. Issues: missing transitions on some symbols, accepting sink confusion, no test trace. Fix: add explicit dead state or complete table, show traces for `abb`, `ab`, `abba`.
+
+```text
+States {q0,q1,q2,q3=accept}; complete δ table required.
+Counter-example: input "ab" wrongly accepted → transitions wrong.
+```
+
+</div>
+
+---
+
+## Exam Preparation
+
+### Exam Structure
+
+1. **Written:** 4 tasks — regex+NFA, CFG+CNF or PDA, TM construction, proof/reduction.
+2. **Oral:** definitions, theorem statements + proofs (pumping, halting, Cook–Levin sketch).
+
+### Key Topics to Review
+
+| Week | Topic | Key Concepts |
+|------|-------|--------------|
+| 1 | Language theory | Σ, words, grammars |
+| 2–3 | Regex | Algebra, practical use |
+| 4–5 | Regular | Type 3, DFA/NFA, scanner |
+| 6–8 | CFL | CFG, CNF/GNF, PDA |
+| 9–11 | TM | Definition, blocks, type 0 |
+| 12 | Decidability | Halting, Rice, reductions |
+| 13 | Complexity | P/NP, NPC proofs |
+
+<div class="exercise-box">
+
+<strong>📝 Sample Exam Questions:</strong>
+
+1. Convert `(a+b)*abb` to an NFA and then to a minimal DFA.
+2. Prove `{aⁿbⁿcⁿ}` is not context-free (pumping lemma for CFL).
+3. Design a TM deciding palindromes over `{0,1}`.
+4. Prove HALT undecidable by diagonalization.
+5. Show VERTEX-COVER is NP-complete via reduction from 3-SAT.
+
+</div>
+
+### Resources
+
+- Lecture slides and exercise sheets (STAG / Moodle)
+- Sipser, *Introduction to the Theory of Computation* (ch. 1–7)
+- Hopcroft–Motwani–Ullman reference tables
+- Regex playground + automata simulator links in lectures
+
+---
+
+## Quick Reference Cards
+
+### Regex → Automata → Grammar
+
+```text
+regex r  --Thompson-->  ε-NFA  --subset-->  DFA  --minimize-->  minimal DFA
+  |                                                              |
+  +-- Kleene theorem --------------------------------------------+
+Regular expression ⟺ ε-NFA ⟺ DFA ⟺ right-linear grammar
+CFG ⟺ PDA (nondeterministic) ; CSL ⟺ LBA ; Type 0 ⟺ TM
+```
+
+### Pumping Lemmas
+
+| Lemma | Condition | Use |
+|-------|-----------|-----|
+| Regular | `w=xyz`, `\|xy\|≤p`, `\|y\|>0`, `xyⁱz∈L` | Kill regularity |
+| CFL | `w=uvxyz`, `\|vxy\|≤p`, `\|vy\|>0`, `uvⁱxyⁱz∈L` | Kill context-freeness |
+
+### Complexity Cheat Sheet
+
+| To prove | Do |
+|----------|----|
+| `L ∈ P` | Poly-time decider |
+| `L ∈ NP` | Poly verifier or NTM |
+| `L` NP-complete | `L ∈ NP` + `SAT ≤ₚ L` (or 3-SAT, CLIQUE) |
+| `L` undecidable | Reduce `A_TM` / HALT to `L` |
+
+---
+
+*End of Course Documentation*
+
+**Last Updated:** 2026-09-20
+**Course Code:** KAM/NNTEI

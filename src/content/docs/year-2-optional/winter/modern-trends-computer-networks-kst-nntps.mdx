@@ -1,0 +1,865 @@
+---
+title: "Modern Trends of Computer Networks (KST/NNTPS)"
+description: "Complete course materials for modern networking: SDN, NFV, IPv6, QUIC, 5G, data centers, WiFi 6/7, automation, telemetry, Zero Trust and quantum-safe networking"
+template: doc
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+# Modern Trends of Computer Networks (KST/NNTPS)
+
+Welcome to Modern Trends of Computer Networks! From SDN and NFV through IPv6, QUIC/HTTP-3, 5G/6G, data-center fabrics, WiFi 6/7, network automation, telemetry, Zero Trust/SASE to quantum-safe networking — each week pairs concepts with runnable configs and code. Hands-on SDN labs live in `upce/NNTPS/` (Mininet, OpenFlow, RYU, Floodlight).
+
+---
+
+## 📑 Table of Contents
+
+### Course Overview
+- [Course Objectives](#course-objectives)
+- [Assessment & Credit Requirements](#assessment--credit-requirements)
+- [Examination Structure](#examination-structure)
+- [Schedule](#schedule)
+
+### Lecture Materials (Weeks 1-13)
+1. [Week 1: SDN — Separating Control and Data Planes](#week-1-sdn--separating-control-and-data-planes)
+2. [Week 2: NFV and Service Chaining](#week-2-nfv-and-service-chaining)
+3. [Week 3: IPv6 in Practice](#week-3-ipv6-in-practice)
+4. [Week 4: QUIC and HTTP/3](#week-4-quic-and-http3)
+5. [Week 5: 5G and the Road to 6G](#week-5-5g-and-the-road-to-6g)
+6. [Week 6: Data Center Fabrics — Clos and VXLAN](#week-6-data-center-fabrics--clos-and-vxlan)
+7. [Week 7: WiFi 6 and WiFi 7](#week-7-wifi-6-and-wifi-7)
+8. [Week 8: Network Automation — NETCONF, YANG, Ansible](#week-8-network-automation--netconf-yang-ansible)
+9. [Week 9: Telemetry — SNMP to Streaming](#week-9-telemetry--snmp-to-streaming)
+10. [Week 10: IoT and Edge Networking](#week-10-iot-and-edge-networking)
+11. [Week 11: Zero Trust and SASE](#week-11-zero-trust-and-sase)
+12. [Week 12: Quantum-Safe Networking](#week-12-quantum-safe-networking)
+13. [Week 13: AI-Driven NOC — The Self-Driving Network](#week-13-ai-driven-noc--the-self-driving-network)
+
+### Assignments & Exam
+- [Assignment Requirements](#assignment-requirements)
+- [Code Review Guide](#code-review-guide)
+- [Exam Preparation](#exam-preparation)
+- [Quick Reference Cards](#quick-reference-cards)
+
+---
+
+## Course Overview
+
+### Course Objectives
+
+<span class="badge">Core</span> <span class="badge info">Networks</span> <span class="badge warn">Elective B</span>
+
+Students will be able to:
+
+- **Explain SDN** — OpenFlow pipeline, RYU/Floodlight controllers, Mininet topologies (see `upce/NNTPS/labs/`).
+- **Design NFV services** — VNFs, MANO, service function chaining with real templates.
+- **Deploy IPv6** — addressing plans, dual-stack, tunneling, DHCPv6 and first-hop security.
+- **Analyse QUIC/HTTP-3** — handshakes, streams, migration and performance trade-offs.
+- **Describe 5G/6G** — SBA core, slicing, CU/DU split and edge integration.
+- **Build data-center fabrics** — Clos topologies, EVPN-VXLAN overlays, ECMP.
+- **Compare WiFi 6/7** — OFDMA, MU-MIMO, MLO and 6 GHz planning.
+- **Automate networks** — YANG models, NETCONF/RESTCONF, Ansible playbooks.
+- **Stream telemetry** — gNMI/gRPC, eBPF, flow analytics vs legacy SNMP.
+- **Secure with Zero Trust/SASE** — identity-aware policy, microsegmentation, SSE.
+- **Prepare for post-quantum** — hybrid KEM/TLS, inventory and migration planning.
+- **Run an AI-assisted NOC** — anomaly detection, closed-loop remediation.
+
+### Assessment & Credit Requirements
+
+<div class="exercise-box">
+
+<strong>📋 To receive credit (Zk+), students must:</strong>
+
+1. Complete **SDN labs** from `upce/NNTPS/labs/` (topology + manual flows + REST API interaction).
+2. Submit a **programming task** — RYU learning-switch extension or Floodlight module (see `upce/NNTPS/programming/`).
+3. Submit a **mini-project** — controller comparison or end-to-end deployment report (see `upce/NNTPS/projects/`).
+4. Pass a **mid-term test** on SDN, IPv6 and automation basics (min. 60 %).
+
+</div>
+
+### Examination Structure
+
+#### Full-time Format
+1. **Practical defence** — live Mininet + controller demo with flow-table explanation.
+2. **Oral examination** — two theory topics (e.g. QUIC handshake, EVPN-VXLAN) + one design task.
+
+#### Distance Format
+1. **Oral examination via MS Teams** — theory questions, config/code walkthrough, packet-capture analysis.
+
+#### Passing Criteria
+- **Minimum 60 %** overall; SDN demo must forward traffic and explain at least one flow entry.
+
+### Schedule
+
+| Week | Lecture Topic | Exercise Focus |
+|------|---------------|----------------|
+| 1 | SDN, OpenFlow | Mininet + flows |
+| 2 | NFV, chaining | VNF template |
+| 3 | IPv6 | Addressing plan |
+| 4 | QUIC/HTTP-3 | Handshake analysis |
+| 5 | 5G/6G | Slice design |
+| 6 | Clos + VXLAN | Overlay config |
+| 7 | WiFi 6/7 | Channel plan |
+| 8 | Automation | Ansible playbook |
+| 9 | Telemetry | gNMI subscribe |
+| 10 | IoT + edge | MQTT pipeline |
+| 11 | Zero Trust/SASE | Policy rules |
+| 12 | Quantum-safe | Hybrid TLS test |
+| 13 | AI-driven NOC | Anomaly detector |
+
+---
+
+## Week 1: SDN — Separating Control and Data Planes
+
+SDN removes distributed routing intelligence from switches into a logically centralised controller; switches become fast match-action tables programmed via OpenFlow.
+
+### Architecture
+
+```
+Application layer (routing, firewall, LB apps)
+        ^  northbound (REST API)
+Controller (RYU / Floodlight / ONOS / ODL): topology, paths, policy
+        v  southbound (OpenFlow, NETCONF, P4Runtime)
+Data plane (Open vSwitches): flow tables -> forward / drop / modify
+```
+
+### OpenFlow Match-Action Pipeline
+
+| Table step | Example match | Example action |
+|------------|---------------|----------------|
+| Ingress port + MAC | `in_port=1, dl_dst=...` | forward to controller |
+| L3 routing | `ip, nw_dst=10.0.0.0/24` | output port 2 |
+| ACL | `tcp, tp_dst=22` | drop |
+| Rewrite | `vlan_tci=...` | push VLAN, output |
+
+> **Rule:** Every SDN decision must be traceable to a flow entry — `ovs-ofctl dump-flows` is the ground truth, not the dashboard.
+
+### Mininet + RYU Hands-On
+
+```python
+# labs/01-virtual-network-deployment/mininet_remote.py (excerpt, full file in upce/NNTPS/)
+from mininet.topo import Topo
+from mininet.net import Mininet
+from mininet.node import RemoteController
+
+class TwoSwitchTopo(Topo):
+    def build(self):
+        s1, s2 = self.addSwitch('s1'), self.addSwitch('s2')
+        h1, h2 = self.addHost('h1'), self.addHost('h2')
+        self.addLink(h1, s1); self.addLink(h1, s2)
+        self.addLink(h2, s1); self.addLink(h2, s2)
+        self.addLink(s1, s2)
+
+if __name__ == '__main__':
+    net = Mininet(topo=TwoSwitchTopo(), controller=RemoteController('c0', ip='127.0.0.1'))
+    net.start(); net.pingAll(); net.stop()
+```
+
+```python
+# programming/01-l2-learning-switch/l2_learning_switch.py (RYU excerpt)
+from ryu.base import app_manager
+from ryu.ofproto import ofproto_v1_3
+
+class L2Switch(app_manager.RyuApp):
+    OFP_VERSIONS = [ofproto_v1_3.OFP_VERSION]
+    def __init__(self, *a, **kw):
+        super().__init__(*a, **kw)
+        self.mac_to_port = {}
+```
+
+```bash
+# Terminal 1: controller | Terminal 2: topology | Terminal 3: inspect
+ryu-manager programming/01-l2-learning-switch/l2_learning_switch.py
+sudo python3 labs/01-virtual-network-deployment/mininet_remote.py
+sudo ovs-ofctl -O OpenFlow13 dump-flows s1
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Run the two-switch topology from `upce/NNTPS/labs/01-virtual-network-deployment/`. After `pingall`, dump flows on both switches, then install one manual flow with `ovs-ofctl` that blocks ICMP between h1 and h2 while keeping ARP working. Show the flow tables before/after plus a failing `ping` as evidence.
+
+</div>
+
+---
+
+## Week 2: NFV and Service Chaining
+
+NFV virtualises middleboxes (firewall, NAT, DPI, vEPC) as software VNFs on commodity servers; MANO orchestrates their lifecycle; service chaining steers traffic through ordered VNF sequences.
+
+### ETSI MANO Blocks
+
+| Block | Role | Example |
+|-------|------|---------|
+| NFVO | End-to-end service orchestration | OSM, ONAP |
+| VNFM | VNF lifecycle (instantiate, scale, heal) | Tacker, Juju |
+| VIM | Virtualised infrastructure (compute/net/storage) | OpenStack, K8s |
+
+### Service Function Chaining
+
+Classifier tags packets (NSH header) → forwarders walk the chain `firewall -> DPI -> NAT` → declassifier strips tags. Ordering and symmetry (return path) are the hard parts.
+
+```yaml
+# VNF descriptor excerpt (ETSI SOL001-style, TOSCA flavour)
+topology_template:
+  node_templates:
+    vFirewall:
+      type: tosca.nodes.nfv.VNF
+      properties:
+        descriptor_id: fw-v1
+        flavour: small        # 2 vCPU / 4 GB
+      requirements:
+        - virtual_link: net-mgmt
+        - virtual_link: net-wan
+      interfaces:
+        Vnflcm:
+          instantiate: scripts/fw_boot.sh
+          scale: scripts/fw_scale.sh
+```
+
+```bash
+# Chain check on the wire: tag, forward, verify order with tcpdump marks
+sudo ovs-ofctl -O OpenFlow13 add-flow s1 "ip,nw_dst=10.0.0.0/24 actions=mod_nw_tos:8,output:2"
+sudo tcpdump -i s1-eth2 -v 'ip[1] & 0xfc == 8' -c 5
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Design a 3-VNF chain (firewall → IDS-monitor → NAT) for a branch office: draw the forwarding graph, write the classifier rules (5-tuple + DSCP), and state which VNFs must see both directions (symmetry). One diagram + one rule table.
+
+</div>
+
+---
+
+## Week 3: IPv6 in Practice
+
+IPv6 is not IPv4 with longer addresses: no NAT-by-default, no broadcast, SLAAC autonomy, extension-header chains and mandatory first-hop security thinking.
+
+### Addressing Plan
+
+| Block | Purpose | Example |
+|-------|---------|---------|
+| `2001:db8::/32` | Documentation (never route publicly) | Labs, slides |
+| `fd00::/8` (ULA) | Private, locally unique | `fd00:lab:1::/48` per site |
+| `fe80::/10` | Link-local (ND, routing protocols) | Auto on every interface |
+| `ff00::/8` | Multicast (replaces broadcast) | `ff02::1` all-nodes |
+
+Plan nibbles on `/48` per site → `/64` per LAN (SLAAC needs a full 64 bits).
+
+### Key Mechanisms
+
+- **SLAAC + RDNSS** — plug-and-play addresses; control with RA guard + `AdvAutonomous` flags.
+- **DHCPv6** — stateful when you need DNS control, audit trails, reservations.
+- **Dual-stack + Happy Eyeballs** — run both, race connections, measure v6/v4 ratio.
+- **Transition** — NAT64/DNS64 for v6-only clients, 464XLAT on mobiles, tunnels for legacy links.
+
+```bash
+# Linux: static ULA + forwarding + RA guard basics
+sudo ip -6 addr add fd00:lab:1::1/64 dev eth0
+sudo sysctl -w net.ipv6.conf.all.forwarding=1
+ip -6 route show
+# FRR: advertise the prefix
+# router ospf6 / interface eth0 area 0.0.0.0 ; redistribute connected
+```
+
+```
+# dnsmasq DHCPv6 excerpt (stateful range + DNS)
+# /etc/dnsmasq.d/ipv6.conf
+enable-ra
+dhcp-range=fd00:lab:1::100,fd00:lab:1::1ff,slaac,24h
+dhcp-option=option6:dns-server,[fd00:lab:1::53]
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Write an addressing plan for 3 sites + 2 LANs each from `fd00:lab::/48` (every LAN a `/64`, list all prefixes). Then configure one Linux namespace pair dual-stack, prove `ping -6` works link-local and ULA, and capture one Router Advertisement in Wireshark showing the prefix + flags.
+
+</div>
+
+---
+
+## Week 4: QUIC and HTTP/3
+
+QUIC moves transport into UDP userspace: 0–1 RTT crypto handshakes, independent streams (no TCP head-of-line blocking), connection migration across IP changes — the foundation of HTTP/3.
+
+### QUIC vs TCP+TLS
+
+| Feature | TCP + TLS 1.2 | QUIC + TLS 1.3 |
+|---------|---------------|----------------|
+| Handshake | 2–3 RTT | 0–1 RTT (resumption 0-RTT) |
+| Loss in one stream | Blocks all (HOL) | Only that stream stalls |
+| IP/port change | New connection | Migration, same CID |
+| Middlebox ossification | TCP flags visible | Encrypted, versioned |
+
+### HTTP/3 Consequences
+
+QPACK (header compression for out-of-order streams), server push removed (use 103 Early Hints), UDP blocking on corporate firewalls becomes a deployment issue.
+
+```python
+# Compare HTTP/2 vs HTTP/3 handshake cost with curl (timing only)
+# Requires curl with HTTP/3 support (nghttp3/ngtcp2)
+import subprocess
+for args in (["--http2", "https://example.com"],
+             ["--http3-only", "https://example.com"]):
+    r = subprocess.run(["curl", "-o", "/dev/null", "-s",
+                        "-w", "%{time_connect} %{time_appconnect} %{time_total}\n",
+                        *args], capture_output=True, text=True)
+    print(" ".join(args[:1]), r.stdout.strip())
+# Columns: TCP connect | TLS/app connect | total. Expect appconnect ~ 1 RTT lower on H3 resumption.
+```
+
+```bash
+# Watch migration/blocking: QUIC is UDP/443 — confirm the path allows it
+sudo tcpdump -i any 'udp port 443' -c 5
+curl --http3-only -v https://example.com -o /dev/null 2>&I | head -20
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Capture a QUIC handshake (ClientHello + server flight) and a TCP+TLS 1.2 handshake in Wireshark. Count round trips to first application byte in each, then test connection migration (switch WiFi → hotspot or change source IP in a namespace) and report whether the QUIC connection survived. Table + 4-line conclusion.
+
+</div>
+
+---
+
+## Week 5: 5G and the Road to 6G
+
+5G splits radio and core into cloud-native functions: Service-Based Architecture, slicing, CU/DU disaggregation (O-RAN) and MEC put compute one hop from the antenna.
+
+### Core Ideas
+
+| Concept | What it is | Why it matters |
+|---------|-----------|----------------|
+| SBA core (AMF/SMF/UPF/NEF) | REST-based NFs | Sliceable, scalable control plane |
+| Slicing (eMBB/URLLC/mMTC) | Virtual networks per SLA | One radio, many guarantees |
+| CU/DU + O-RAN | Split baseband, open fronthaul | Multi-vendor, xApps/rApps |
+| MEC | Edge UPF + apps | <10 ms latency, local breakout |
+| 6G direction | THz, sensing+comms, AI-native air interface | Research now, standards ~2028+ |
+
+### Slice Design Mini-Example
+
+```yaml
+# Slice intent: URLLC robot cell vs eMBB cameras on one gNB
+slices:
+  - id: urllc-robots
+    sst: 2                      # URLLC
+    latency_budget_ms: 5
+    gbr_mbps: 20
+    upf: mec-floor-1            # local breakout
+    qos_5qi: 82
+  - id: embb-cameras
+    sst: 1                      # eMBB
+    latency_budget_ms: 50
+    ambr_mbps: 400
+    upf: central
+    qos_5qi: 8
+```
+
+```bash
+# UPF-adjacent check on MEC host: is breakout local? (latency proves it)
+ping -c 20 robot-controller.local | tail -2
+mtr -rwzc 20 robot-controller.local | tail -5
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Dimension two slices sharing 100 MHz: URLLC (5 ms budget, 20 Mbps GBR) + eMBB (best effort). Allocate PRBs/priority, place the UPFs (edge vs central), and define one overload policy (who gets pre-empted). One table + topology sketch + 3-line justification.
+
+</div>
+
+---
+
+## Week 6: Data Center Fabrics — Clos and VXLAN
+
+Modern DCs are Clos fabrics (leaf-spine, all ECMP) with EVPN-VXLAN overlays: any VM anywhere in a virtual L2, routed L3 underlay, BGP as the only protocol.
+
+### Leaf-Spine + ECMP
+
+```
+   spine1   spine2
+   /  \     /  \
+leaf1 leaf2 leaf3 ... (servers hang off leafs only)
+```
+
+Oversubscription `leaf-uplinks : server-ports` (3:1 typical); ECMP hashes flows across all equal paths — elephant flows need flowlet/packet-spray help.
+
+### EVPN-VXLAN Overlay
+
+- **VXLAN** — L2-in-UDP (VNI = tenant), VTEPs on leafs.
+- **EVPN (BGP)** — control plane advertises MAC+IP bindings; no flood-and-learn.
+- **Anycast gateway** — same gateway IP/MAC on every leaf; first-hop stays local.
+
+```bash
+# FRR: eBGP underlay (unnumbered) + EVPN overlay skeleton
+# /etc/frr/frr.conf excerpt
+router bgp 65001
+ neighbor fabric peer-group
+ neighbor fabric remote-as external
+ neighbor eth0 interface peer-group fabric
+ !
+ address-family ipv4 unicast
+  redistribute connected
+ address-family l2vpn evpn
+  advertise-all-vni
+```
+
+```bash
+# Linux VTEP sanity: VNI 10010 riding over 10.0.0.0/24 underlay
+sudo ip link add vxlan10 type vxlan id 10010 dstport 4789 \
+  local 10.0.1.1 nolearning
+sudo ip link set vxlan10 up
+bridge fdb show dev vxlan10 | head
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> On paper or in Mininet, build a 2-spine/2-leaf fabric with 2 tenants (VNI 10, 20). Show the underlay BGP sessions, the EVPN type-2 routes for one VM per tenant, and prove tenant isolation with a `ping` matrix (same-VNI works, cross-VNI fails). Diagram + matrix.
+
+</div>
+
+---
+
+## Week 7: WiFi 6 and WiFi 7
+
+WiFi 6 (802.11ax) optimised *efficiency* (OFDMA, uplink MU-MIMO, BSS colouring, TWT); WiFi 7 (802.11be) adds *throughput + determinism* (320 MHz, 4096-QAM, Multi-Link Operation, multi-AP coordination).
+
+### Generation Deltas
+
+| Feature | WiFi 5 (ac) | WiFi 6 (ax) | WiFi 7 (be) |
+|---------|-------------|-------------|-------------|
+| MU access | DL MU-MIMO | + OFDMA, UL MU | + MLO, puncturing |
+| Channels | 80/160 MHz | + 6 GHz (6E) | 320 MHz, 4096-QAM |
+| Determinism | EDCA only | BSS colour, TWT | rTWT, multi-AP coord |
+| Peak (1 AP) | ~3.5 Gbps | ~9.6 Gbps | ~46 Gbps (theory) |
+
+### Planning Rules
+
+1. 6 GHz for capacity/clean spectrum; keep 2.4 GHz for IoT reach.
+2. Reuse with BSS colouring + transmit-power control, not just channels.
+3. Separate latency-sensitive SSIDs; enable rTWT where supported.
+4. Validate with surveys (RSSI, SNR, retries, airtime), not bars.
+
+```bash
+# Survey with Linux tools: scan, link quality, retries
+sudo iw dev wlan0 scan | grep -E 'SSID|primary channel|signal' | head -30
+iw dev wlan0 link
+iw dev wlan0 station dump | grep -E 'Station|signal|tx .* retries' | head
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Produce a channel plan for one floor (6 APs, 2.4/5/6 GHz): assign channels + widths, set BSS colours 1–8, and mark which SSID carries real-time traffic with rTWT. Justify co-channel separation in 5 lines and list the survey metrics you would verify after deployment.
+
+</div>
+
+---
+
+## Week 8: Network Automation — NETCONF, YANG, Ansible
+
+Clicking CLIs does not scale: model-driven automation (YANG models + NETCONF/RESTCONF) plus idempotent playbooks (Ansible/Nornir) make networks testable code.
+
+### Stack
+
+```
+Intent (YAML inventory + variables)
+  -> Template (Jinja2) -> Render per device
+  -> Transport (NETCONF/YANG or RESTCONF or SSH) -> Commit + verify
+  -> Test (pyATS/Batfish diff) -> Git history
+```
+
+### YANG/NETCONF in 30 Seconds
+
+YANG models config *and* state; NETCONF edits `<running>` in transactions with commit/rollback; RESTCONF maps the same models to HTTP.
+
+```xml
+<!-- NETCONF edit-config: set hostname (RFC 6241 framing) -->
+<rpc message-id="1" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+  <edit-config>
+    <target><running/></target>
+    <config>
+      <system xmlns="urn:ietf:params:xml:ns:yang:ietf-system">
+        <hostname>leaf1</hostname>
+      </system>
+    </config>
+  </edit-config>
+</rpc>
+```
+
+```yaml
+# Ansible: idempotent VLAN push + backup (ios/vyos/eos modules analogous)
+- hosts: switches
+  gather_facts: false
+  tasks:
+    - name: Ensure VLAN 10 exists
+      community.network.vn_vlan:
+        vlan_id: 10
+        name: tenants-a
+        state: present
+    - name: Backup running config
+      ansible.builtin.fetch:
+        src: /config/running.cfg
+        dest: backups/{{ inventory_hostname }}.cfg
+        flat: true
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Write an Ansible playbook that renders per-leaf BGP config from Jinja2 (ASN, loopback, neighbours from inventory), pushes it with `--check --diff` first, then applies and stores the diff. Run against 2 containers/VMs (or `--check` mode) and attach the diff output.
+
+</div>
+
+---
+
+## Week 9: Telemetry — SNMP to Streaming
+
+SNMP polls every minutes; streaming telemetry pushes every seconds with structured paths — the difference between autopsy and intensive care.
+
+### Generations
+
+| Gen | Protocol | Model | Cadence |
+|-----|----------|-------|---------|
+| Poll | SNMPv2c/v3 | MIB/OID | 1–5 min |
+| Flow | NetFlow/IPFIX/sFlow | 5-tuple aggregates | Per-flow expiry |
+| Streaming | gNMI/gRPC, NETCONF notif. | YANG paths | 1–30 s subscriptions |
+| In-band | INT (P4), eBPF events | Per-packet/hop | Line rate (sampled) |
+
+### gNMI Subscribe Example
+
+```python
+# Streaming interface counters via gNMI (grpcio + pygnmi style pseudocode)
+from pygnmi.client import gNMIclient
+
+with gNMIclient(target=('leaf1', '6030'), username='admin',
+                password='admin', insecure=True) as c:
+    sub = c.subscribe(subscribe=[{
+        'path': 'interfaces/interface[name=Ethernet1]/state/counters',
+        'mode': 'sample', 'sample_interval': 10_000_000_000}])
+    for msg in sub:
+        print(msg)  # in_octets/in_errors deltas -> rate + alert
+```
+
+```bash
+# eBPF instant view: retransmits + top talkers without a collector
+sudo ss -tin | head -20
+sudo tcpdump -i any -nn -c 1000 2>/dev/null | awk '{print $3}' | sort | uniq -c | sort -rn | head
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Define 5 golden signals for one leaf (CPU, buffer drops, optic levels, BGP session state, interface error rate) with YANG paths, thresholds and cadence. Implement one: poll or stream it for 10 minutes, plot the series, and mark the alert line. Submit paths table + plot.
+
+</div>
+
+---
+
+## Week 10: IoT and Edge Networking
+
+Millions of constrained devices speak MQTT/CoAP over lossy links; the edge (gateway/MEC) aggregates, filters and decides locally so the cloud sees insight, not noise.
+
+### Protocol Picks
+
+| Protocol | Transport | Pattern | Best for |
+|----------|-----------|---------|----------|
+| MQTT v5 | TCP (+TLS) | pub/sub, QoS 0–2 | Telemetry, commands |
+| CoAP | UDP (+DTLS/OSCORE) | REST-like, observe | Constrained nodes |
+| LwM2M | CoAP | Device mgmt | Firmware, provisioning |
+| LoRaWAN | Sub-GHz | Aloha classes A–C | Battery km-range |
+
+### Edge Pipeline
+
+`sensor -> gateway (filter/dedupe) -> local rules (shutdown on threshold) -> batch uplink -> cloud twin`.
+
+```python
+# MQTT sensor publisher + edge threshold subscriber (paho-mqtt)
+import json, paho.mqtt.client as mqtt
+
+pub = mqtt.Client(); pub.connect("edge-broker.local", 1883, 60)
+pub.publish("plant/zone1/temp", json.dumps({"c": 78.5, "id": "t-12"}), qos=1)
+
+def on_msg(cli, ud, msg):
+    c = json.loads(msg.payload)["c"]
+    if c > 80.0:
+        cli.publish("plant/zone1/cmd", json.dumps({"fan": "on"}), qos=1)
+
+sub = mqtt.Client(); sub.on_message = on_msg
+sub.connect("edge-broker.local"); sub.subscribe("plant/zone1/temp"); sub.loop_forever()
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Build the pipeline above with a Mosquitto broker: 1 publisher (10 values, one spike), 1 edge rule (fan on >80), 1 logger. Show broker logs proving QoS-1 delivery and the command message caused by the spike. Add TLS in 3 bullet steps (what changes where).
+
+</div>
+
+---
+
+## Week 11: Zero Trust and SASE
+
+Never trust, always verify: identity-aware proxying, device posture and per-session policy replace the "inside = safe" perimeter; SASE converges SSE security with SD-WAN delivery.
+
+### Pillars
+
+| Pillar | Control | Example |
+|--------|---------|---------|
+| Identity | MFA, short-lived certs (SPIFFE) | `user@`, `service-a` |
+| Device | Posture, EDR signal | compliant + patched |
+| Network | Microsegmentation, mTLS | workload-to-workload policy |
+| Data | DLP, CASB | block PII upload |
+| Access edge | ZTNA broker, SWG | no VPN hairpin |
+
+### Policy as Code
+
+```yaml
+# ZTNA-style intent: only on-call engineers on compliant laptops reach prod DB
+policies:
+  - name: prod-db-access
+    match:
+      resource: db-prod-01:5432
+      user_group: oncall
+      device_posture: compliant
+      mfa: true
+    action: allow
+    session_timeout_min: 60
+    require_approval: true
+  - name: default-deny
+    match: {resource: "db-prod-01:5432"}
+    action: deny
+```
+
+```bash
+# mTLS sanity between two workloads (SPIRE/SDS or plain certs in lab)
+curl --cert workload-a.pem --key workload-a-key.pem --cacert mesh-ca.pem https://db-prod-01:8443/health
+sudo iptables -L -n | head  # host microsegmentation backstop
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Write 5 allow-rules + default-deny for a 3-tier app (web → api → db) with identity + posture conditions. Then simulate 3 access attempts (legit, missing MFA, compromised device) and show the decision table. Justify each deny in one line.
+
+</div>
+
+---
+
+## Week 12: Quantum-Safe Networking
+
+A cryptographically relevant quantum computer breaks RSA/ECC (Shor) and halves symmetric strength (Grover): migrate to NIST post-quantum KEMs/signatures now via hybrid handshakes and a crypto inventory.
+
+### NIST PQC Winners (What to Deploy)
+
+| Use | Algorithm | Notes |
+|-----|-----------|-------|
+| KEM | ML-KEM (Kyber) 512/768/1024 | Hybrid X25519+Kyber in TLS today |
+| Signatures | ML-DSA (Dilithium), SLH-DSA (SPHINCS+), FN-DSA | Bigger keys/sigs — mind MTU/ handshake size |
+| Symmetric | AES-256, SHA-384+ | Double strength vs Grover |
+
+### Hybrid TLS Today
+
+```bash
+# OpenSSL 3.x with PQC provider: list KEMs, test hybrid group (names vary by build)
+openssl list -kem-algorithms | grep -i -E 'kyber|ml-kem|x25519' | head
+curl --curves X25519MLKEM768 -v https://pq-enabled.example.com -o /dev/null 2>&I | head -15
+# Watch: larger ClientHello/KeyShare — confirm no middlebox fragmentation
+sudo tcpdump -i any 'tcp port 443' -c 3 -v | grep -i -E 'length|fragment' | head
+```
+
+### Migration Playbook
+
+1. **Inventory** — every RSA/ECC usage (certs, VPNs, firmware signing, code).
+2. **Hybrid first** — classical + PQC so both eras verify.
+3. **Size impact** — Dilithium certs ≈ kBs; test MTU, caches, embedded stacks.
+4. **Crypto-agility** — negotiate algorithms; never hard-code one.
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Inventory TLS/RSA usage on one host (`cert locations`, `ssllabs` or `testssl.sh` for one service, VPN config). Classify each item (migrate-now / hybrid / monitor) and estimate handshake-size impact of ML-DSA certs on your most constrained link. One table + 4-line plan.
+
+</div>
+
+---
+
+## Week 13: AI-Driven NOC — The Self-Driving Network
+
+From dashboards to closed loops: detect (anomaly), decide (policy/ranker), act (automation from Week 8), verify (telemetry from Week 9) — with a human approval gate sized to blast radius.
+
+### Closed Loop
+
+```
+stream telemetry -> features -> anomaly/rank -> action proposal
+     -> blast-radius gate (auto | approve | freeze) -> Ansible/NETCONF
+     -> verify KPI -> learn (label, retrain)
+```
+
+### Level Ladder
+
+| Level | Name | Human role |
+|-------|------|-----------|
+| L1 | Assist (copilot summaries) | Decides everything |
+| L2 | Supervised (proposed diffs) | Approves |
+| L3 | Guardrailed (auto in blast radius) | On-call for pages |
+| L4 | Autonomous (self-heal + report) | Audits |
+
+```python
+# Baseline + z-score anomaly on interface error rate (pandas)
+import pandas as pd
+
+s = pd.read_csv("if_errors.csv", parse_dates=["ts"]).set_index("ts")["err_rate"]
+roll = s.rolling("30min")
+z = (s - roll.mean()) / roll.std().replace(0, 1e-9)
+alerts = s[z > 4].dropna()
+print(f"alerts: {len(alerts)}")
+print(alerts.tail().to_string())
+# Wire the output to Week 8 playbook (damp interface / reroute) behind an approval gate.
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Take one week of interface counters (or synthesise with a daily pattern + injected spike). Implement the z-score detector, tune the threshold to ≤1 false positive/day, and define the automated action + approval gate for a real alert. Submit plot with flagged points + runbook entry.
+
+</div>
+
+---
+
+## Assignment Requirements
+
+### SDN Labs + Programming
+
+<div class="checklist">
+
+- [ ] Labs 01–05 in `upce/NNTPS/labs/` reproduced (topology, flows, capture, REST)
+- [ ] Programming task: RYU extension or Floodlight module runs on Mininet
+- [ ] Flow tables + captures attached as evidence
+- [ ] README: versions (Mininet, OVS, RYU), exact commands, expected output
+
+</div>
+
+### Mini-Project
+
+<div class="checklist">
+
+- [ ] Controller comparison (RYU vs Floodlight vs ODL/ONOS) or end-to-end deployment
+- [ ] Measurable result (failover time, throughput, rule count)
+- [ ] Reproducible steps + config/code in repo
+- [ ] 5-minute defence: architecture diagram + one lesson learned
+
+</div>
+
+---
+
+## Code Review Guide
+
+### What to Look For
+
+1. **Controller safety** — no blanket `output: flood`; table-miss goes to controller with rate limits.
+2. **Idempotent automation** — playbooks converge; `--check --diff` clean on second run.
+3. **Config hygiene** — secrets vaulted, versions pinned, diffs committed to Git.
+4. **Observability** — every change emits telemetry; alerts reference runbooks.
+5. **Blast radius** — canary + rollback plan for fabric-wide pushes.
+
+<div class="review-note">
+
+<strong>🔍 Practice Review:</strong> Identify issues in this flow:
+
+```
+ovs-ofctl add-flow s1 "actions=output:flood"
+```
+
+**Issues:** matches everything (no match fields, lowest implicit priority chaos); floods BPDUs/loops broadcast storms; no timeout/hardening; bypasses controller policy; invisible in version control. Fix with explicit match + priority + timeouts + controller-managed install.
+
+</div>
+
+---
+
+## Exam Preparation
+
+### Key Topics to Review
+
+| Week | Topic | Key Concepts |
+|------|-------|--------------|
+| 1 | SDN | OpenFlow pipeline, RYU, Mininet |
+| 2 | NFV | MANO, chaining, NSH |
+| 3 | IPv6 | Plans, SLAAC/DHCPv6, RA guard |
+| 4 | QUIC | 0-RTT, streams, migration |
+| 5 | 5G/6G | SBA, slicing, MEC |
+| 6 | DC fabric | Clos, EVPN-VXLAN, ECMP |
+| 7 | WiFi 6/7 | OFDMA, MLO, 6 GHz |
+| 8 | Automation | YANG, NETCONF, Ansible |
+| 9 | Telemetry | gNMI, eBPF, flows |
+| 10 | IoT/edge | MQTT/CoAP, MEC pipeline |
+| 11 | Zero Trust | ZTNA, microsegmentation |
+| 12 | PQC | ML-KEM/ML-DSA, hybrids |
+| 13 | AI NOC | Closed loop, blast radius |
+
+<div class="exercise-box">
+
+<strong>📝 Sample Exam Questions:</strong>
+
+1. Trace a packet through OpenFlow tables; where does the controller get involved?
+2. Design an IPv6 plan + first-hop security for a campus.
+3. Why does QUIC migrate across IPs while TCP cannot?
+4. Explain EVPN-VXLAN: what does BGP advertise and why no flooding?
+5. Contrast SNMP polling with gNMI streaming for outage detection time.
+
+</div>
+
+---
+
+## Quick Reference Cards
+
+### Mininet / OVS / RYU
+
+```bash
+sudo mn --topo single,3 --mac --switch ovsk --controller remote
+sudo ovs-ofctl -O OpenFlow13 dump-flows s1
+sudo ovs-ofctl -O OpenFlow13 add-flow s1 "priority=100,ip,nw_dst=10.0.0.2 actions=output:2"
+ryu-manager programming/01-l2-learning-switch/l2_learning_switch.py
+```
+
+### Automation / Telemetry One-Liners
+
+```bash
+ansible-playbook -i inventory.ini site.yml --check --diff
+curl -s http://floodlight:8080/wm/core/controller/summary/json | head -c 400
+ss -tin | head; sudo tcpdump -i any 'udp port 443' -c 3
+```
+
+### Subnet / VNI Cheatsheet
+
+```
+IPv6 LAN: /64 fixed (SLAAC) | site: /48 | ULA: fd00::/8 | link-local: fe80::/10
+VXLAN: VNI 24-bit (16M tenants) | dst UDP 4789 | VTEP per leaf
+WiFi: 2.4 reach / 5 balance / 6 capacity | MLO bonds links in WiFi 7
+PQC: KEM ML-KEM | sign ML-DSA | hybrid classical+PQC during migration
+```
+
+---
+
+*End of Course Documentation*
+
+**Last Updated:** 2026-09-20
+**Course Code:** KST/NNTPS
+**Credits:** 5 | Completion: Zk+ | Elective B

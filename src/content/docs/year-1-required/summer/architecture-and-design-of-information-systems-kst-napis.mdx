@@ -1,3 +1,708 @@
 ---
-title: Architecture and Design of Information Systems (KST/NAPIS)
+title: "Architecture and Design of Information Systems (KST/NAPIS)"
+description: "Complete course materials for enterprise architecture, ArchiMate, BPMN and SOA"
+template: doc
 ---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+# Architecture and Design of Information Systems (KST/NAPIS)
+
+Welcome to the Architecture and Design of Information Systems course! This documentation contains all lecture materials, exercises, assignment guidelines, and exam preparation resources in one comprehensive file.
+
+---
+
+## 📑 Table of Contents
+
+### Course Overview
+- [Course Objectives](#course-objectives)
+- [Assessment & Credit Requirements](#assessment--credit-requirements)
+- [Examination Structure](#examination-structure)
+- [Schedule](#schedule)
+
+### Lecture Materials (Weeks 1-13)
+1. [Week 1: Enterprise Architecture — Concepts, Goals, Methods](#week-1-enterprise-architecture--concepts-goals-methods)
+2. [Week 2: ArchiMate Language Basics](#week-2-archimate-language-basics)
+3. [Week 3: Types of Architectural Views](#week-3-types-of-architectural-views)
+4. [Week 4: Software Quality Requirements and Measurement](#week-4-software-quality-requirements-and-measurement)
+5. [Week 5: Application Portfolio Analysis](#week-5-application-portfolio-analysis)
+6. [Week 6: Architecture and Solution Building Blocks](#week-6-architecture-and-solution-building-blocks)
+7. [Week 7: BPMN Business Process Modelling in Camunda](#week-7-bpmn-business-process-modelling-in-camunda)
+8. [Week 8: Building Applications from Solution Building Blocks](#week-8-building-applications-from-solution-building-blocks)
+9. [Week 9: Agile Methods in the Enterprise Context](#week-9-agile-methods-in-the-enterprise-context)
+10. [Week 10: Architecture and Project Preparation](#week-10-architecture-and-project-preparation)
+11. [Week 11: Defining the Application Ecosystem Change](#week-11-defining-the-application-ecosystem-change)
+12. [Week 12: Typical Ecosystem Transformation Problems](#week-12-typical-ecosystem-transformation-problems)
+13. [Week 13: Service-Oriented Architectures](#week-13-service-oriented-architectures)
+
+### Assignments & Exam
+- [Assignment Requirements](#assignment-requirements)
+- [Code Review Guide](#code-review-guide)
+- [Exam Preparation](#exam-preparation)
+- [Quick Reference Cards](#quick-reference-cards)
+
+---
+
+## Course Overview
+
+### Course Objectives
+
+<span class="badge">Core</span> <span class="badge info">Architecture</span> <span class="badge warn">Enterprise</span>
+
+Familiarize students with designing information systems at enterprise scale, including:
+
+- **Enterprise architecture (EA)** - Goals, frameworks (TOGAF, Zachman), ADM cycle
+- **ArchiMate** - Business, application, technology layers and relations
+- **Architectural views** - Stakeholder viewpoints, cross-layer dependencies
+- **Quality** - ISO 25010 attributes, scenarios, measurement
+- **Portfolio analysis** - TIME model, rationalization, roadmaps
+- **ABB/SBB** - Architecture vs solution building blocks, catalogs
+- **BPMN + Camunda** - Process modelling, DMN, executable processes
+- **Agile enterprise** - SAFe, architecture runway, governance balance
+- **Transformation** - Ecosystem change definition, migration, SOA
+
+### Assessment & Credit Requirements
+
+<div class="exercise-box">
+
+<strong>📋 To receive credit, students must:</strong>
+
+1. Deliver a **semester project**: EA snapshot of a chosen organization (ArchiMate + views + portfolio + change proposal)
+2. Complete **BPMN/Camunda lab** (deployable process with user + service tasks)
+3. Present the project and **pass the review** (architecture rationale defended)
+
+</div>
+
+### Examination Structure
+
+#### In-Person Format
+1. **Written test** - ArchiMate reading, quality scenarios, portfolio decisions
+2. **Oral discussion** - Project defense + one drawn topic (SOA, transformation, agile EA)
+
+#### Distance Format
+1. **Oral examination** over MS Teams: project walkthrough + theory questions
+
+#### Passing Criteria
+- **Minimum 60%** of the written test; project must be rated "accepted"
+
+### Schedule
+
+| Week | Lecture Topic | Exercise Focus |
+|------|---------------|----------------|
+| 1 | Enterprise architecture basics | EA goals, frameworks |
+| 2 | ArchiMate language | Layer modelling |
+| 3 | Architectural views | Viewpoint design |
+| 4 | Quality requirements, measurement | Quality scenarios |
+| 5 | Application portfolio analysis | TIME quadrants |
+| 6 | ABB and SBB | Block cataloging |
+| 7 | BPMN in Camunda | Executable processes |
+| 8 | Apps from SBBs | Composition |
+| 9 | Agile enterprise methods | SAFe, runway |
+| 10 | Architecture & project prep | Charters, risks |
+| 11 | Ecosystem change definition | Gap analysis |
+| 12 | Transformation problems | Migration patterns |
+| 13 | Service-oriented architectures | SOA design |
+
+---
+
+## Week 1: Enterprise Architecture — Concepts, Goals, Methods
+
+Enterprise architecture aligns business strategy with IT landscape. Frameworks like TOGAF ADM and Zachman organize the work from principles to governed change. This week sets vocabulary and method.
+
+### Key Concepts
+
+- **EA domains:** business, data, application, technology (+ security).
+- **Goals:** transparency, standardization, agility, cost control, risk reduction.
+- **TOGAF ADM:** vision → business → IS → technology → opportunities → migration → governance.
+
+| Framework | Idea | Strength |
+|-----------|------|----------|
+| TOGAF | ADM cycle + content metamodel | Process-heavy, complete |
+| Zachman | 6×6 interrogative matrix | Taxonomy clarity |
+| ArchiMate | Visual EA language | Communicable models |
+
+```text
+Example principle:
+  P-03 "Cloud-first, but data stays in EU."
+  Rationale: elasticity + GDPR. Implication: vet every SaaS for residency.
+```
+
+> **Rule:** Every architecture decision needs rationale + implication — otherwise it is decoration.
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Pick a university faculty. Write 5 architecture principles (naming, rationale, implication), list 10 stakeholders with concerns, and map them to TOGAF ADM phases in a one-page table.
+
+```text
+// stub table:
+// | Stakeholder | Concern | ADM phase | Deliverable |
+// | Dean        | Cost    | Vision    | ...         |
+```
+
+</div>
+
+---
+
+## Week 2: ArchiMate Language Basics
+
+ArchiMate models active structure, behavior, and passive structure across three core layers plus motivation and implementation extensions. Relations (serving, realization, assignment, aggregation) carry the meaning.
+
+### Layers at a Glance
+
+| Layer | Active | Behavior | Passive |
+|-------|--------|----------|---------|
+| Business | Actor, Role | Process, Function | Business Object |
+| Application | Component | Service, Function | Data Object |
+| Technology | Node, Device | Service, Function | Artifact |
+
+### Relations Mini-Guide
+
+```text
+Serving:      A ----> B   (A serves B, arrow to user)
+Realization:  A - - |> B   (A realizes B, e.g. process realizes service)
+Assignment:   A ---● B    (responsibility: role assigned to process)
+Aggregation:  A <>--- B   (whole-part)
+```
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Model "student enrolment": business actor Student, process Enrol, application service Enrolment Service, component SIS, technology node App Server. Use at least 4 element types and 3 relation types; export ASCII or tool screenshot description.
+
+```text
+// stub:
+// Student --triggers--> Enrol --realizes--> Enrolment Service
+// Enrolment Service --served by--> SIS --runs on--> App Server
+```
+
+</div>
+
+---
+
+## Week 3: Types of Architectural Views
+
+A view is a projection for a stakeholder concern; a viewpoint is the template. Good architects maintain traceability from motivation (goals, requirements) down to physical deployment without mixing abstraction levels.
+
+### Viewpoint Catalog
+
+| Viewpoint | Audience | Shows |
+|-----------|----------|-------|
+| Organization | Management | Actors, roles, locations |
+| Business process | Process owners | Flows, objects, services |
+| Application cooperation | App owners | Components + interfaces |
+| Technology usage | Ops | Nodes, artifacts, networks |
+| Migration | Board | Plateaus, gaps, work packages |
+
+```yaml
+# viewpoint definition sketch
+viewpoint: application-usage
+stakeholders: [CIO, app-owner]
+concerns: [overlap, licensing-cost]
+elements: [application-component, application-service, data-object]
+```
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> For your semester organization define 3 views (business, application, migration) with purpose, audience, and 6+ elements each. Explain one cross-view trace: requirement → process → service → component → node.
+
+```yaml
+# stub
+trace:
+  requirement: R-12
+  process: OrderHandling
+  service: OrderAPI
+  component: OrderSvc
+  node: K8s-cluster
+```
+
+</div>
+
+---
+
+## Week 4: Software Quality Requirements and Measurement
+
+Quality requirements are measurable constraints (ISO/IEC 25010: performance, reliability, security, maintainability...). Architecture must turn vague "-ilities" into scenarios with stimulus, response, and measure — then design tactics to satisfy them.
+
+### Quality Scenario Template
+
+| Field | Example |
+|-------|---------|
+| Stimulus | 1000 concurrent checkouts |
+| Response | P95 < 2 s, no errors |
+| Tactic | Cache, autoscale, async queue |
+| Metric | APM p95, error budget burn |
+
+### Tactics Sampler
+
+```text
+Availability:  ping/echo, active redundancy, spare, rollback.
+Performance:   caching, pooling, load balancing, CQRS read models.
+Security:      authenticate, authorize, encrypt, audit.
+Modifiability: encapsulation, interfaces, publish-subscribe, config-as-code.
+```
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Write 6 quality scenarios (2 performance, 1 availability, 1 security, 2 modifiability) for an e-shop. For each give stimulus → measurable response → tactic → how you would verify it (test/monitor).
+
+```text
+// stub:
+// QS-1 ... | measure: k6 p95 < 2s @ 1000 VUs | verify: load test in CI
+```
+
+</div>
+
+---
+
+## Week 5: Application Portfolio Analysis
+
+Portfolios drift: duplicates,Zombie apps, shadow IT. TIME (Tolerate, Invest, Migrate, Eliminate) plus business-fit/technical-fit scoring rationalizes the landscape into invest/divest roadmaps.
+
+### TIME Model
+
+| Quadrant | Action | Example |
+|----------|--------|---------|
+| Invest | Standardize, scale | Core ERP |
+| Migrate | Replatform/replace | Legacy billing → SaaS |
+| Tolerate | Contain cost | Niche lab tool |
+| Eliminate | Retire | Duplicate reporting |
+
+```text
+Scoring (1-5): businessFit, techFit, cost/yr, risk.
+  Eliminate candidates: businessFit ≤ 2 AND techFit ≤ 2.
+  Migrate candidates:   businessFit ≥ 4 AND techFit ≤ 2.
+```
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Inventory 12 fictional apps with businessFit/techFit/cost/risk. Plot them into TIME, propose 3 retire + 2 migrate moves with savings estimate and risk note each.
+
+```csv
+# stub
+name,businessFit,techFit,costK,risk
+OldReports,2,1,45,high
+```
+
+</div>
+
+---
+
+## Week 6: Architecture and Solution Building Blocks
+
+TOGAF distinguishes Architecture Building Blocks (ABB — reusable specifications) from Solution Building Blocks (SBB — concrete products/instances). Catalogs, interfaces, and compliance keep reuse real instead of slideware.
+
+### ABB vs SBB
+
+| Aspect | ABB | SBB |
+|--------|-----|-----|
+| Nature | Spec, pattern | Product, instance |
+| Example | "SSO service spec" | Keycloak v22 @ SSO-cluster |
+| Reuse | Reference | Deploy |
+| Governed by | Standards board | Change + ops |
+
+```yaml
+abb:
+  id: ABB-AUTH-01
+  name: Central Authentication
+  standards: [OIDC, SAML2]
+  interfaces: [login, token-refresh, logout]
+sbb:
+  id: SBB-AUTH-KEYCLOAK
+  implements: ABB-AUTH-01
+  version: "22.0"
+  sla: "99.9%"
+```
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Define 4 ABBs (auth, notification, payments, reporting) with interfaces + standards, then bind each to 1–2 SBBs (product + version + hosting). Flag one compliance gap and its remediation.
+
+```yaml
+# stub
+abb: {id: ABB-NOTIF-01, interfaces: [send, template-render]}
+sbb: {id: SBB-NOTIF-SES, implements: ABB-NOTIF-01}
+```
+
+</div>
+
+---
+
+## Week 7: BPMN Business Process Modelling in Camunda
+
+BPMN 2.0 executable processes connect business flows to software: start events, user/service tasks, exclusive/parallel gateways, boundary timers. Camunda adds FEEL/DMN, external tasks, and Cockpit monitoring.
+
+### Core Symbols
+
+| Symbol | Use |
+|--------|-----|
+| Start / End event | Process boundaries |
+| User task | Human form step |
+| Service task | Code/connector call |
+| Exclusive gateway `×` | If/else branch |
+| Parallel gateway `+` | Fork/join |
+
+### Executable Snippet
+
+```xml
+<!-- Camunda BPMN excerpt: order approval -->
+<serviceTask id="checkStock" name="Check stock"
+  camunda:type="external" camunda:topic="stock-check" />
+<exclusiveGateway id="inStock" name="In stock?" />
+<sequenceFlow sourceRef="inStock" targetRef="ship">
+  <conditionExpression xsi:type="tFormalExpression">${stockOk}</conditionExpression>
+</sequenceFlow>
+<userTask id="approve" name="Manager approval"
+  camunda:assignee="${manager}" camunda:dueDate="P2D" />
+```
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Model "leave request" (submit → manager approve → HR record) with one timer boundary (escalate after 2 days) and one service task (notify). Deploy to Camunda (Docker), run 2 instances, and paste Cockpit token paths + one DMN table for approval rules.
+
+```bpmn
+// stub: start → userTask(Submit) → userTask(Approve) → serviceTask(Notify) → end
+// boundary timer on Approve: PT48H → escalate task
+```
+
+</div>
+
+---
+
+## Week 8: Building Applications from Solution Building Blocks
+
+Composable applications assemble SBBs through contracts: API gateways, events, shared identity. Integration styles (sync REST, async messaging, file/ETL) trade coupling for autonomy — choose per quality scenario.
+
+### Integration Matrix
+
+| Style | Coupling | When |
+|-------|----------|------|
+| REST sync | Temporal | Query, low latency |
+| Events/async | Decoupled | Notifications, sagas |
+| ETL/batch | Loose, stale | Reporting, migration |
+
+```yaml
+# docker-compose sketch wiring SBBs
+services:
+  gateway: {image: kong:3, ports: ["8000:8000"]}
+  orders:  {image: org/orders:1.4, depends_on: [db, kafka]}
+  notify:  {image: org/notify:2.1, depends_on: [kafka]}
+```
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Compose "order → pay → notify" from 3 SBBs with a C4-container sketch, OpenAPI fragment for one interface, and an async fallback (outbox or DLQ). List 3 failure modes + handling.
+
+```yaml
+# stub
+openapi: 3.0.0
+paths: {/pay: {post: {responses: {'200': {description: ok}}}}}
+```
+
+</div>
+
+---
+
+## Week 9: Agile Methods in the Enterprise Context
+
+Enterprise agility scales Scrum with architecture runway, PI planning, and lean governance. Intentional architecture (emergent + planned) prevents both big-upfront-design stall and integration chaos.
+
+### Scaling Elements
+
+| Element | Purpose |
+|---------|---------|
+| Epic → Feature → Story | Portfolio to team backlog |
+| Architecture runway | Just-enough enablers ahead |
+| PI planning (SAFe) | Cross-team dependency sync |
+| Lean business case | Fund epics by WSJF |
+
+```text
+WSJF = Cost of Delay / Job Size.  Highest first.
+Enabler example: "API gateway mTLS" as runway before "partner onboarding".
+```
+
+> **Rule:** If the runway is empty, teams build on sand; if it is a highway, you rebuilt waterfall.
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Plan 2 PIs (8 sprints) for your ecosystem change: 6 features + 3 enablers, WSJF-ranked, with dependencies on a program board sketch. Identify the top risk and its mitigation spike.
+
+```text
+// stub:
+// PI-1: auth-hardening(enabler) → partner-API(feature) ...
+// dependency: notify-rework blocked by event-bus enabler
+```
+
+</div>
+
+---
+
+## Week 10: Architecture and Project Preparation
+
+Architecture feeds project charters: scope, constraints, risks, estimates, and decision logs (ADR). RACI plus stage gates keep sponsors, architects, and delivery aligned from initiation to transition.
+
+### Charter Checklist
+
+```markdown
+- Vision + measurable outcomes
+- Scope in/out, constraints, assumptions
+- Risks (top 5 + owners)
+- Milestones, budget envelope
+- ADRs referenced (IDs)
+```
+
+```markdown
+# ADR-07: Postgres over Oracle for orders
+- Status: accepted — Date: 2026-03-01
+- Context: license cost, JSONB needs
+- Decision: Postgres 16 on managed cluster
+- Consequences: retrain 2 DBAs, migrate PL/SQL ×14
+```
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Write a 2-page charter for your change (scope, 5 risks with mitigation, 4 milestones) plus 2 ADRs in full format. Include a RACI for 6 roles.
+
+```markdown
+# stub ADR
+# ADR-08: ...
+- Status: proposed
+- Context: ...
+- Decision: ...
+```
+
+</div>
+
+---
+
+## Week 11: Defining the Application Ecosystem Change
+
+Change definition = baseline → target → gap → work packages → plateaus. Gap analysis on ArchiMate migration viewpoint turns "modernize everything" into sequenced, fundable increments.
+
+### Gap Table
+
+| ID | Baseline | Target | Gap | Work package |
+|----|----------|--------|-----|--------------|
+| G-1 | Monolith billing | Billing SaaS | Missing API parity | WP-3 adapter |
+| G-2 | File reports | Event-driven DWH | No CDC | WP-5 Debezium |
+
+```text
+Plateau P0 (now) → P1 (coexist, strangler) → P2 (retire legacy).
+Each plateau: verifiable + demoable + rollback plan.
+```
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Produce baseline/target diagrams (component level, 8+ elements each), a 6-row gap table, and 3 plateaus with acceptance criteria and rollback notes.
+
+```text
+// stub:
+// P1 acceptance: 20% traffic via strangler, p95 unchanged, rollback < 30 min
+```
+
+</div>
+
+---
+
+## Week 12: Typical Ecosystem Transformation Problems
+
+Transformations fail on data, coupling, and people — not diagrams. Strangler fig, anti-corruption layer, data migration (expand–migrate–contract), and parallel runs de-risk the cutover.
+
+### Problem → Pattern
+
+| Problem | Pattern | Note |
+|---------|---------|------|
+| Big-bang fear | Strangler fig | Route incrementally |
+| Legacy model leaks | Anti-corruption layer | Translate at boundary |
+| Downtime migration | Expand–migrate–contract | Dual-write then switch |
+| Silent regression | Parallel run / shadow | Compare outputs |
+
+```text
+Strangler route example (gateway):
+  /billing/* --10%--> new-billing, --90%--> legacy
+  promote % weekly on error-budget signal.
+```
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Take one legacy module and design its strangler: 4 incremental slices, ACL interface (3 operations), expand–migrate–contract steps for one table, and a rollback playbook (5 steps, < 30 min).
+
+```yaml
+# stub
+slices: [read-orders, create-order, payments, admin]
+acl: {ops: [getOrder, placeOrder, refund]}
+```
+
+</div>
+
+---
+
+## Week 13: Service-Oriented Architectures
+
+SOA (and its microservice descendant) structures capabilities as governed services with explicit contracts, registries, and policies. REST, events, and (where needed) SOAP/ESB each fit different coupling and governance needs.
+
+### SOA Checklist
+
+| Concern | Solution |
+|---------|----------|
+| Contract | OpenAPI / AsyncAPI, versioning |
+| Discovery | Registry, gateway routing |
+| Security | OAuth2/OIDC, mTLS, scopes |
+| Resilience | Timeout, retry+backoff, circuit breaker |
+| Observability | Trace IDs, SLO dashboards |
+
+```yaml
+# service contract fragment (AsyncAPI)
+channels:
+  order.created:
+    subscribe:
+      message: {payload: {type: object, properties: {orderId: {type: string}}}}
+```
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Design 4 services (catalog, order, pay, notify) with sync/async choices justified per quality scenario, OpenAPI fragment for one sync API, AsyncAPI fragment for one event, and a versioning + deprecation policy (6 rules).
+
+```yaml
+# stub
+policies: [semver, 2-versions-live, sunset-header, 90d-notice, ...]
+```
+
+</div>
+
+---
+
+## Assignment Requirements
+
+### Semester Project
+
+<div class="exercise-box">
+
+<strong>📋 Project deliverables (one team repo):</strong>
+
+| Part | Content |
+|------|---------|
+| **A — Snapshot** | ArchiMate baseline (business + app + tech), 3 views |
+| **B — Analysis** | Quality scenarios (6), TIME portfolio (10+ apps) |
+| **C — Change** | ABB/SBB catalog, BPMN process, target + plateaus |
+| **D — Defense** | 10-min presentation + ADR walkthrough |
+
+</div>
+
+### Submission Checklist
+
+<div class="checklist">
+
+- [ ] ArchiMate files + exported diagrams readable
+- [ ] 6 quality scenarios measurable and traced to tactics
+- [ ] TIME table with retire/migrate decisions justified
+- [ ] Camunda BPMN deploys without errors (attach deploy log)
+- [ ] ADRs numbered, dated, with consequences
+- [ ] Presentation PDF under 15 slides
+
+</div>
+
+---
+
+## Code Review Guide
+
+### What to Look For
+
+#### 1. Model hygiene
+- Element types correct per layer? Relations legal in ArchiMate?
+
+#### 2. Traceability
+- Requirement → process → service → component → node unbroken?
+
+#### 3. Executability
+- BPMN has no dead ends, gateways balanced, service topics bound?
+
+<div class="review-note">
+
+<strong>🔍 Practice Review:</strong> A BPMN has an exclusive gateway with 3 outgoing flows but only 1 condition, plus a service task with no topic. Issues: default flow missing, unbound connector, no error boundary. Fix: add default flow + conditions on all, bind `camunda:topic`, add error end event and retry policy.
+
+```xml
+<!-- fixed gateway -->
+<exclusiveGateway id="g1" />
+<sequenceFlow id="f1" sourceRef="g1" targetRef="a">
+  <conditionExpression>${approved}</conditionExpression>
+</sequenceFlow>
+<sequenceFlow id="default" sourceRef="g1" targetRef="b" />
+```
+
+</div>
+
+---
+
+## Exam Preparation
+
+### Exam Structure
+
+1. **Written (60 min):** read an ArchiMate fragment, write 2 quality scenarios, classify 4 apps into TIME.
+2. **Oral (15 min):** project defense + one drawn question (SOA vs microservices, strangler, ABB/SBB, agile EA).
+
+### Key Topics to Review
+
+| Week | Topic | Key Concepts |
+|------|-------|--------------|
+| 1–3 | EA + ArchiMate + views | Layers, relations, viewpoints |
+| 4 | Quality | Scenarios, tactics, metrics |
+| 5–6 | Portfolio, ABB/SBB | TIME, catalogs |
+| 7–8 | BPMN/Camunda, composition | Gateways, topics, integration |
+| 9–12 | Agile, charter, change, migration | Runway, gaps, strangler |
+| 13 | SOA | Contracts, governance |
+
+<div class="exercise-box">
+
+<strong>📝 Sample Exam Questions:</strong>
+
+1. Explain ABB vs SBB with two examples each.
+2. When is async messaging preferable to sync REST? Give 2 criteria.
+3. Draw a migration viewpoint from baseline to target with 2 plateaus.
+4. Write a measurable availability scenario + tactic + verification.
+5. Compare SOA and microservices on governance and coupling.
+
+</div>
+
+### Resources
+
+- Lecture slides (STAG / Moodle), ArchiMate 3.2 quick card
+- TOGAF ADM pocket guide, Camunda docs + BPMN 2.0 poster
+- Team project repo as primary study artifact
+
+---
+
+## Quick Reference Cards
+
+### ArchiMate Relations
+
+```text
+Serving      A ------> B     (used by)
+Realization  A - - - |> B    (implements)
+Assignment   A -------● B    (does)
+Aggregation  A <>------ B    (has)
+Composition  A <#>------ B   (owns)
+Triggering   A ---|> B       (causes, hollow arrow)
+```
+
+### BPMN Essentials
+
+| Element | Pitfall | Fix |
+|---------|---------|-----|
+| Exclusive gateway | Missing default | Always add default flow |
+| Service task | No topic/connector | Bind type + topic |
+| Timer boundary | No escalation path | Link to escalate task |
+| Parallel gateway | Unbalanced fork/join | Pair every fork |
+
+### TIME + Migration
+
+```text
+TIME: Invest / Migrate / Tolerate / Eliminate (fit ×2 + cost + risk).
+Migration: baseline → gaps → work packages → P1 → P2 (each demoable).
+Strangler: gateway % split, ACL at seam, expand–migrate–contract for data.
+```
+
+---
+
+*End of Course Documentation*
+
+**Last Updated:** 2026-09-20
+**Course Code:** KST/NAPIS

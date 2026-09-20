@@ -1,0 +1,935 @@
+---
+title: Data Warehousing (KIT/NNDSK)
+description: Complete course materials for data warehouses, ETL, OLAP, and business intelligence
+template: doc
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+# Data Warehousing (KIT/NNDSK)
+
+Welcome to the Data Warehousing course! This documentation covers data warehouse concepts, OLTP vs OLAP, dimensional modelling, ETL/ELT processes, OLAP analysis, SQL aggregation, Oracle Data Integrator, reporting, visualisation, and data mining.
+
+---
+
+## 📑 Table of Contents
+
+### Course Overview
+
+- [Course Objectives](#course-objectives)
+- [Assessment & Credit Requirements](#assessment--credit-requirements)
+- [Examination Structure](#examination-structure)
+- [Schedule](#schedule)
+
+### Lecture Materials (Weeks 1-13)
+
+1. [DWH Introduction](#week-1-dwh-introduction)
+2. [OLTP vs OLAP, ETL, BI](#week-2-oltp-vs-olap-etl-bi)
+3. [DWH Architectures](#week-3-dwh-architectures)
+4. [Star, Snowflake, Layers](#week-4-star-snowflake-layers)
+5. [DWH Methodology](#week-5-dwh-methodology)
+6. [ETL and ELT Preparation](#week-6-etl-and-elt-preparation)
+7. [OLAP Analysis](#week-7-olap-analysis)
+8. [CUBE and ROLLUP in SQL](#week-8-cube-and-rollup-in-sql)
+9. [Integration Tools I — ODI](#week-9-integration-tools-i--odi)
+10. [Integration Tools II and Reporting](#week-10-integration-tools-ii-and-reporting)
+11. [Visualisation and Dashboards](#week-11-visualisation-and-dashboards)
+12. [BI in Practice](#week-12-bi-in-practice)
+13. [Data Mining in Practice](#week-13-data-mining-in-practice)
+
+### Assignments & Exam
+
+- [Assignment Requirements](#assignment-requirements)
+- [Code Review Guide](#code-review-guide)
+- [Exam Preparation](#exam-preparation)
+
+---
+
+## Course Overview
+
+### Course Objectives
+
+<span class="badge">Core</span> <span class="badge info">Data</span>
+
+By the end of this course students will be able to:
+
+- **Explain DWH concepts** — subject-oriented, integrated, time-variant, non-volatile stores.
+- **Contrast OLTP vs OLAP** — workload, schema, and performance differences.
+- **Design dimensional models** — star and snowflake schemas, facts and dimensions.
+- **Build ETL/ELT pipelines** — extraction, cleansing, transformation, loading.
+- **Write analytical SQL** — `GROUP BY`, `ROLLUP`, `CUBE`, `GROUPING SETS`, window functions.
+- **Use integration tools** — Oracle Data Integrator (ODI) topology, mappings, scenarios.
+- **Create reports and dashboards** — reporting layers, ODV principles, visualisation best practice.
+- **Apply BI and data mining basics** — dashboards, KPIs, classification, clustering, association.
+
+### Assessment & Credit Requirements
+
+<div class="exercise-box">
+
+<strong>📋 To receive credit, students must:</strong>
+
+1. Complete the **semester project** (dimensional model + ETL + sample reports).
+2. Pass **continuous checks** (SQL/OLAP exercises during labs).
+3. Submit all deliverables before the deadline and attend the final review.
+
+</div>
+
+### Examination Structure
+
+#### In-Person Format
+
+1. **Written test** — theory (DWH concepts, modelling, ETL, OLAP) and SQL tasks.
+2. **Oral verification** — discussion of the semester project.
+
+#### Distance Format
+
+1. **Oral examination** — theoretical questions plus a practical SQL/ETL task.
+
+#### Passing Criteria
+
+- **Minimum 60%** overall; project must be accepted before the exam.
+- Grade E requires demonstrating core DWH modelling and SQL aggregation skills.
+
+### Schedule
+
+| Week | Lecture Topic | Exercise Focus |
+|------|---------------|----------------|
+| 1 | DWH introduction | Key terms, use cases |
+| 2 | OLTP vs OLAP, ETL, ELT, BI | Workload comparison |
+| 3 | DWH architectures, multidimensional DBs | Architecture diagrams |
+| 4 | Star, snowflake, reporting layers | Schema design |
+| 5 | DWH methodology | Requirements, source analysis |
+| 6 | Data prep, ETL/ELT | Staging, cleansing |
+| 7 | OLAP analysis | Slice, dice, drill |
+| 8 | SQL CUBE and ROLLUP | Aggregation queries |
+| 9 | ODI I — topology | ODI setup |
+| 10 | ODI II, reporting, ODV | Mappings + reports |
+| 11 | Visualisation, dashboards | Dashboard design |
+| 12 | BI in practice | KPI case study |
+| 13 | Data mining in practice | Classification demo |
+
+---
+
+## Week 1: DWH Introduction
+
+A data warehouse (DWH) is a central analytical repository. Inmon's definition: *subject-oriented, integrated, time-variant, non-volatile* collection of data supporting management decisions.
+
+### Key Concepts
+
+#### 1. Four Defining Properties
+
+- **Subject-oriented** — organised around business subjects (sales, customers), not applications.
+- **Integrated** — consistent naming, codes, units across sources.
+- **Time-variant** — history is kept; every fact carries a time context.
+- **Non-volatile** — loaded data is rarely updated in place; new snapshots are appended.
+
+#### 2. DWH vs Operational Database
+
+| Aspect | Operational DB | Data Warehouse |
+|--------|---------------|----------------|
+| Purpose | Run daily business | Analyse history, decide |
+| Data | Current, detailed | Historical, aggregated |
+| Updates | Frequent CRUD | Bulk loads, appends |
+| Users | Clerks, applications | Analysts, managers |
+
+#### 3. Basic Building Blocks
+
+- **Sources** — OLTP systems, files, APIs.
+- **Staging area** — raw landing zone for cleansing.
+- **Core DWH** — integrated, historised store.
+- **Data marts** — subject-specific subsets for departments.
+- **Consumers** — reports, OLAP cubes, dashboards, mining tools.
+
+### Example: Grain Statement
+
+```sql
+-- Grain: one row per order line per day, amounts in CZK incl. VAT.
+CREATE TABLE fact_sales_line (
+    date_key     INTEGER NOT NULL,
+    product_key  INTEGER NOT NULL,
+    customer_key INTEGER NOT NULL,
+    quantity     INTEGER NOT NULL,
+    amount_czk   NUMERIC(12,2) NOT NULL,
+    PRIMARY KEY (date_key, product_key, customer_key)
+);
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Write a one-paragraph grain statement for a university library warehouse (book loans). State the subject, time span kept (e.g. 5 years), and whether fines are included. Then list 3 source systems the data would come from.
+
+</div>
+
+---
+
+## Week 2: OLTP vs OLAP, ETL, BI
+
+OLTP systems process transactions; OLAP systems analyse them. ETL/ELT moves data between the two worlds; Business Intelligence is the consuming layer.
+
+### Key Concepts
+
+#### 1. OLTP vs OLAP
+
+| Aspect | OLTP | OLAP |
+|--------|------|------|
+| Query pattern | Many small reads/writes | Few large aggregations |
+| Schema | Highly normalised (3NF) | Denormalised star/snowflake |
+| Data volume per query | Tens of rows | Millions of rows |
+| Optimisation | Indexes, locking, concurrency | Partitioning, bitmaps, cubes |
+
+#### 2. ETL vs ELT
+
+- **ETL** — Extract, Transform, Load. Transform before loading; classic for on-premise DWH.
+- **ELT** — Extract, Load, Transform. Load raw data first, transform inside the target; common with cloud/lakehouse platforms.
+
+#### 3. BI Stack and Data Mining Position
+
+```
+Sources → Staging → DWH → Data marts → BI (reports, OLAP, dashboards) → Decisions
+                                              └→ Data mining (patterns, predictions)
+```
+
+### Example: OLTP vs OLAP Query
+
+```sql
+-- OLTP: single order lookup (fast, indexed).
+SELECT order_id, status, total
+FROM orders
+WHERE order_id = 12345;
+
+-- OLAP: monthly revenue by category (scan + aggregate).
+SELECT d.month, p.category, SUM(f.amount_czk) AS revenue
+FROM fact_sales_line f
+JOIN dim_date d    ON d.date_key = f.date_key
+JOIN dim_product p ON p.product_key = f.product_key
+GROUP BY d.month, p.category
+ORDER BY d.month;
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Classify 4 queries as OLTP or OLAP: (a) account balance lookup, (b) yearly churn by segment, (c) insert new order, (d) top-10 products by margin. For one OLAP query, sketch its `GROUP BY` clause.
+
+</div>
+
+---
+
+## Week 3: DWH Architectures
+
+Common topologies: two-tier (sources → DWH → marts), hub-and-spoke (Inmon), bus architecture with conformed dimensions (Kimball), and multidimensional (MOLAP/ROLAP/HOLAP) storage options.
+
+### Key Concepts
+
+#### 1. Inmon vs Kimball
+
+| Aspect | Inmon (top-down) | Kimball (bottom-up) |
+|--------|------------------|---------------------|
+| Core | Normalised enterprise DWH | Dimensional marts first |
+| Build order | DWH, then marts | Marts with conformed dims |
+| Strength | Consistency, integration | Speed of delivery, usability |
+
+#### 2. Storage Modes
+
+- **MOLAP** — data in proprietary cubes; fast queries, costly rebuilds.
+- **ROLAP** — data stays relational; flexible, relies on SQL optimisation.
+- **HOLAP** — hybrid: aggregates in cubes, details relational.
+
+#### 3. Multidimensional View
+
+- **Dimensions** — analysis axes (time, product, region).
+- **Measures** — numeric facts (revenue, quantity).
+- **Hierarchies** — drill paths (year → quarter → month → day).
+
+### Example: Conformed Dimension
+
+```sql
+-- One shared date dimension used by sales AND inventory marts.
+CREATE TABLE dim_date (
+    date_key   INTEGER PRIMARY KEY,
+    full_date  DATE NOT NULL,
+    year       SMALLINT NOT NULL,
+    quarter    SMALLINT NOT NULL,
+    month      SMALLINT NOT NULL,
+    day        SMALLINT NOT NULL,
+    is_weekend BOOLEAN NOT NULL
+);
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Draw (as text/boxes) a hub-and-spoke vs a bus architecture for a retail chain with sales, inventory, and HR marts. Mark where conformed dimensions sit in the Kimball variant.
+
+</div>
+
+---
+
+## Week 4: Star, Snowflake, Layers
+
+The star schema puts one fact table at the centre with denormalised dimension tables around it. Snowflake normalises dimensions into sub-tables. Reporting layers separate raw, integrated, and presentation zones.
+
+### Key Concepts
+
+#### 1. Facts vs Dimensions
+
+| Element | Content | Example |
+|---------|---------|---------|
+| **Fact** | Measures + foreign keys | `amount_czk`, `quantity` |
+| **Dimension** | Descriptive attributes | product name, region |
+| **Degenerate dim** | Operational number kept in fact | `order_number` |
+
+#### 2. Star vs Snowflake
+
+- **Star** — one table per dimension; fewer joins, more redundancy; preferred for query speed.
+- **Snowflake** — dimensions normalised (product → subcategory → category); less redundancy, more joins.
+
+#### 3. Layer Responsibilities
+
+| Layer | Role |
+|-------|------|
+| Staging | Raw extracts, no business rules |
+| Integration / core | Cleansed, conformed, historised |
+| Presentation / marts | Star schemas, aggregates, report views |
+
+### Example: Star Schema
+
+```sql
+CREATE TABLE dim_product (
+    product_key INTEGER PRIMARY KEY,
+    sku         VARCHAR(20) NOT NULL,
+    name        VARCHAR(200) NOT NULL,
+    category    VARCHAR(100) NOT NULL,
+    brand       VARCHAR(100)
+);
+
+CREATE TABLE fact_sales (
+    date_key    INTEGER NOT NULL REFERENCES dim_date(date_key),
+    product_key INTEGER NOT NULL REFERENCES dim_product(product_key),
+    quantity    INTEGER NOT NULL,
+    amount_czk  NUMERIC(12,2) NOT NULL,
+    PRIMARY KEY (date_key, product_key)
+);
+
+-- Snowflake variant: split category out.
+CREATE TABLE dim_category (
+    category_id   INTEGER PRIMARY KEY,
+    category_name VARCHAR(100) NOT NULL
+);
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Design a star schema for cinema ticket sales (film, hall, time, customer type). List one fact table with 2 measures and 4 dimensions with 2 attributes each. Then show which dimension you would snowflake and why.
+
+</div>
+
+---
+
+## Week 5: DWH Methodology
+
+Methodology covers business requirements, source analysis, design, build, deployment, and operation. Skipping requirements or source profiling is the most common cause of DWH failure.
+
+### Key Concepts
+
+#### 1. Business Requirements
+
+- Identify decisions, questions, KPIs, users, and refresh needs (daily? hourly?).
+- Distinguish must-have vs nice-to-have facts and dimensions.
+- Record data ownership and access rules.
+
+#### 2. Source Data Analysis
+
+- Inventory systems, tables, keys, codes, and data quality issues.
+- Profile data: nulls, duplicates, formats, ranges.
+- Decide historisation strategy: SCD Type 1 (overwrite), Type 2 (new row), Type 3 (previous-value column).
+
+#### 3. Build and Operate
+
+```
+Requirements → Dimensional design → ETL design → Build → Test → Deploy → Monitor
+```
+
+### Example: SCD Type 2
+
+```sql
+-- Keep history of customer segment changes: new row per change.
+CREATE TABLE dim_customer_scd2 (
+    customer_sk  SERIAL PRIMARY KEY,   -- surrogate key
+    customer_bk  VARCHAR(20) NOT NULL, -- business key
+    segment      VARCHAR(50) NOT NULL,
+    valid_from   DATE NOT NULL,
+    valid_to     DATE,                 -- NULL = current
+    is_current   BOOLEAN NOT NULL
+);
+
+-- Current view for reports.
+CREATE VIEW v_dim_customer_current AS
+SELECT * FROM dim_customer_scd2 WHERE is_current;
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> A product changes category from "Books" to "E-books". Show the SCD Type 1 vs Type 2 result for `dim_product`. State which one preserves history and when you would pick Type 1.
+
+</div>
+
+---
+
+## Week 6: ETL and ELT Preparation
+
+Data preparation means extracting from sources, cleansing, conforming, and deploying into the DWH. Typical steps: extract → validate → cleanse → deduplicate → conform → load, with logging and restartability.
+
+### Key Concepts
+
+#### 1. Extraction Patterns
+
+- **Full load** — reload everything; simple, heavy.
+- **Incremental / CDC** — load only changes via timestamps, flags, or log capture.
+- **Trickle feed** — near-real-time micro-batches.
+
+#### 2. Transformation Duties
+
+- Type casts, code mapping, unit conversion, address standardisation.
+- Surrogate key assignment, SCD handling, aggregate pre-computation.
+- Quarantine of rejected rows with error codes.
+
+#### 3. Deployment Concerns
+
+- Idempotent loads (re-running is safe), load order (dimensions before facts).
+- Row counts, checksums, and reconciliation reports after each run.
+
+### Example: Staging + Cleansing
+
+```sql
+-- 1. Land raw extract.
+CREATE TABLE stg_orders_raw (
+    order_id   VARCHAR(20),
+    order_date VARCHAR(20),   -- dirty format from CSV
+    amount     VARCHAR(20)
+);
+
+-- 2. Cleanse into staging clean.
+INSERT INTO stg_orders_clean (order_id, order_date, amount_czk)
+SELECT
+    TRIM(order_id),
+    TO_DATE(TRIM(order_date), 'DD.MM.YYYY'),
+    REPLACE(TRIM(amount), ',', '.')::NUMERIC(12,2)
+FROM stg_orders_raw
+WHERE TRIM(order_id) <> '' AND TRIM(amount) <> '';
+
+-- 3. Quarantine rejects.
+INSERT INTO stg_orders_reject (order_id, reason)
+SELECT order_id, 'missing amount'
+FROM stg_orders_raw
+WHERE TRIM(amount) = '' OR amount IS NULL;
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Given a CSV with dates in mixed formats (`2026-01-05` and `05.01.2026`) and amounts with spaces (`1 250,50`), write the cleansing `SELECT` that normalises both columns, and describe where rejected rows go.
+
+</div>
+
+---
+
+## Week 7: OLAP Analysis
+
+OLAP operations navigate multidimensional data: slice (fix one dimension value), dice (sub-cube), drill-down/up (change hierarchy level), roll-up (aggregate), and pivot (rotate axes).
+
+### Key Concepts
+
+#### 1. Core Operations
+
+| Operation | Meaning | Example |
+|-----------|---------|---------|
+| Slice | One value of a dimension | Year = 2026 |
+| Dice | Range on several dims | Q1, categories A–C |
+| Drill-down | More detail | Quarter → month |
+| Roll-up | Less detail | Month → quarter |
+| Pivot | Swap axes | Products to rows |
+
+#### 2. Hierarchies and Levels
+
+- Time: year → quarter → month → day.
+- Geography: country → region → city → store.
+- Product: category → subcategory → SKU.
+
+#### 3. Query Pattern
+
+- Large scans with `GROUP BY` over hierarchies; pre-aggregated summary tables speed up common levels.
+
+### Example: Drill Path in SQL
+
+```sql
+-- Roll-up level: revenue by quarter.
+SELECT d.year, d.quarter, SUM(f.amount_czk) AS revenue
+FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.date_key
+GROUP BY d.year, d.quarter
+ORDER BY d.year, d.quarter;
+
+-- Drill-down: same, but by month.
+SELECT d.year, d.quarter, d.month, SUM(f.amount_czk) AS revenue
+FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.date_key
+GROUP BY d.year, d.quarter, d.month
+ORDER BY d.year, d.quarter, d.month;
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Using a sales cube (time, product, region), describe in words a slice, a dice, a drill-down, and a pivot. Then write the SQL for the drill-down from quarter to month for region = 'Pardubice'.
+
+</div>
+
+---
+
+## Week 8: CUBE and ROLLUP in SQL
+
+`ROLLUP`, `CUBE`, and `GROUPING SETS` produce subtotals and grand totals in one query. The `GROUPING()` function distinguishes real NULLs from subtotal rows.
+
+### Key Concepts
+
+#### 1. ROLLUP — Hierarchical Subtotals
+
+- `GROUP BY ROLLUP (a, b, c)` generates totals for (a,b,c), (a,b), (a), and ().
+- Order of columns matters: it follows the hierarchy left to right.
+
+#### 2. CUBE — All Combinations
+
+- `GROUP BY CUBE (a, b)` generates (a,b), (a), (b), and ().
+- Use for cross-tab reports; more rows than `ROLLUP`.
+
+#### 3. GROUPING SETS and GROUPING()
+
+- `GROUPING SETS` lists exactly the groupings wanted.
+- `GROUPING(col)` returns 1 on subtotal rows, 0 otherwise — use it for labels.
+
+### Example: ROLLUP vs CUBE
+
+```sql
+-- ROLLUP: year > quarter subtotals + grand total.
+SELECT d.year, d.quarter, SUM(f.amount_czk) AS revenue,
+       GROUPING(d.year) AS g_year, GROUPING(d.quarter) AS g_q
+FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.date_key
+GROUP BY ROLLUP (d.year, d.quarter)
+ORDER BY d.year, d.quarter;
+
+-- CUBE: all combos of region x category.
+SELECT r.region, p.category, SUM(f.amount_czk) AS revenue
+FROM fact_sales f
+JOIN dim_product p ON p.product_key = f.product_key
+JOIN dim_region r  ON r.region_key = f.region_key
+GROUP BY CUBE (r.region, p.category)
+ORDER BY r.region, p.category;
+
+-- Exact control with GROUPING SETS.
+SELECT d.year, p.category, SUM(f.amount_czk) AS revenue
+FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.date_key
+JOIN dim_product p ON p.product_key = f.product_key
+GROUP BY GROUPING SETS ((d.year, p.category), (d.year), ());
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Write a `ROLLUP(year, month)` query over `fact_sales` and add a `CASE` on `GROUPING()` to label rows as 'detail', 'month subtotal', or 'grand total'. Then rewrite it with `CUBE(region, category)`.
+
+</div>
+
+---
+
+## Week 9: Integration Tools I — ODI
+
+Oracle Data Integrator (ODI) is an ELT-style integration tool. Key ideas: topology (physical + logical architecture), models (source/target metadata), interfaces/mappings, packages, and scenarios for execution.
+
+### Key Concepts
+
+#### 1. Topology: Physical vs Logical
+
+| Level | Content | Example |
+|-------|---------|---------|
+| Physical | Servers, schemas, agents | `PROD_ORACLE`, `STG_POSTGRES` |
+| Logical | Abstract names used in mappings | `SRC_SALES`, `TRG_DWH` |
+| Context | Binds logical to physical | DEV, TEST, PROD |
+
+#### 2. Models and Datastores
+
+- Reverse-engineer source/target structures into models.
+- Datastores carry columns, keys, and constraints used by mappings.
+
+#### 3. Interface / Mapping Anatomy
+
+- Sources → joins/filters → expressions → target with loading knowledge module (LKM/IKM choice).
+- Design once against logical schemas; execute in any context.
+
+### Example: ODI-style Mapping Sketch
+
+```sql
+-- What an ODI mapping "sales -> fact_sales" does under the hood (ELT):
+-- 1. Load raw into staging (C$ table), 2. transform inside target DB.
+CREATE TABLE c$_fact_sales AS
+SELECT TRIM(order_id) AS order_id, amount::NUMERIC(12,2) AS amount_czk
+FROM src_orders;
+
+INSERT INTO fact_sales (date_key, product_key, quantity, amount_czk)
+SELECT d.date_key, p.product_key, s.qty, s.amount_czk
+FROM c$_fact_sales s
+JOIN dim_date d    ON d.full_date = s.order_date
+JOIN dim_product p ON p.sku = s.sku;
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Sketch an ODI topology for DEV and PROD: name 2 physical schemas, 2 logical schemas, and which context maps to which. Then list the steps of a mapping that loads `dim_product` with SCD Type 1.
+
+</div>
+
+---
+
+## Week 10: Integration Tools II and Reporting
+
+ODI packages chain mappings with variables, loops, and error handling; scenarios freeze a version for scheduling. Reporting tools then consume the presentation layer; ODV (Oracle Data Visualization / reporting) architecture separates data, semantic model, and visual layer.
+
+### Key Concepts
+
+#### 1. Packages and Scenarios
+
+- **Package** — ordered steps: mappings, procedures, OS commands, e-mail on failure.
+- **Scenario** — generated executable snapshot (versioned) for the scheduler/agent.
+- **Load plans** — parallel/serial orchestration with restart points.
+
+#### 2. Reporting Layers
+
+| Layer | Role |
+|-------|------|
+| Physical | Tables, materialised aggregates |
+| Semantic / business model | Friendly names, joins, calculations, security |
+| Presentation | Folders per department, pre-built metrics |
+
+#### 3. ODV / Reporting Principles
+
+- One metric, one definition (certified KPIs in the semantic model).
+- Parameterised, drillable reports; separate ad-hoc from certified content.
+- Schedule heavy reports off-peak; cache aggregates.
+
+### Example: Certified Metric View
+
+```sql
+-- Semantic-layer style view: single definition of "net revenue".
+CREATE VIEW v_rep_net_revenue AS
+SELECT d.year, d.month, p.category,
+       SUM(f.amount_czk) AS net_revenue,
+       SUM(f.quantity)   AS units
+FROM fact_sales f
+JOIN dim_date d    ON d.date_key = f.date_key
+JOIN dim_product p ON p.product_key = f.product_key
+GROUP BY d.year, d.month, p.category;
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Design an ODI load plan with 3 steps (dimensions → facts → aggregates) and mark serial vs parallel steps. Then define one certified metric (e.g. "net revenue") and show the view that implements it.
+
+</div>
+
+---
+
+## Week 11: Visualisation and Dashboards
+
+Good dashboards answer one business question per page, show KPIs with context (targets, trends), and keep the visual encoding honest. Common elements: KPI cards, trend lines, bar comparisons, maps, and filtered detail tables.
+
+### Key Concepts
+
+#### 1. Dashboard Design Rules
+
+- <span class="badge">Good</span> One message per dashboard; 5-second rule (key insight visible immediately).
+- <span class="badge danger">Bad</span> 3D pie charts, dual axes with different scales, rainbow colours.
+- Always show comparison: vs target, vs prior period, or vs benchmark.
+
+#### 2. Chart Selection
+
+| Question | Chart |
+|----------|-------|
+| Trend over time | Line / area |
+| Compare categories | Bar (horizontal for long labels) |
+| Part of whole (few parts) | Stacked bar or donut |
+| Distribution | Histogram / box plot |
+| Geography | Choropleth map |
+
+#### 3. Interactivity
+
+- Global filters (year, region), drill from chart to detail, cross-highlighting.
+- Separate exploratory (analyst) from executive (static KPI) dashboards.
+
+### Example: KPI Query for a Dashboard
+
+```sql
+-- KPI: current vs previous month revenue + change %.
+WITH m AS (
+    SELECT d.year, d.month, SUM(f.amount_czk) AS revenue
+    FROM fact_sales f
+    JOIN dim_date d ON d.date_key = f.date_key
+    GROUP BY d.year, d.month
+)
+SELECT cur.year, cur.month, cur.revenue AS revenue_now,
+       prev.revenue AS revenue_prev,
+       ROUND(100.0 * (cur.revenue - prev.revenue) / NULLIF(prev.revenue, 0), 1) AS pct_change
+FROM m cur
+LEFT JOIN m prev
+  ON (prev.year * 12 + prev.month) = (cur.year * 12 + cur.month) - 1
+ORDER BY cur.year DESC, cur.month DESC
+LIMIT 6;
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Sketch a one-page sales dashboard: 3 KPI cards, 1 trend line, 1 bar chart, 1 detail table. For each element write the metric and its SQL source. Justify one chart choice.
+
+</div>
+
+---
+
+## Week 12: BI in Practice
+
+BI in practice means governed self-service: certified datasets, KPI definitions, refresh SLAs, row-level security, and adoption tracking. Technology matters less than trust in numbers.
+
+### Key Concepts
+
+#### 1. Governed Self-Service
+
+- IT owns certified models and refresh; business builds own reports on top.
+- Promotion path: personal → team → certified.
+
+#### 2. KPIs and SLAs
+
+- Each KPI has owner, definition, grain, refresh cadence, and target.
+- Monitor refresh jobs; alert on failure or stale data.
+
+#### 3. Security and Adoption
+
+- Row-level security (region managers see only their region).
+- Track usage: which dashboards are opened, which are stale — retire unused ones.
+
+### Example: Row-Level Security Pattern
+
+```sql
+-- Region managers see only their region (application predicate).
+CREATE VIEW v_sales_my_region AS
+SELECT f.*, r.region
+FROM fact_sales f
+JOIN dim_region r ON r.region_key = f.region_key
+WHERE r.region = CURRENT_SETTING('app.current_region');
+
+-- KPI with owner and target (documented alongside the view).
+COMMENT ON VIEW v_sales_my_region IS 'Owner: Sales Controlling. Refresh: daily 06:00. Target: +5% YoY.';
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Write a KPI card definition (name, formula, grain, refresh, owner, target) for "on-time delivery rate". Then describe who certifies it and how row-level security restricts it per warehouse.
+
+</div>
+
+---
+
+## Week 13: Data Mining in Practice
+
+Data mining finds patterns (segmentation, associations) and builds predictions (churn, demand) on top of the warehouse. Typical process: business goal → data prep → model → evaluate → deploy, with careful attention to data leakage and overfitting.
+
+### Key Concepts
+
+#### 1. Task Types
+
+| Task | Question | Example method |
+|------|----------|----------------|
+| Classification | Which class? | Decision tree, logistic regression |
+| Clustering | Which natural groups? | K-means |
+| Association | What goes together? | Apriori (market basket) |
+| Forecasting | How much next month? | Exponential smoothing, regression |
+
+#### 2. Process (CRISP-DM in Brief)
+
+1. Business understanding, 2. data understanding, 3. preparation, 4. modelling, 5. evaluation, 6. deployment.
+
+#### 3. Pitfalls
+
+- <span class="badge danger">Bad</span> Training on future data (leakage), judging by accuracy on imbalanced classes.
+- Always hold out a test set; prefer confusion matrix / lift over raw accuracy.
+
+### Example: Mining-Ready Mart + Scoring Sketch
+
+```sql
+-- Churn mart: one row per customer with behavioural features.
+CREATE VIEW v_churn_features AS
+SELECT c.customer_key,
+       COUNT(DISTINCT f.date_key) AS active_days_90d,
+       SUM(f.amount_czk)           AS revenue_90d,
+       MAX(d.full_date)            AS last_purchase
+FROM dim_customer_scd2 c
+LEFT JOIN fact_sales f ON f.customer_key = c.customer_sk
+LEFT JOIN dim_date d    ON d.date_key = f.date_key
+WHERE c.is_current
+GROUP BY c.customer_key;
+
+-- PostgreSQL-style scoring stub (illustrative):
+-- SELECT customer_key,
+--   (CASE WHEN revenue_90d < 500 AND active_days_90d < 3 THEN 'high-risk' ELSE 'ok' END) AS churn_band
+-- FROM v_churn_features;
+```
+
+### Exercise
+
+<div class="exercise-box">
+
+<strong>🎯 Task:</strong> Pick one mining task for a retail DWH (churn, basket analysis, or demand forecast). Define the target variable, 3 input features from the warehouse, and how you would evaluate the model.
+
+</div>
+
+---
+
+## Assignment Requirements
+
+### Semester Project
+
+<div class="exercise-box">
+
+<strong>📋 Project deliverables:</strong>
+
+| Part | Content |
+|------|---------|
+| **Model** | Star/snowflake schema DDL + grain statements |
+| **ETL** | Staging design, cleansing rules, load scripts or ODI mappings |
+| **Analysis** | 5+ SQL queries (ROLLUP/CUBE, drill paths) |
+| **Presentation** | 2 reports or 1 dashboard + 10-minute walkthrough |
+
+</div>
+
+### Submission Checklist
+
+<div class="checklist">
+
+- [ ] DDL scripts run without errors on a clean schema
+- [ ] Sample data loads reproducibly (full + incremental)
+- [ ] ROLLUP/CUBE queries return correct subtotals
+- [ ] Reports show certified metric definitions
+- [ ] README with build order and refresh instructions
+
+</div>
+
+---
+
+## Code Review Guide
+
+### What to Look For
+
+1. **Correctness** — grain respected, keys consistent, no fan-out in joins.
+2. **Completeness** — SCD handling, rejects quarantined, reconciliation counts.
+3. **Performance** — partitioning, indexes, aggregate strategy for large facts.
+4. **Readability** — named views, comments on business rules.
+
+<div class="review-note">
+
+<strong>🔍 Practice Review:</strong> A fact table joins to two dimensions but row counts triple. Likely causes: duplicate dimension keys, missing SCD filter (`is_current`), or a many-to-many join without a bridge table. Check `COUNT(*) GROUP BY key HAVING COUNT(*) > 1` on each dimension.
+
+</div>
+
+---
+
+## Exam Preparation
+
+### Key Topics to Review
+
+| Week | Topic | Key Concepts |
+|------|-------|--------------|
+| 1 | DWH intro | Inmon properties, blocks |
+| 2 | OLTP vs OLAP | Workloads, ETL vs ELT |
+| 3 | Architectures | Inmon vs Kimball, MOLAP/ROLAP |
+| 4 | Star/snowflake | Facts, dims, layers |
+| 5 | Methodology | Requirements, SCD |
+| 6 | ETL/ELT | CDC, cleansing, deployment |
+| 7 | OLAP | Slice, dice, drill |
+| 8 | CUBE/ROLLUP | Subtotals, GROUPING() |
+| 9 | ODI I | Topology, mappings |
+| 10 | ODI II + reporting | Scenarios, semantic model |
+| 11 | Visualisation | Dashboard rules |
+| 12 | BI practice | KPIs, governance |
+| 13 | Mining | Classification, clustering |
+
+### Practice Questions
+
+<div class="exercise-box">
+
+<strong>📝 Sample Exam Questions:</strong>
+
+1. Explain the four Inmon properties of a DWH.
+2. When is ELT preferable to ETL?
+3. Star vs snowflake: trade-offs?
+4. Write a `ROLLUP` query with labelled subtotals.
+5. Describe ODI topology (physical, logical, context).
+6. Name two dashboard design anti-patterns.
+
+</div>
+
+### Resources
+
+- Lecture slides and lab SQL scripts (MS Teams).
+- Oracle ODI documentation for topology and knowledge modules.
+- Sample datasets for the semester project.
+
+---
+
+## Quick Reference Cards
+
+### Analytical SQL
+
+```sql
+-- Subtotals and grand total
+SELECT a, b, SUM(m) FROM t GROUP BY ROLLUP (a, b);
+SELECT a, b, SUM(m) FROM t GROUP BY CUBE (a, b);
+SELECT a, SUM(m) FROM t GROUP BY GROUPING SETS ((a), ());
+
+-- Month-over-month change
+SELECT month, revenue,
+  revenue - LAG(revenue) OVER (ORDER BY month) AS delta
+FROM monthly_revenue;
+```
+
+### SCD Quick Table
+
+| Type | Behaviour | Keeps history? |
+|------|-----------|----------------|
+| 1 | Overwrite | No |
+| 2 | New row + dates | Yes |
+| 3 | Previous-value column | Limited |
+
+---
+
+*End of Course Documentation*
+
+**Last Updated:** 2026-09-20
+**Course Code:** KIT/NNDSK
