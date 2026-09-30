@@ -6,6 +6,464 @@ sidebar:
   order: 2
 ---
 
+# Partitioning do hloubky — Oracle Database 23ai (AI23)
+
+Navazuje na přehledový soubor `oracle-partitioning-23ai.md`. Zde je detailní rozbor:
+interní principy, syntaxe, rozhodovací kritéria, indexy, storage/ASM, operace,
+optimalizér, diagnostika a kompletní řešení úlohy `objednavky`.
+
+> Verze: Oracle AI Database 23ai. Dělení vyžaduje licenci **Partitioning option**.
+> Z pohledu SQL je dělená tabulka transparentní — bez změny aplikačního kódu.
+
+---
+
+## 1. Jak partitioning funguje uvnitř
+
+### 1.1 Logika směrování řádků
+1. Každý řádek je vyhodnocen vůči **partitioning key** (1–N sloupců, virtuální sloupec nebo v 23ai přímo **výraz**).
+2. Dle metody (RANGE/LIST/HASH/…) je určena cílová partition, u kompozitní tabulky pak i subpartition.
+3. `INSERT` do špatného oddílu nikdy „nepřeteče" — pokud neexistuje vyhovující oddíl, chyba `ORA-14400` (kromě INTERVAL / AUTOMATIC LIST, které oddíl založí, a LIST s `DEFAULT`).
+4. `UPDATE` měnící partitioning key přesune řádek mezi oddíly **jen pokud** je `ENABLE ROW MOVEMENT` (defaultně OFF při CREATE — nutno zapnout):
+   ```sql
+   ALTER TABLE objednavky ENABLE ROW MOVEMENT;
+   ```
+   Bez toho: `ORA-14402: updating partition key column would cause a partition-wise migration`.
+
+### 1.2 Fyzická struktura
+- Partition = samostatný **segment** (jako malá tabulka): vlastní extenty, `TABLESPACE`, `PCTFREE`, komprese, statistiky.
+- Subpartition = ještě jemnější segment uvnitř partition.
+- Lokální index = N segmentů 1:1 k oddílům. Globální nedělený index = 1 segment přes vše.
+- Slovníkové pohledy:
+  ```sql
+  SELECT * FROM user_part_tables;        -- metoda, interval, row movement
+  SELECT * FROM user_tab_partitions;     -- high_value, tablespace, rows, compression
+  SELECT * FROM user_tab_subpartitions;
+  SELECT * FROM user_part_key_columns;   -- partitioning key
+  SELECT * FROM user_ind_partitions;     -- indexové oddíly + status USABLE/UNUSABLE
+  ```
+
+### 1.3 Omezení (23ai)
+- Max cca 1 048 575 partitions na tabulku; všechny tablespaces oddílů stejný block size.
+- Nelze dělit tabulku s `LONG/LONG RAW` (použij LOB).
+- Partitioning key max 16 sloupců, datové typy až na pár výjimek libovolné.
+- `REFERENCE` vyžaduje aktivní (enabled + validated) PK na parentu a FK na childu, oba `NOT NULL` na FK straně; nefunguje s `DBMS_REDEFINITION` online redefinicí.
+- Hybridní/externí oddíly: jen `RANGE`/`LIST` (+ v 23ai `INTERVAL`/`AUTOLIST` pro hybrid), bez LOB/ADT, bez unique indexů, externí oddíly read-only.
+
+---
+
+## 2. Důvody dělení — detail a kdy NE-dělit
+
+### 2.1 Výkon — tři mechanismy
+1. **Partition pruning (největší efekt).** Optimalizér eliminuje oddíly už při parse (static) nebo za běhu (dynamic — bind proměnné, correlated subquery, nested-loop join klíč, star-schema bloom pruning). Ověření v plánu: `PARTITION RANGE SINGLE|ITERATOR|INLIST`, sloupce `PSTART/PSTOP`.
+2. **Partition-wise join.**
+   - *Full*: obě tabulky equipartitioned na join klíči (stejná metoda + stejný počet oddílů, nebo parent + reference child) → N nezávislých joinů, každý menší hash/sort v paměti.
+   - *Partial*: jen jedna strana dělená → paralelní slave si dynamicky filtruje oddíly (dynamic pruning).
+3. **Paralelní I/O a menší struktury.** Granule paralelismu = (sub)partition; lokální b-tree má mělčí hloubku než jeden globální strom přes 100M řádků; komprese starých oddílů šetří buffer cache.
+
+### 2.2 Správa (ILM/rolling window)
+Klasický vzor datového skladu:
+```
+ADD / INTERVAL vytvoří nový oddíl → EXCHANGE nahraje dávku → starý oddíl DROP / zkomprimuj / přesuň / archivuj
+```
+- Statistiky po oddílech (`DBMS_STATS.GATHER_TABLE_STATS(..., granularity=>'APPROX_GLOBAL AND PARTITION')`) — po loadu stačí sesbírat jen nový oddíl.
+- Záloha po tablespaces (`BACKUP TABLESPACE ts_ord_cold_2024`), `READ ONLY` tablespace pro historii = zálohuj jednou.
+- ADO/ILM politiky: `ALTER TABLE ... MODIFY PARTITION ... COMPRESS FOR ARCHIVE READ ONLY` po 12 měsících, případně přesun do hybridního externího oddílu (Object Storage).
+
+### 2.3 Dostupnost
+- Oddíl v nedostupném tablespace (`OFFLINE`, poškozený datafile) nezablokuje DML/SELECT na ostatní oddíly — pokud plán nepotřebuje chybějící oddíl.
+- Recovery prioritizuje `ts_hot` (systém je částečně online dřív).
+- Online DDL v 23ai/19c: `MOVE/SPLIT/MERGE ... ONLINE` + `UPDATE INDEXES` minimalizuje zamykání.
+
+### 2.4 Kdy nedělit
+- Malé tabulky (< cca 2 GB) bez historického růstu — režie slovníku a plánů převáží.
+- Přístup výhradně přes PK lookup bez filtrování dle data — přínos malý, globální unique index stejně nutný.
+- Extrémní počet malých oddílů (tisíce prázdných denních oddílů) — zpomaluje parse, zvyšuje počet segmentů. Lepší měsíční interval + kompozitní subpartitions.
+
+---
+
+## 3. Typy dělení — detail, syntaxe, volba
+
+### 3.1 RANGE — rozsahy, základ časových řad
+```sql
+CREATE TABLE mereni (
+  id NUMBER, datum DATE NOT NULL, hodnota NUMBER
+)
+PARTITION BY RANGE (datum) (
+  PARTITION p2025q1 VALUES LESS THAN (DATE '2025-04-01') TABLESPACE ts_hot,
+  PARTITION p2025q2 VALUES LESS THAN (DATE '2025-07-01') TABLESPACE ts_hot,
+  PARTITION pmax    VALUES LESS THAN (MAXVALUE)          TABLESPACE ts_hot
+);
+```
+- Každý oddíl (kromě prvního) má implicitní dolní mez z předchozího `LESS THAN`.
+- `MAXVALUE` zachytí vše včetně `NULL` (NULL se řadí jako „nekonečno" u RANGE — pozor, `NULL` datum padne do `pmax`!).
+- Multi-column range: `PARTITION BY RANGE (region_id, datum)` — lexikografické porovnání.
+- **Benefity:** přirozený purge, pruning na `=, BETWEEN, <, >`; **nevýhoda:** nutná údržba hranic → řeší INTERVAL.
+
+### 3.2 LIST — explicitní výčty
+```sql
+CREATE TABLE prodeje_region (
+  id NUMBER, region VARCHAR2(20), castka NUMBER
+)
+PARTITION BY LIST (region) (
+  PARTITION p_vychod VALUES ('NY','VA','FL'),
+  PARTITION p_zapad  VALUES ('CA','OR','WA'),
+  PARTITION p_def    VALUES (DEFAULT)
+);
+```
+- Bez `DEFAULT` → `ORA-14400` při neznámé hodnotě. `DEFAULT` zachytí i `NULL` (na rozdíl od RANGE je NULL explicitní hodnota listu).
+- Multi-column list v 23ai možný: `PARTITION BY LIST (zeme, kanal)`.
+- **Benefity:** plná kontrola, seskupení nesouvisejících hodnot, pruning na `= / IN`. **Nevýhoda:** každá nová hodnota = DDL → řeší AUTOMATIC LIST.
+
+### 3.3 AUTOMATIC LIST — samoškálující list
+```sql
+CREATE TABLE prodeje_auto (
+  id NUMBER, obchod_id NUMBER, castka NUMBER
+)
+PARTITION BY LIST (obchod_id) AUTOMATIC (
+  PARTITION p_init VALUES (1, 2, 3)
+);
+```
+- Nová hodnota při INSERTu automaticky založí oddíl (pojmenuje ho Oracle, např. `SYS_P12345` — lze přejmenovat `RENAME PARTITION FOR (99) TO p_obchod_99`).
+- V 23ai podporováno i pro hybridní tabulky.
+- **Benefity:** nulová údržba dimenze, žádný `ORA-14400`. **Rizika:** divoký růst (vysoká kardinalita = tisíce oddílů), každý oddíl = segment — hlídat `user_tab_partitions` a případně přejít na HASH.
+
+### 3.4 HASH — rovnoměrnost
+```sql
+CREATE TABLE zakaznici_h ( id NUMBER PRIMARY KEY, jmeno VARCHAR2(100) )
+PARTITION BY HASH (id) PARTITIONS 8 STORE IN (ts1, ts2, ts3, ts4);
+-- nebo explicitně: (PARTITION h1 TABLESPACE ts1, PARTITION h2 TABLESPACE ts2, ...)
+```
+- Počet oddílů = mocnina 2 pro rovnoměrnost (2,4,8,16…). Hash funkci nelze změnit ani ovlivnit.
+- Pruning jen na rovnost (`WHERE id = :x` → 1 oddíl; `WHERE id BETWEEN` → všechny).
+- **Benefity:** žádný hotspot, rovnoměrné full scany pro paralelismus, jednoduchost. **Nevýhoda:** žádný rolling window, purge jen mazáním řádků.
+
+### 3.5 INTERVAL — automatický kalendář (rozšíření RANGE)
+```sql
+CREATE TABLE objednavky_i (
+  id NUMBER, datum_objednavky DATE NOT NULL, castka NUMBER
+)
+PARTITION BY RANGE (datum_objednavky)
+INTERVAL (NUMTOYMINTERVAL(1,'MONTH'))       -- nebo NUMTODSINTERVAL(1,'DAY'), číslo 1000, ...
+(PARTITION p_start VALUES LESS THAN (DATE '2024-01-01'));
+```
+- Musí existovat aspoň 1 range oddíl = **transition point**; vše za ním zakládá Oracle automaticky s deterministickými hranicemi (spodní = horní předchozího, i když mezilehlé oddíly fyzicky neexistují).
+- `PARTITION FOR (DATE '2026-05-15')` syntaxe odkazuje na oddíl bez znalosti jména — ideální pro údržbu.
+- Interval lze definovat i na čísle (`INTERVAL (10000)`).
+- Kompozitní varianty: `INTERVAL-RANGE / INTERVAL-HASH / INTERVAL-LIST`.
+- **Benefity:** konec plánování „založ měsíční oddíly"; **pozor:** nelze `MERGE` interval oddílů zpětně na libovolné hranice bez převodu na RANGE (`SET INTERVAL ()`), jména generuje systém.
+
+### 3.6 REFERENCE — dědění přes FK
+```sql
+CREATE TABLE orders (
+  order_id NUMBER PRIMARY KEY, order_date DATE NOT NULL
+)
+PARTITION BY RANGE (order_date)
+INTERVAL (NUMTOYMINTERVAL(1,'MONTH'))
+(PARTITION p0 VALUES LESS THAN (DATE '2024-01-01'));
+
+CREATE TABLE order_items (
+  item_id NUMBER PRIMARY KEY,
+  order_id NUMBER NOT NULL,
+  CONSTRAINT fk_oi FOREIGN KEY (order_id) REFERENCES orders(order_id)
+)
+PARTITION BY REFERENCE (fk_oi);
+```
+- Child **nesmí** mít vlastní partitioning key — dědí granularitu parentu 1:1 (včetně intervalového růstu).
+- DDL na parentu (`DROP/SPLIT/MERGE/ADD/TRUNCATE/EXCHANGE`) se kaskáduje na child — jedna operace udržuje konzistenci.
+- **Benefity:** žádná duplikace `order_date` v childu, partition-wise join zdarma, jednodušší ETL. **Podmínky:** PK+FK enabled/validated, FK sloupec `NOT NULL`; některé operace (online redefinice) nepodporovány.
+
+### 3.7 Kompozitní — dvě dimenze
+```sql
+CREATE TABLE prodeje_komp (
+  datum DATE NOT NULL, kanal VARCHAR2(10), castka NUMBER
+)
+PARTITION BY RANGE (datum)
+SUBPARTITION BY LIST (kanal)
+SUBPARTITION TEMPLATE (
+  SUBPARTITION s_web   VALUES ('WEB'),
+  SUBPARTITION s_shop  VALUES ('SHOP'),
+  SUBPARTITION s_other VALUES (DEFAULT)
+)
+(PARTITION p2026_01 VALUES LESS THAN (DATE '2026-02-01'),
+ PARTITION p2026_02 VALUES LESS THAN (DATE '2026-03-01'));
+```
+- Kombinace: Range/Hash/List × Range/Hash/List + Interval-* varianty. `SUBPARTITION TEMPLATE` zajišťuje stejné suboddíly pro budoucí (intervalové) oddíly.
+- Typické volby: `RANGE-HASH` (čas + striping), `RANGE-LIST` (čas + kanál/region), `LIST-RANGE` (tenant + čas), `HASH-HASH` (dva join klíče pro full partition-wise join ve 2 dimenzích).
+- **Benefity:** pruning ve 2 dimenzích, jemný ILM (komprimuj jen `p2024_* / s_web`), vyšší paralelismus. **Cena:** více segmentů → rozumná granularita (měsíc × jednotky suboddílů, ne den × stovky).
+
+### 3.8 Ostatní (23ai)
+- **Partition by expression / virtual column:** klíč = výraz bez ručního sloupce:
+  ```sql
+  CREATE TABLE t (a NUMBER, b NUMBER)
+  PARTITION BY RANGE (a + b) (PARTITION p1 VALUES LESS THAN (100), PARTITION pmax VALUES LESS THAN (MAXVALUE));
+  ```
+  (Oracle založí skrytý virtuální sloupec.)
+- **System partitioning:** placement řídí aplikace (`INSERT INTO t PARTITION (p1) ...`), Oracle nekontroluje.
+- **Hybrid partitioned:** interní + externí oddíly (Data Pump/Parquet/ORC/CSV na Object Storage/HDFS/Kafka); stará data levně, stále dotazovatelná jedním SQL.
+
+**Jak vybrat (rozhodovací strom):**
+1. Historie + purge dle času? → **RANGE / INTERVAL**.
+2. Diskrétní dimenze s kontrolou? → **LIST** (stabilní) / **AUTOMATIC LIST** (rostoucí).
+3. Rovnoměrnost bez klíče? → **HASH**.
+4. Master-detail? → **REFERENCE** na childu.
+5. Dvě filtrovací dimenze? → **kompozitní** nad výše zvoleným.
+
+---
+
+## 4. Indexy — lokální vs. globální do hloubky
+
+### 4.1 Lokální (default volba)
+```sql
+CREATE INDEX ix_obj_datum ON objednavky (datum_objednavky) LOCAL;
+-- jen některé oddíly indexovat (partial):
+CREATE INDEX ix_obj_status ON objednavky (status) LOCAL INDEXING PARTIAL;
+ALTER TABLE objednavky MODIFY PARTITION p2024_01 INDEXING OFF;
+```
+- **Prefixed** (první sloupec indexu = partitioning key) → optimální pruning. **Non-prefixed** lokální také prunuje, ale může sondovat více indexových oddílů.
+- DDL oddílu (`DROP/TRUNCATE/EXCHANGE`) ovlivní jen vlastní indexový oddíl.
+- **Partial indexing:** index existuje jen na oddílech s `INDEXING ON` — šetří místo/údržbu u archivu.
+
+### 4.2 Globální
+```sql
+-- nedělený (celá tabulka = 1 segment)
+CREATE UNIQUE INDEX ux_obj_id ON objednavky (id) GLOBAL;
+-- dělený na jiném klíči (např. hash pro rozprostření hotspotu rostoucí sekvence)
+CREATE UNIQUE INDEX ux_obj_id_h ON objednavky (id) GLOBAL
+  PARTITION BY HASH (id) PARTITIONS 16;
+```
+- Jediná cesta pro **unique/PK bez partitioning key** v klíči (lokální unique vyžaduje partitioning key v indexu).
+- Bodové lookups mimo partitioning key jsou rychlé, ale full scan globálního indexu = přes vše.
+- **Údržba:** každé `DROP/TRUNCATE/EXCHANGE/SPLIT/MERGE/MOVE` oddílu tabulky bez klauzule znamená `UNUSABLE` globální index (historicky). Vždy:
+  ```sql
+  ALTER TABLE objednavky DROP PARTITION p_old UPDATE GLOBAL INDEXES;
+  -- nebo UPDATE INDEXES u EXCHANGE/SPLIT/MERGE/MOVE
+  ```
+  Moderní Oracle umí údržbu odložit/asynchronně doběhnout, ale plánuj okno a monitoring `user_ind_partitions.status`.
+- Rostoucí klíč (sekvence zprava) → hotspot v pravém listu globálního stromu; řešení: hash-dělený globální index nebo `REVERSE` key.
+
+### 4.3 Srovnání a doporučení
+| Aspekt | Lokální | Globální (ne)dělený |
+|---|---|---|
+| Pruning | ano | ne (vlastní dělení jen částečně) |
+| DDL oddílu | izolované | vyžaduje `UPDATE GLOBAL INDEXES` |
+| Unique bez part. klíče | nelze | lze |
+| Přístup mimo part. klíč | sondy do N oddílů | 1 struktura |
+| Skew rostoucího klíče | nevadí | hotspot → hash/reverse |
+
+**Pravidlo:** vše lokálně, co jde; globálně jen unikátnost a cesty mimo partitioning key. Nikdy nenechávej globální index `UNUSABLE` — monitoruj po každém DDL.
+
+---
+
+## 5. Storage: oddíl → tablespace → disk → ASM
+
+### 5.1 Proč vlastní tablespace na oddíl
+```sql
+CREATE TABLESPACE ts_hot  DATAFILE '+DATA_HIGH' SIZE 20G AUTOEXTEND ON NEXT 1G;
+CREATE TABLESPACE ts_cold DATAFILE '+DATA_LOW'  SIZE 50G AUTOEXTEND ON NEXT 5G;
+
+CREATE TABLE doklady (
+  id NUMBER, datum DATE NOT NULL, dokument CLOB
+)
+PARTITION BY RANGE (datum) INTERVAL (NUMTOYMINTERVAL(1,'MONTH'))
+(PARTITION p0 VALUES LESS THAN (DATE '2024-01-01'))
+LOB (dokument) STORE AS BASICFILE (TABLESPACE ts_cold); -- LOB mimo hlavní segment
+```
+- **Tiering:** horké na NVMe/`+DATA_HIGH`, studené komprimované na `+DATA_LOW`, LOB zvlášť.
+- **Paralelismus:** datafiles na různých LUNech čtou paralelně.
+- **Životní cyklus:** `ALTER TABLE ... MOVE PARTITION p2024_01 TABLESPACE ts_cold COMPRESS FOR ARCHIVE READ ONLY;`
+- **Záloha/obnova:** `BACKUP TABLESPACE`, transportable tablespaces pro archiv, `READ ONLY` historii zálohuj jednou.
+
+### 5.2 ASM v kostce
+- Místo `/disk1/app/oracle/...dbf` stačí `'+DATA'` — ASM soubory **mirroruje** (normal/high redundancy) a **stripeuje** extenty přes všechny disky disk group → není třeba ručně rozhazovat datafiles.
+- Typický layout: `+DATA_HIGH` (SSD, horké oddíly), `+DATA_LOW` (HDD, archiv), `+RECO` (archivelogy/backup).
+- Partitioning + ASM se doplňují: partitioning = **logická** distribuce (co se čte), ASM = **fyzická** (jak je to rozloženo na discích).
+- Stále platí: stejný block size tablespaces pro všechny oddíly jednoho objektu; `ALTER TABLESPACE ... READ ONLY` funguje nad ASM stejně.
+
+---
+
+## 6. Operace s oddíly — syntaxe, zámky, indexy
+
+> Po každé operaci zkontroluj `user_ind_partitions.status` a dosbírej statistiky oddílu.
+
+| Operace | Syntaxe (příklad) | Chování / pozor |
+|---|---|---|
+| ADD | `ALTER TABLE t ADD PARTITION p3 VALUES LESS THAN (...) TABLESPACE ts;` | metadata-only, bez zámku dat; u INTERVAL/AUTOLIST není potřeba |
+| DROP | `ALTER TABLE t DROP PARTITION p1 UPDATE GLOBAL INDEXES;` | DDL purge bez undo; u REFERENCE se kaskáduje na child; segment se uvolní (nebo `... UPDATE INDEXES`) |
+| TRUNCATE | `ALTER TABLE t TRUNCATE PARTITION p1 UPDATE GLOBAL INDEXES;` | vyprázdní, strukturu nechá; nejrychlejší „smaz vše z měsíce" |
+| SPLIT | `ALTER TABLE t SPLIT PARTITION pmax AT (...) INTO (PARTITION a, PARTITION pmax) UPDATE INDEXES;` | rozdělení (často `pmax`/`DEFAULT`); přesun řádků = fyzická práce, plánuj okno; v 19c+ `ONLINE` varianta |
+| MERGE | `ALTER TABLE t MERGE PARTITIONS a,b INTO PARTITION ab UPDATE INDEXES;` | konsolidace denních→měsíční; snižuje počet segmentů |
+| EXCHANGE | `ALTER TABLE t EXCHANGE PARTITION p1 WITH TABLE stg WITHOUT VALIDATION UPDATE GLOBAL INDEXES;` | výměna segmentů ve slovníku (ms); staging musí mít stejnou strukturu (bez dělení), constrainty; `WITHOUT VALIDATION` = důvěra, jinak kontrola; ETL standard pro load i archivaci |
+| MOVE | `ALTER TABLE t MOVE PARTITION p1 TABLESPACE ts_cold COMPRESS FOR ARCHIVE UPDATE INDEXES;` | fyzický přesun/reorganizace + změna komprese; `ONLINE` minimalizuje blokování |
+| RENAME / MODIFY | `ALTER TABLE t RENAME PARTITION FOR (...) TO p_new;` / `MODIFY PARTITION ... READ ONLY` | přejmenování (i systémových `SYS_P*`), ILM atributy |
+
+**Staging pro EXCHANGE (vzor):**
+```sql
+CREATE TABLE stg_obj AS SELECT * FROM objednavky WHERE 1=0; -- stejné sloupce+typy
+-- naplň dávku, vybuduj indexy, pak:
+ALTER TABLE objednavky EXCHANGE PARTITION FOR (DATE '2026-06-15')
+  WITH TABLE stg_obj WITHOUT VALIDATION UPDATE GLOBAL INDEXES;
+-- konformitu lze ověřit: SELECT ORA_PARTITION_VALIDATION(rowid) FROM objednavky PARTITION FOR (...);
+```
+
+### Partition pruning — jak ho číst a vynutit
+- Filtr **musí** být na partitioning key (nebo join na equipartitioned klíč). Funkce nad klíčem (`TRUNC(datum)`) pruning zabije — řeší virtual-column/expression partitioning.
+- `EXPLAIN PLAN` + `DBMS_XPLAN.DISPLAY`:
+  - `PARTITION RANGE SINGLE` = 1 oddíl (ideál), `ITERATOR` = rozsah, `INLIST` = výčet, `ALL` = žádný pruning → zkontroluj predikát/typy (implicitní konverze `VARCHAR2` vs `DATE`!).
+- Bind proměnné → dynamic pruning (v plánu `KEY`/`KEY(I)` v PSTART/PSTOP) — stále efektivní.
+- Statistiky: po každém loadu `DBMS_STATS.GATHER_TABLE_STATS(..., partname=>'...')`, jinak optimalizér podcení pruning.
+
+### Partition-wise join — kdy nastane
+- Full: stejná metoda + stejný počet (sub)oddílů na join klíči, nebo REFERENCE child ↔ parent. V plánu `PARTITION HASH ... / PARTITION RANGE ...` u obou větví + `PX PARTITION HASH JOIN`.
+- Jinak se optimalizér pokusí aspoň o partial pruning. Ověřuj na reálných datech, ne „papírově".
+
+---
+
+## 7. Ukázka do hloubky: časová tabulka a měření vlivu
+
+### 7.1 Scénář
+`faktury_big`: 4 roky měsíčně = 48 oddílů, ~100M řádků. Reporty: (a) agregace 1 měsíce, (b) bodový lookup, (c) purge měsíce.
+
+```sql
+CREATE TABLE faktury_big (
+  id NUMBER GENERATED ALWAYS AS IDENTITY,
+  datum_vystaveni DATE NOT NULL,
+  zakaznik_id NUMBER NOT NULL,
+  castka NUMBER(12,2),
+  CONSTRAINT pk_fakt PRIMARY KEY (id)
+)
+PARTITION BY RANGE (datum_vystaveni)
+INTERVAL (NUMTOYMINTERVAL(1,'MONTH'))
+(PARTITION p_start VALUES LESS THAN (DATE '2022-01-01'));
+
+CREATE INDEX ix_fakt_datum ON faktury_big (datum_vystaveni) LOCAL;
+CREATE UNIQUE INDEX ux_fakt_id ON faktury_big (id) GLOBAL;
+ALTER TABLE faktury_big ENABLE ROW MOVEMENT;
+```
+
+### 7.2 Měření (metodika, ne „magická čísla")
+```sql
+SET AUTOTRACE TRACEONLY STATISTICS
+-- nebo: EXPLAIN PLAN FOR ...; SELECT * FROM TABLE(DBMS_XPLAN.DISPLAY_CURSOR);
+
+-- (a) Agregace měsíce: očekáváno PARTITION RANGE SINGLE, čte ~1/48 dat
+SELECT SUM(castka), COUNT(*) FROM faktury_big
+WHERE datum_vystaveni >= DATE '2026-01-01' AND datum_vystaveni < DATE '2026-02-01';
+
+-- (b) Mimo klíč: globální index, bez ohledu na datum
+SELECT * FROM faktury_big WHERE id = 12345678;
+
+-- (c) Purge: porovnej DELETE vs DROP
+-- DELETE FROM faktury_big WHERE datum_vystaveni < DATE '2022-02-01'; -- hodiny + undo
+ALTER TABLE faktury_big DROP PARTITION FOR (DATE '2022-01-15') UPDATE GLOBAL INDEXES; -- sekundy
+```
+Sleduj: `consistent gets / physical reads`, `PSTART/PSTOP`, čas, velikost čtených segmentů (`v$segment_statistics`). Typický výsledek na 100M řádcích: měsíční agregace full scan 100M (desítky s) vs. 1 oddíl ~2M (< 2 s); purge `DELETE` (hodiny) vs. `DROP` (sekundy).
+
+### 7.3 Proč to funguje
+Menší I/O (pruning) + mělčí lokální stromy + paralelizovatelné granule + partition-wise join s reference childu (`polozky`). Bez filtru na klíči se čtou všechny oddíly — proto je volba partitioning key = volba dominantního přístupu (zde datum).
+
+---
+
+## 8. Úkol — kompletní řešení: `objednavky` s tablespaces a purge
+
+**Požadavky:** růst v čase, reporty dle data, tiering hot/cold, rychlé odstranění nejstarších dat, child `polozky_objednavek`.
+
+```sql
+-- 8.1 Storage (ASM)
+CREATE TABLESPACE ts_ord_hot_2026q1 DATAFILE '+DATA_HIGH' SIZE 20G AUTOEXTEND ON NEXT 1G;
+CREATE TABLESPACE ts_ord_cold_2024  DATAFILE '+DATA_LOW'  SIZE 50G AUTOEXTEND ON NEXT 5G;
+-- historické tablespaces po naplnění: ALTER TABLESPACE ts_ord_cold_2024 READ ONLY;
+
+-- 8.2 Parent: RANGE + INTERVAL měsíčně, default pro nové oddíly = hot
+CREATE TABLE objednavky (
+  id NUMBER GENERATED ALWAYS AS IDENTITY,
+  datum_objednavky DATE NOT NULL,
+  zakaznik_id NUMBER NOT NULL,
+  status VARCHAR2(20),
+  castka NUMBER(12,2),
+  CONSTRAINT pk_obj PRIMARY KEY (id)
+)
+PARTITION BY RANGE (datum_objednavky)
+INTERVAL (NUMTOYMINTERVAL(1,'MONTH'))
+(
+  PARTITION p2024_01 VALUES LESS THAN (DATE '2024-02-01') TABLESPACE ts_ord_cold_2024,
+  PARTITION p2024_02 VALUES LESS THAN (DATE '2024-03-01') TABLESPACE ts_ord_cold_2024
+);
+ALTER TABLE objednavky MODIFY DEFAULT ATTRIBUTES TABLESPACE ts_ord_hot_2026q1;
+ALTER TABLE objednavky ENABLE ROW MOVEMENT;
+
+-- 8.3 Indexy: lokální pro reporty, globální pro unikátnost
+CREATE INDEX ix_obj_datum ON objednavky (datum_objednavky) LOCAL;
+CREATE UNIQUE INDEX ux_obj_id ON objednavky (id) GLOBAL;
+
+-- 8.4 Child dědí distribuci
+CREATE TABLE polozky_objednavek (
+  polozka_id NUMBER,
+  objednavka_id NUMBER NOT NULL,
+  produkt_id NUMBER, mnozstvi NUMBER, cena NUMBER(12,2),
+  CONSTRAINT pk_pol PRIMARY KEY (polozka_id),
+  CONSTRAINT fk_pol_obj FOREIGN KEY (objednavka_id) REFERENCES objednavky(id)
+)
+PARTITION BY REFERENCE (fk_pol_obj);
+
+-- 8.5 ILM: staré oddíly zkomprimuj a přesuň na cold (plánovaná úloha 1× měsíčně)
+ALTER TABLE objednavky MOVE PARTITION FOR (DATE '2024-03-15')
+  TABLESPACE ts_ord_cold_2024 COMPRESS FOR ARCHIVE UPDATE INDEXES;
+-- volitelně: ALTER TABLE objednavky MODIFY PARTITION FOR (DATE '2024-03-15') READ ONLY;
+
+-- 8.6 Load nové dávky výměnou (bez blokování historie)
+CREATE TABLE stg_obj AS SELECT * FROM objednavky WHERE 1=0;
+-- ... naplň stg_obj dávkou za 06/2026, vybuduj indexy ...
+ALTER TABLE objednavky EXCHANGE PARTITION FOR (DATE '2026-06-15')
+  WITH TABLE stg_obj WITHOUT VALIDATION UPDATE GLOBAL INDEXES;
+
+-- 8.7 Purge nejstarších dat (zdarma kaskáda na child díky REFERENCE)
+-- varianta A: prostý DROP (nejrychlejší)
+ALTER TABLE objednavky DROP PARTITION FOR (DATE '2024-01-15') UPDATE GLOBAL INDEXES;
+-- varianta B: archivace před smazáním
+-- ALTER TABLE objednavky EXCHANGE PARTITION FOR (DATE '2024-01-15')
+--   WITH TABLE archiv_2024_01 WITHOUT VALIDATION UPDATE GLOBAL INDEXES;
+
+-- 8.8 Údržba po DDL (vždy!)
+BEGIN
+  DBMS_STATS.GATHER_TABLE_STATS(USER, 'OBJEDNAVKY',
+    granularity => 'APPROX_GLOBAL AND PARTITION');
+END;
+/
+SELECT index_name, partition_name, status FROM user_ind_partitions
+WHERE index_name IN ('IX_OBJ_DATUM','UX_OBJ_ID');
+
+-- 8.9 Verifikace
+SELECT partition_name, tablespace_name, high_value, num_rows, compression
+FROM user_tab_partitions WHERE table_name='OBJEDNAVKY' ORDER BY partition_position;
+EXPLAIN PLAN FOR
+  SELECT SUM(castka) FROM objednavky WHERE datum_objednavky >= DATE '2026-05-01'
+    AND datum_objednavky < DATE '2026-06-01';
+SELECT * FROM TABLE(DBMS_XPLAN.DISPLAY); -- PARTITION RANGE SINGLE
+```
+
+**Proč tento návrh:**
+- **INTERVAL měsíčně** = nulová údržba kalendáře, deterministické hranice, `PARTITION FOR (date)` bez znalosti jmen.
+- **Hot/cold tablespaces + ASM** = rychlé reporty nad novým, levný archiv, nezávislá záloha/obnova, `READ ONLY` historie.
+- **REFERENCE child** = bez duplikace data, kaskádový DROP, partition-wise joiny.
+- **Lokální + globální index** = pruning + unikátnost; každé DDL s `UPDATE GLOBAL INDEXES` + kontrola `USABLE`.
+- **EXCHANGE/DROP místo DML** = load/purge v sekundách, minimální undo/redo a zamykání.
+- **Kompozitní rozšíření** (volitelné): pokud přibudou filtry dle `status`/`region`, přidej `SUBPARTITION BY LIST` — pruning ve 2 dimenzích bez změny návrhu.
+
+---
+
+## 9. Kontrolní seznam pro produkci
+
+1. Partitioning key = dominantní filtr/purge klíč (zde datum).
+2. `ENABLE ROW MOVEMENT`, default tablespace pro nové oddíly, `SUBPARTITION TEMPLATE` u kompozit.
+3. Každé DDL s `UPDATE GLOBAL INDEXES`; kontrola `user_ind_partitions.status = USABLE`.
+4. Statistiky po oddílech po každém loadu/purge.
+5. Monitoring růstu (`user_tab_partitions.num_rows`, počet oddílů u AUTOLIST/INTERVAL).
+6. ILM job: compress → move to cold → read-only → drop/exchange po retenci.
+7. Plány ověřeny (`PSTART/PSTOP`, pruning, partition-wise join), ne „od stolu".
+
+
+
+
 ## Database Administration and Development on the Oracle Platform (KST/NNADS) — My Notes
 
 Personal notebook for **Database Administration and Development on the Oracle Platform (KST/NNADS)**. This page is a plain MDX file stored in the
@@ -20,6 +478,7 @@ are versioned and never lost.
 - Takeaway 2
 
 ## Lecture log
+
 
 ### Week 1
 

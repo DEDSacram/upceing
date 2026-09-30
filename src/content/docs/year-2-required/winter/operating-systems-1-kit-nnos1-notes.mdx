@@ -23,7 +23,41 @@ are versioned and never lost.
 
 ### Week 1
 
-Notes…
+Zapocet je za ulohy delane v prubehu semestru. Pokud jsou udelane vsechny zkouska je uznana
+Prezence se nekontroluje
+
+Zisk zápočtu je podmíněn včasným odevzdáním řešení praktických úloh zadaných na cvičeních dle pokynů a splněním podmínek odevzdání. Úlohy jsou hodnoceny body, které se počítají do celkového hodnocení u zkoušky. Pro udělení zápočtu je třeba získat alespoň 50 % bodů ze zadaných úloh.
+
+Pokud v den zkoušky ještě nejsou vyhodnocené všechny úlohy, je podmínkou připuštění ke zkoušce zisk alespoň 40 % bodů za dosud vyhodnocené úlohy; to znamená, že je možné se na termín zkoušky přihlásit, i když ještě není jasné, zda bude zápočet získán.
+
+Během cvičení v půběhu semestru mohou být zadávány drobné úkoly, jejichž úspěšné splnění může vést k získání bonusových bodů započítávaných do hodnocení zkoušky.
+
+
+Podmínkou připuštění ke zkoušce je zisk zápočtu. Body získané za úlohy se počítají do hodnocení zkoušky.
+
+Při zkoušení se klade důraz na porozumění tématu, prosté odpovědi bez zdůvodnění obvykle nejsou bodovány.
+
+Zkouška se skládá ze dvou částí:
+
+    Písemný test na PC
+        Jedná se o napsání či úpravu jednoduchého programu, který je variací na příklady ze cvičení a který je hodnocen podle obtížnosti – obvykle 10 body.
+        Během testu je možné používat vlastní vyřešené úlohy ze cvičení a vzorové úlohy.
+        Pro syntaxi systémových volání a knihovních funkcí lze používat manuálové stránky (lze je vyhledávat i na internetu).
+    Test teoretických znalostí dle vytyčených okruhů
+        Zkouška zahrnuje jedno hlavní téma vyberané z níže uvedených okruhů
+        a čtyři témata všeobecného přehledu.
+        Forma testu je obvykle ústní, případně kombinace ústní a písemná (na PC, výjimečně na papír).
+            Písemná forma v podstatě nemá časové omezení, tj. dokud mají studenti co relevantního psát, mohou tak činit. (Obvykle bohatě stačí 60 minut na PC nebo 30 minut na papír).
+            Při vyhodnocování písemné části mohou být studenti vyzváni k objasnění (např. z důvodu nečitelného textu).
+            Ústní forma zkoušení je obvykle časově omezená:
+            Příprava: 20 min. Příprava probíhá individuálně, lze použít prázdný papír na poznámky.
+            Zkoušení: 20 min. Chtějí‑li studenti dobu zkoušení překročit, je možné přidat až čtvrtinu času navíc přičemž se ale snižuje maximální bodový zisk: za každou (započatou) minutu navíc o dva body.
+            Proto je vhodné začít při zkoušení tím, co studenti ovládají. V případě, že studenti nedokážou odpovědět na otázku zkoušejícího, je ze stejného důvodu vhodné se nezdržovat, přiznat neznalost a přejít k dalšímu tématu. K zodpovězení otázky je možné se v rámci časového limitu zkoušení vrátit.
+        Hlavní téma je hodnoceno maximálně 20 body. Přehledová témata jsou hodnocena 5 body (za každé). Celkem lze tedy v teoretické části získat 40 bodů.
+        Hodnocení každého tématu je graduální, tj. pokud není vysvětlen princip, nelze získat body za další výklad.
+        Příklad pro okruh stránkování paměti:
+        Bez vysvětlení principu stránkování nelze získat body za převod adresy, vlastnosti, sdílení.
+
 
 ## Exam tips
 
@@ -31,8 +65,25 @@ Notes…
 
 ## Questions to revisit
 
-- [ ] Open question 1
+Vlákna: Procesy a vlákna, společné a samostatné položky. Motivace zavedení vláken, výhody, nevýhody. Možnosti implementace vláken. Posixová vlákna: co nabízí knihovna posixových vláken (pro řešení problémů souběhu). Nevýhody používání (posixových) vláken, problémy: předávání parametrů a návratových hodnot.
+Plánování: Plánovací algoritmy včetně plánování na systémech reálného času, plánování v unixových systémech a v Linuxu. Plánování vláken na SMP.
+Stránkování: Virtualizace paměti, vlastnosti stránkování (včetně sdílení), velikost stránky, víceúrovňové stránkové seznamy, režimy PAE a IA‑32e.
+Stránkové algoritmy: Stránkové strategie, vliv volby velikosti resident set, převod lineární adresy na fyzickou.
+Segmentace: Princip segmentace, způsob alokace paměti, výhody a nevýhody. Převod adresy. Architektura IA‑32 a modely segmentace. Kombinace se stránkováním.
+IPC: Problémy souběhu, metody řešení vstupu do kritické sekce, synchronizace, IPC (fronty zpráv, sdílení paměti, semafory), implementace semaforů.
+Design OS a zabezpečení: Vlastnosti moderního OS a související požadavky na HW. Důvody náročnosti implementace OS, principy vývoje. Zabezpečení a typy útoků na OS, zásady tvorby hesel. 
+
+1 asymetrické šifrování   1 autentizace a autorizace, jak volit heslo   1 bankéřův algoritmus, definice bezpečného stavu   1 buffer overflow   2 (Coffmanovy) nutné podmínky pro vznik uváznutí   2 (D)DoS   2 deadlock (definice) a možnosti jeho řešení   2 DMA   3 dynamická alokace paměti   3 elektronický podpis   3 fáze provádění instrukce   3 granularita úlohy   4 HW metody ošetření KS   4 koncept monitoru   4 kritická sekce: definice a podmínky pro řešení   4 latence a odezva   5 login spoofing   5 lokalita odkazů   5 metoda umožňující spustit proces větší než dostupná RAM (jiná než swap)   5 mikrojádro   6 optimalizace fork()   6 posixové signály   6 požadavky OS na HW   6 princip paměti cache a střední přístupová doba do paměti   7 problém (pěti) obědvajících filozofů   7 průběh systémového volání   7 přepínání kontextu   7 rozdělení MP systémů (dle vazby a symetrie)   8 rozdělení systémů RT   8 sockety   8 statické (pevné) dělení paměti   8 SW metody ošetření KS   9 thrashing   9 TLB   9 vestavěné systémy: definice a typické vlastnosti   9 vnější a vnitřní fragmentace paměti   10 vylepšení metod alokace paměti   10 vznik a zánik procesu + systémová volání   10 způsoby zvyšování výkonu CPU   10 3stavový model 
 
 ## Links & resources
+Tanen baum A Modern operating systems ed 3.
+
+INtel 64 and I32 systems developers manual memory paging
+
+POSIX norma opengroup specification
+
+
+
+
 
 - [Resource](https://example.com)
