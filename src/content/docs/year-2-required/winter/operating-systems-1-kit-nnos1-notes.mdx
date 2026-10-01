@@ -75,6 +75,37 @@ Design OS a zabezpečení: Vlastnosti moderního OS a související požadavky n
 
 1 asymetrické šifrování   1 autentizace a autorizace, jak volit heslo   1 bankéřův algoritmus, definice bezpečného stavu   1 buffer overflow   2 (Coffmanovy) nutné podmínky pro vznik uváznutí   2 (D)DoS   2 deadlock (definice) a možnosti jeho řešení   2 DMA   3 dynamická alokace paměti   3 elektronický podpis   3 fáze provádění instrukce   3 granularita úlohy   4 HW metody ošetření KS   4 koncept monitoru   4 kritická sekce: definice a podmínky pro řešení   4 latence a odezva   5 login spoofing   5 lokalita odkazů   5 metoda umožňující spustit proces větší než dostupná RAM (jiná než swap)   5 mikrojádro   6 optimalizace fork()   6 posixové signály   6 požadavky OS na HW   6 princip paměti cache a střední přístupová doba do paměti   7 problém (pěti) obědvajících filozofů   7 průběh systémového volání   7 přepínání kontextu   7 rozdělení MP systémů (dle vazby a symetrie)   8 rozdělení systémů RT   8 sockety   8 statické (pevné) dělení paměti   8 SW metody ošetření KS   9 thrashing   9 TLB   9 vestavěné systémy: definice a typické vlastnosti   9 vnější a vnitřní fragmentace paměti   10 vylepšení metod alokace paměti   10 vznik a zánik procesu + systémová volání   10 způsoby zvyšování výkonu CPU   10 3stavový model 
 
+Tri stavovy model procesu
+Tri systemove signaly ke zkousce
+SIGTERM
+SIGINT
+SIGQUIT to get coredump
+CTRL + Z TERMINALSTOP
+SIGKILL NELZE zachytit ani ignorovat
+SIGSTOP NELZE zachytit ani ignorovat
+
+Jaka je motivace zavedeni vlaken, procesy dlouho cekaly. jedno vlakno cekalo na vstup
+moznost vytvoreni vice vlaken, aby procesor nestal, rozdil oproti procesu proces si musi prealokovat pamet
+vlakno toto nepotrebuje
+Pri zeptani na vlakna bude ocekavano vysvelteni proc kazde vlakno musis mit vlastni stack pthread_create je az 50x rychlejsi nez fork (kopie celeho procesu)
+reentrantni volani muze byt zavolane vicekrat soucasne,
+nereentrantni globalni promene, compiler ma moznost vyuzit malloc s reentrantni moznosti
+
+pri spousteni programu bez cesty se prvni prohledavaji
+aliasy
+pote funkce
+pote vnitrni funkce shellu
+potom az soubory na disku
+
+cviceni kompilace s varovanim
+minusove body za varovani na cvicenich pri odevzdavani
+
+flag static zakomponuje knihovny do komp. programu
+bez vyuziva uvedenou cestu k nalezeni po linku
+
+pri pridane ceste se spusti jen co je v uvedene ceste
+
+zaklady makefilu
 ## Links & resources
 Tanen baum A Modern operating systems ed 3.
 
